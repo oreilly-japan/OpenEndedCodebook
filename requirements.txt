@@ -1,0 +1,4 @@
+neat-python == 0.92
+matplotlib == 3.0.3
+graphviz == 0.14.2
+numpy == 1.18.5
