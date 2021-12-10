@@ -28,10 +28,13 @@ import random
 import argparse
 import os
 
+import matplotlib
+matplotlib.use('TkAgg')
 import graphviz
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-import matplotlib.patches as mpatches
+import matplotlib.patches as patches
+
 import numpy as np
 
 import geometry
@@ -299,6 +302,7 @@ def draw_maze_records(maze_env, records, best_threshold=0.8, filename=None, view
 
     plt.close()
 
+
 def _draw_species_(records, sid, colors, ax):
     """
     The function to draw specific species from the records with
@@ -371,3 +375,72 @@ if __name__ == '__main__':
                       view=True,
                       show_axes=args.show_axes,
                       filename=args.output)
+
+
+class ProgressDrawer():
+    def __init__(self,maze_env,width=400,height=400,fig_height=6,max_generation=500,show_axes=False):
+        self.maze_env = maze_env
+        self.width = width
+        self.height = height
+        self.fig_height = fig_height
+        self.fig_width = fig_height * (float(width)/float(height )) - 0.2
+        self.max_generation = max_generation
+        self.show_axes = show_axes
+        self.fig = None
+        self.ax = None
+        self.best_fitness = None
+        self.best_path = None
+        self.best_genome = None
+        self.update_in_generation = False
+
+    def initialize_figure(self):
+        self.fig,self.ax = plt.subplots()
+        self.fig.set_dpi(100)
+        self.fig.set_size_inches(self.fig_width,self.fig_height)
+
+        self.ax.set_xlim(0, self.width)
+        self.ax.set_ylim(0, self.height)
+
+        self.ax.invert_yaxis()
+
+
+    def update_best(self,genome,fitness):
+        if self.best_genome is None or fitness>self.best_fitness:
+            self.best_fitness = fitness
+            self.best_genome = genome
+            self.update_in_generation = True
+
+    def set_path(self,path):
+        self.best_path = path
+
+    def draw(self,generation,archives,current_items,filename=None):
+        self.ax.set_title('Generation : %d , best Genome ID: %s' % (generation,self.best_genome.key))
+
+        for p in self.best_path:
+            circle = plt.Circle((p.x, p.y), 1.0, facecolor='orange',alpha=0.7)
+            self.ax.add_patch(circle)
+
+        for item in archives:
+            circle = plt.Circle((item.data[0],item.data[1]),1.3,facecolor='b',alpha=0.7)
+            self.ax.add_patch(circle)
+
+        for item in current_items:
+            circle = plt.Circle((item.data[0],item.data[1]), 0.8, facecolor='gray',alpha=0.7)
+            self.ax.add_patch(circle)
+
+
+        _draw_maze_(self.maze_env,self.ax)
+        if not self.show_axes:
+            self.ax.axis('off')
+
+        if filename is not None:
+            plt.savefig(filename)
+
+        plt.pause(0.1)
+        self.ax.patches = []
+
+        self.update_in_generation = False
+
+    def close(self):
+        plt.clf()
+        plt.close('all')

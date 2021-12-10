@@ -11,6 +11,7 @@ import random
 import time
 import copy
 import argparse
+from functools import reduce
 
 # The NEAT-Python library imports
 import neat
@@ -52,6 +53,7 @@ class MazeSimulationTrial:
 # The simulation results holder for a one trial.
 # It must be initialized before start of each trial.
 trial_sim = None
+Drawer = None
 
 
 def store_agent_record(genome_id,maze_env,goal_fitness,novelty):
@@ -73,6 +75,21 @@ def store_agent_record(genome_id,maze_env,goal_fitness,novelty):
     trial_sim.record_store.add_record(record)
     return record
 
+def draw_progress(n_items_map,config):
+
+    if Drawer.update_in_generation:
+        best_genome = Drawer.best_genome
+        maze_env = copy.deepcopy(trial_sim.orig_maze_environment)
+        control_net = neat.nn.FeedForwardNetwork.create(best_genome, config)
+        path_points = []
+        evaluate_fitness = maze.maze_simulation_evaluate(
+                                    env=maze_env,
+                                    net=control_net,
+                                    time_steps=SOLVER_TIME_STEPS,
+                                    path_points=path_points)
+        Drawer.set_path(path_points)
+
+    Drawer.draw(trial_sim.population.generation,trial_sim.archive.novel_items,n_items_map.values())
 
 def eval_individual(genome_id, genome, n_item, config):
     """
@@ -109,6 +126,8 @@ def eval_individual(genome_id, genome, n_item, config):
 
     # store simulation results into the agent record
     store_agent_record(genome_id,maze_env,goal_fitness,novelty)
+
+    Drawer.update_best(genome,goal_fitness)
 
     return maze_env.exit_found
 
@@ -157,6 +176,8 @@ def eval_genomes(genomes, config):
     # to signal the finish evolution
     if solver_genome is not None:
         solver_genome.fitness = math.log(800000) # ~=13.59
+
+    draw_progress(n_items_map,config)
 
 
 def run_experiment(config_file, maze_env, novelty_archive, trial_out_dir, args=None, n_generations=100,
@@ -303,6 +324,8 @@ if __name__ == '__main__':
     maze_env = maze.read_environment(maze_env_config)
     maze_env.location_sample_rate = args.location_sample_rate
 
+    Drawer = visualize.ProgressDrawer(maze_env,width=args.width,height=args.height,max_generation=args.generations)
+
     # Run the maze experiment trials
     print("Starting the %s maze experiment (Novelty Search), for %d trials" % (args.maze, args.trials))
     for t in range(args.trials):
@@ -312,6 +335,9 @@ if __name__ == '__main__':
                                                  metric=maze.maze_novelty_metric)
         trial_out_dir = os.path.join(out_dir, str(t))
         os.makedirs(trial_out_dir, exist_ok=True)
+
+        Drawer.initialize_figure()
+
         solution_found = run_experiment( config_file=config_path,
                                         maze_env=maze_env,
                                         novelty_archive=novelty_archive,
@@ -320,4 +346,5 @@ if __name__ == '__main__':
                                         args=args,
                                         save_results=True,
                                         silent=True)
+        Drawer.close()
         print("\n------ Trial %d complete, solution found: %s ------\n" % (t, solution_found))
