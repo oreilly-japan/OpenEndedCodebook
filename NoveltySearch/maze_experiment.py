@@ -23,6 +23,7 @@ import utils
 import maze_environment as maze
 import agent
 import novelty_archive as archive
+import distance
 
 # The number of maze solving simulator steps
 SOLVER_TIME_STEPS = 400
@@ -75,7 +76,7 @@ def store_agent_record(genome_id,maze_env,goal_fitness,novelty):
     trial_sim.record_store.add_record(record)
     return record
 
-def draw_progress(novelty_genome,n_items_map,config):
+def draw_progress(novelty_genome,items_map,config):
 
     if Drawer.update_in_generation:
         best_genome = Drawer.best_genome
@@ -98,15 +99,15 @@ def draw_progress(novelty_genome,n_items_map,config):
                                 time_steps=SOLVER_TIME_STEPS,
                                 path_points=novelty_path_points)
 
-    Drawer.draw(trial_sim.population.generation,novelty_path_points,trial_sim.archive.novel_items,n_items_map.values())
+    Drawer.draw(trial_sim.population.generation,novelty_path_points,trial_sim.archive.archive_items,items_map.values())
 
-def eval_individual(genome_id, genome, n_item, config):
+def eval_individual(genome_id, genome, item, config):
     """
     Evaluates the individual represented by genome.
     Arguments:
         genome_id:      The ID of genome.
         genome:         The genome to evaluate.
-        n_item:         The novelty items of the genome.
+        item:           The novelty items of the genome.
         config:         The NEAT configuration holder.
     Return:
         The True if successful solver found.
@@ -120,7 +121,7 @@ def eval_individual(genome_id, genome, n_item, config):
                                         env=maze_env,
                                         net=control_net,
                                         time_steps=SOLVER_TIME_STEPS,
-                                        n_item=n_item,
+                                        item=item,
                                         mcns=MCNS)
 
     if goal_fitness == -1:
@@ -130,8 +131,7 @@ def eval_individual(genome_id, genome, n_item, config):
         return False
 
     # evaluate the novelty of a genome
-    # print(dir(trial_sim.archive))
-    novelty = trial_sim.archive.evaluate_individual_novelty(item=n_item)
+    novelty = trial_sim.archive.evaluate_individual_novelty(item=item)
 
     # store simulation results into the agent record
     store_agent_record(genome_id,maze_env,goal_fitness,novelty)
@@ -150,34 +150,36 @@ def eval_genomes(genomes, config):
         config:  The configuration settings with algorithm
                  hyper-parameters
     """
-    n_items_map = {} # The map to hold the novelty items for current generation
+    items_map = {} # The map to hold the novelty items for current generation
     solver_genome = None
     for genome_id, genome in genomes:
         # create NoveltyItem for genome and store it into map
-        n_item = archive.NoveltyItem(
+        item = archive.NoveltyItem(
             generation=trial_sim.population.generation,genomeId=genome_id)
-        n_items_map[genome_id] = n_item
+        items_map[genome_id] = item
 
         found = eval_individual(genome_id=genome_id,
                                 genome=genome,
-                                n_item=n_item,
+                                item=item,
                                 config=config)
         if found:
             solver_genome = genome
 
     # update fittest organisms list
     trial_sim.archive.update_fittest_with_genome(
-        n_items_map=n_items_map)
+        items_map=items_map)
 
     # now adjust the archive settings
     trial_sim.archive.end_of_generation()
 
     # evaluate population and pick best fitness genome
     novelty_genome,best_fitness = None,-1e10
+    current_items = list(items_map.values())
     for genome_id, genome in genomes:
+        item = items_map[genome_id]
         # set fitness value as a logarithm of a novelty score of a genome in the population
         fitness = trial_sim.archive.evaluate_individual_novelty(
-            item=n_items_map[genome_id],n_items_map=n_items_map,for_neat_fitness=True)
+            item=item,current_items=current_items,for_neat_fitness=True)
         # To avoid negative genome fitness scores we just set to zero all obtained
         # fitness scores that is less than 1 (note we use the natural logarithm)
         fitness = math.log(fitness) if fitness>1 else 0
@@ -194,7 +196,7 @@ def eval_genomes(genomes, config):
         solver_genome.fitness = math.log(800000) # ~=13.59
 
     # draw progress figure
-    draw_progress(novelty_genome,n_items_map,config)
+    draw_progress(novelty_genome,items_map,config)
 
 
 def run_experiment(config_file, maze_env, novelty_archive, trial_out_dir, args=None, n_generations=100,
@@ -342,7 +344,7 @@ if __name__ == '__main__':
     maze_env = maze.read_environment(maze_env_config)
     maze_env.location_sample_rate = args.location_sample_rate
 
-    Drawer = visualize.ProgressDrawer(maze_env,width=args.width,height=args.height,max_generation=args.generations,save_interval=args.progress_save)
+    Drawer = visualize.ProgressDrawer(maze_env,width=args.width,height=args.height,save_interval=args.progress_save)
 
     # Run the maze experiment trials
     print("Starting the %s maze experiment (Novelty Search), for %d trials" % (args.maze, args.trials))
@@ -350,7 +352,7 @@ if __name__ == '__main__':
         print("\n\n----- Starting Trial: %d ------" % (t))
         # Create novelty archive
         novelty_archive = archive.NoveltyArchive(threshold=args.ns_threshold,
-                                                 metric=maze.maze_novelty_metric)
+                                                 metric=distance.novelty_metric_manhattan)
         trial_out_dir = os.path.join(out_dir, str(t))
         os.makedirs(trial_out_dir, exist_ok=True)
 

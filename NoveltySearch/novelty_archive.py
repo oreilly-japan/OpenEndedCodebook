@@ -124,18 +124,18 @@ class NoveltyArchive:
         self.generation = 0
 
         # list with all novel items found so far
-        self.novel_items = []
+        self.archive_items = []
         # list with all novel items found that is related to the fittest
         # genomes (using the goal-oriented fitness score)
         self.fittest_items = []
 
-    def evaluate_individual_novelty(self, item, n_items_map=None, for_neat_fitness=False):
+    def evaluate_individual_novelty(self, item, current_items=None, for_neat_fitness=False):
         """
         The function to evaluate the novelty score of a single genome within
         population and update its fitness if appropriate (for_neat_fitness=True)
         Arguments:
             item:               The item of the genome to evaluate
-            n_items_map:        The map of novelty items for the current population by genome ID
+            current_items:      The items for the current population
             for_neat_fitness:   The flag to indicate the purpose of this function.
                                 If True, to evaluate fitness for neat. Otherwise, to evaluate just
                                 novelty and to accept the genome into nevelty items archive.
@@ -146,35 +146,35 @@ class NoveltyArchive:
         if item.fitness == -1.0:
             return -1.0
 
-        result = 0.0
+        novelty = 0.0
         if for_neat_fitness:
             # assign genome fitness according to the average novelty within archive and population
-            compare_items = self.novel_items + list(n_items_map.values())
+            compare_items = self.archive_items + current_items
             distances = self._map_novelty(item,compare_items)
-            result = self._novelty_avg_knn(distances,neighbors=self.neighbors)
+            novelty = self._novelty_avg_knn(distances,k=self.neighbors)
         else:
             # consider adding a NoveltyItem to the archive based on the distance to a closest neighbor
-            compare_items = self.novel_items
+            compare_items = self.archive_items
             distances = self._map_novelty(item,compare_items)
-            result = self._novelty_avg_knn(distances,neighbors=1)
-            if result > self.novelty_threshold or len(self.novel_items) < ArchiveSeedAmount:
+            novelty = self._novelty_avg_knn(distances,k=1)
+            if novelty > self.novelty_threshold or len(self.archive_items) < ArchiveSeedAmount:
                 self._add_novelty_item(item)
 
         # store found values to the novelty item
-        item.novelty = result
+        item.novelty = novelty
         item.generation = self.generation
 
-        return result
+        return novelty
 
-    def update_fittest_with_genome(self, n_items_map):
+    def update_fittest_with_genome(self, items_map):
         """
         The function to update list of NovelItems for the genomes with the higher
         fitness scores achieved so far during the evolution.
         Arguments:
-            n_items_map:    The map of novelty items for the current population by genome ID
+            items_map:    The map of novelty items for the current population by genome ID
         """
 
-        n_items_list = list(n_items_map.values())
+        n_items_list = list(items_map.values())
         # store novelty items into fittest
         self.fittest_items.extend(n_items_list)
         # sort in descending order by fitness
@@ -198,7 +198,7 @@ class NoveltyArchive:
             path: The path to the file where to store NoveltyItems
         """
         with open(path, 'w') as file:
-            for ni in self.novel_items:
+            for ni in self.archive_items:
                 file.write("%s\n" % ni)
 
     def write_fittest_to_file(self, path):
@@ -221,7 +221,7 @@ class NoveltyArchive:
         # add item
         item.in_archive = True
         item.generation = self.generation
-        self.novel_items.append(item)
+        self.archive_items.append(item)
         self.items_added_in_generation += 1
 
     def _adjust_archive_settings(self):
@@ -248,7 +248,7 @@ class NoveltyArchive:
         # reset counters
         self.items_added_in_generation = 0
 
-    def _map_novelty(self,item,compare_items):
+    def _map_novelty(self,item,archive_items):
         """
         The function to map the novelty metric across the list of item against the target item.
         Arguments:
@@ -258,21 +258,21 @@ class NoveltyArchive:
             The list with distances (novelty scores) of provided item from list of item.
         """
         distances = []
-        for c_item in compare_items:
+        for a_item in archive_items:
             distance = ItemsDistance(
-                first_item = c_item,
+                first_item = a_item,
                 second_item = item,
-                distance = self.novelty_metric(c_item, item))
+                distance = self.novelty_metric(a_item, item))
             distances.append(distance)
         return distances
 
-    def _novelty_avg_knn(self,distances,neighbors):
+    def _novelty_avg_knn(self,distances,k):
         """
         The function to calculate the novelty score of a given distances
         using a K-nearest neighbor algorithm.
         Argumnets:
             distances:  The list of distance
-            neighbbors: The number of neighbors to use for calculation
+            k        : The number of neighbors to use for calculation
         Returns:
             The density within the vicinity of the provided distances calculated using the K-nearest neighbor
             algorithm. This density can be used either as a novelty score value or as a fitness value.
@@ -280,21 +280,18 @@ class NoveltyArchive:
         # sort by distance (novelty) in ascending order - the minimal first
         distances.sort()
 
-        density, weight, distance_sum = 0.0, 0.0, 0.0
+        density, distance_sum = 0.0, 0.0
         length = len(distances)
         if length >= ArchiveSeedAmount:
-            length = neighbors
+            length = k
             if len(distances) < length:
                 # the number of mapped distances is less than number of neighbors
                 length = len(distances)
-            i = 0
-            while weight < float(neighbors) and i < length:
+            for i in range(length):
                 distance_sum += distances[i].distance
-                weight += 1.0
-                i += 1
 
             # finding the average
-            if weight > 0:
-                density = distance_sum / weight
+            if length > 0:
+                density = distance_sum / length
 
         return density
