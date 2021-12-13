@@ -416,10 +416,14 @@ class ProgressDrawer():
     def set_path(self,path):
         self.best_path = path
 
-    def draw(self,generation,archives,current_items):
+    def draw(self,generation,novelty_path,archives,current_items):
         self.ax.set_title('Generation : %d , best Genome ID: %s' % (generation,self.best_genome.key))
 
         for p in self.best_path:
+            circle = plt.Circle((p.x, p.y), 1.0, facecolor='b',alpha=0.7)
+            self.ax.add_patch(circle)
+
+        for p in novelty_path:
             circle = plt.Circle((p.x, p.y), 1.0, facecolor='orange',alpha=0.7)
             self.ax.add_patch(circle)
 
