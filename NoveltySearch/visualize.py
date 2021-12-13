@@ -378,13 +378,12 @@ if __name__ == '__main__':
 
 
 class ProgressDrawer():
-    def __init__(self,maze_env,width=400,height=400,fig_height=6,max_generation=500,show_axes=False,save_interval=0):
+    def __init__(self,maze_env,width=400,height=400,fig_height=6,show_axes=False,save_interval=0):
         self.maze_env = maze_env
         self.width = width
         self.height = height
         self.fig_height = fig_height
         self.fig_width = fig_height * (float(width)/float(height )) - 0.2
-        self.max_generation = max_generation
         self.show_axes = show_axes
         self.save_interval = save_interval
         self.fig = None
@@ -419,21 +418,25 @@ class ProgressDrawer():
     def draw(self,generation,novelty_path,archives,current_items):
         self.ax.set_title('Generation : %d , best Genome ID: %s' % (generation,self.best_genome.key))
 
+        current_x,current_y = [],[]
+        for item in current_items:
+            x,y = item.data
+            circle = plt.Circle((x,y), 0.8, facecolor='y',alpha=0.7)
+            current_x.append(x)
+            current_y.append(y)
+            self.ax.add_patch(circle)
+
         for p in self.best_path:
-            circle = plt.Circle((p.x, p.y), 1.0, facecolor='b',alpha=0.7)
+            circle = plt.Circle((p.x, p.y), 1.0, facecolor='b',alpha=1.0)
             self.ax.add_patch(circle)
 
         for p in novelty_path:
-            circle = plt.Circle((p.x, p.y), 1.0, facecolor='orange',alpha=0.7)
+            circle = plt.Circle((p.x, p.y), 1.0, facecolor='orange',alpha=1.0)
             self.ax.add_patch(circle)
 
-        for item in archives:
-            circle = plt.Circle((item.data[0],item.data[1]),1.3,facecolor='b',alpha=0.7)
-            self.ax.add_patch(circle)
-
-        for item in current_items:
-            circle = plt.Circle((item.data[0],item.data[1]), 0.8, facecolor='gray',alpha=0.7)
-            self.ax.add_patch(circle)
+        # for item in archives:
+            # circle = plt.Circle((item.data[0],item.data[1]),1.3,facecolor='b',alpha=0.7)
+            # self.ax.add_patch(circle)
 
 
         _draw_maze_(self.maze_env,self.ax)
@@ -445,7 +448,9 @@ class ProgressDrawer():
             plt.savefig(filename)
 
         plt.pause(0.1)
+
         self.ax.patches = []
+        self.ax.scatter(current_x,current_y,s=1.0,facecolor='gray',alpha=0.7)
 
         self.update_in_generation = False
 
