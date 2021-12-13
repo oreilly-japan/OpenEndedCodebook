@@ -378,7 +378,7 @@ if __name__ == '__main__':
 
 
 class ProgressDrawer():
-    def __init__(self,maze_env,width=400,height=400,fig_height=6,max_generation=500,show_axes=False):
+    def __init__(self,maze_env,width=400,height=400,fig_height=6,max_generation=500,show_axes=False,save_interval=0):
         self.maze_env = maze_env
         self.width = width
         self.height = height
@@ -386,6 +386,7 @@ class ProgressDrawer():
         self.fig_width = fig_height * (float(width)/float(height )) - 0.2
         self.max_generation = max_generation
         self.show_axes = show_axes
+        self.save_interval = save_interval
         self.fig = None
         self.ax = None
         self.best_fitness = None
@@ -393,7 +394,9 @@ class ProgressDrawer():
         self.best_genome = None
         self.update_in_generation = False
 
-    def initialize_figure(self):
+    def initialize_figure(self,save_dir):
+        self.save_dir = save_dir
+
         self.fig,self.ax = plt.subplots()
         self.fig.set_dpi(100)
         self.fig.set_size_inches(self.fig_width,self.fig_height)
@@ -413,7 +416,7 @@ class ProgressDrawer():
     def set_path(self,path):
         self.best_path = path
 
-    def draw(self,generation,archives,current_items,filename=None):
+    def draw(self,generation,archives,current_items):
         self.ax.set_title('Generation : %d , best Genome ID: %s' % (generation,self.best_genome.key))
 
         for p in self.best_path:
@@ -433,7 +436,8 @@ class ProgressDrawer():
         if not self.show_axes:
             self.ax.axis('off')
 
-        if filename is not None:
+        if self.save_interval>0 and generation%self.save_interval==0:
+            filename = os.path.join(self.save_dir,'progress%d.png'%generation)
             plt.savefig(filename)
 
         plt.pause(0.1)

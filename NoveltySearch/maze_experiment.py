@@ -300,6 +300,7 @@ if __name__ == '__main__':
                         help="The sample rate of agent position points saving during simulation steps.")
     parser.add_argument('--width', type=int, default=400, help='The width of the records subplot')
     parser.add_argument('--height', type=int, default=400, help='The height of the records subplot')
+    parser.add_argument('--progress_save',type=int,default=0,help="The interval of saving progress figure.")
     args = parser.parse_args()
 
     if not (args.maze == 'medium' or args.maze == 'hard'):
@@ -324,7 +325,7 @@ if __name__ == '__main__':
     maze_env = maze.read_environment(maze_env_config)
     maze_env.location_sample_rate = args.location_sample_rate
 
-    Drawer = visualize.ProgressDrawer(maze_env,width=args.width,height=args.height,max_generation=args.generations)
+    Drawer = visualize.ProgressDrawer(maze_env,width=args.width,height=args.height,max_generation=args.generations,save_interval=args.progress_save)
 
     # Run the maze experiment trials
     print("Starting the %s maze experiment (Novelty Search), for %d trials" % (args.maze, args.trials))
@@ -336,7 +337,7 @@ if __name__ == '__main__':
         trial_out_dir = os.path.join(out_dir, str(t))
         os.makedirs(trial_out_dir, exist_ok=True)
 
-        Drawer.initialize_figure()
+        Drawer.initialize_figure(save_dir=trial_out_dir)
 
         solution_found = run_experiment( config_file=config_path,
                                         maze_env=maze_env,
