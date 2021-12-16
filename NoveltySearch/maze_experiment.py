@@ -99,7 +99,10 @@ def draw_progress(novelty_genome,items_map,config):
                                 time_steps=SOLVER_TIME_STEPS,
                                 path_points=novelty_path_points)
 
-    Drawer.draw(trial_sim.population.generation,novelty_path_points,trial_sim.archive.archive_items,items_map.values())
+    Drawer.draw(generation=trial_sim.population.generation,
+                novelty_path=novelty_path_points,
+                archives=trial_sim.archive.archive_items,
+                current_items=items_map.values())
 
 def eval_individual(genome_id, genome, item, config):
     """
@@ -322,7 +325,7 @@ if __name__ == '__main__':
     parser.add_argument('--progress_save',type=int,default=0,help="The interval of saving progress figure.")
     args = parser.parse_args()
 
-    if not (args.maze == 'medium' or args.maze == 'hard'):
+    if not (args.maze == 'medium' or args.maze == 'hard' or args.maze=='hard_fix'):
         print('Unsupported maze configuration: %s' % args.maze)
         exit(1)
 
