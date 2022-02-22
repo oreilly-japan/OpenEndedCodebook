@@ -301,7 +301,7 @@ class ProgressDrawer():
     def set_bd(self, bd1_item, bd2_item):
         self.bd1_key,bd1 = bd1_item
         self.bd2_key,bd2 = bd2_item
-        self.axis2,self.axis1 = np.meshgrid(np.array(bd1.bins),np.array(bd2.bins))
+        self.axis2,self.axis1 = np.meshgrid(np.array(bd2.bins),np.array(bd1.bins))
         self.bd_map_2d = np.full(self.axis1.shape,-np.inf)
 
         self.ax_map.set_xlabel(bd1.name)

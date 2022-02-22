@@ -74,7 +74,7 @@ class MapElitesReporter(object):
         fitnesses = [c.fitness for c in population.values()]
         fit_mean = mean(fitnesses)
         fit_std = stdev(fitnesses)
-        best_bd_str = '('+ ', '.join(map(str,best_genome.bd)) + ')'
+        best_bd_str = '('+ ', '.join(map(str,list(best_genome.bd.values()))) + ')'
         print('Population size {}'.format(len(population)))
         print('Population\'s average fitness: {0:3.5f} stdev: {1:3.5f}'.format(fit_mean, fit_std))
         print(

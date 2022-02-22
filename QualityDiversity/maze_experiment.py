@@ -94,7 +94,7 @@ def evaluate_bd(genome, path_points, headings):
     bd = {bd_name: bd_func.evaluate(points=path_points, headings=headings) for bd_name,bd_func in bd_dict.items()}
     return bd
 
-def eval_fitness(genome_id, genome, config, time_steps=400):
+def eval_fitness(genome_id, genome, config):
     """
     Evaluates fitness of the provided genome.
     Arguments:
@@ -166,12 +166,12 @@ def run_experiment(config_file, maze_env, trial_out_dir, args=None, n_generation
     bd_dictionary = {
         'position_x': BD.PositionX(name='x', value_range=[0,200], divide_num=32),
         'position_y': BD.PositionY(name='y', value_range=[0,200], divide_num=32),
-        'velocity': BD.Velocity(time_steps=SOLVER_TIME_STEPS, sample_rate=10,
-                                name='velocity', value_range=[0,1.5], divide_num=32),
-        'rotation': BD.Rotation(time_steps=SOLVER_TIME_STEPS, sample_rate=10,
-                                name='rotation', value_range=[0,1.5], divide_num=32)
+        'velocity': BD.Velocity(time_steps=SOLVER_TIME_STEPS, sample_rate=4,
+                                name='velocity', value_range=[0.1,2.5], divide_num=32),
+        'rotation': BD.Rotation(time_steps=SOLVER_TIME_STEPS, sample_rate=4,
+                                name='rotation', value_range=[0.5,3.0], divide_num=32)
     }
-    bd_axis = ['position_x','position_y']
+    # bd_axis = ['position_x','position_y']
     bd_axis = ['velocity','rotation']
 
     # Create the population, which is the top-level object for a NEAT run.
