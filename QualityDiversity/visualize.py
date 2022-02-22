@@ -343,12 +343,15 @@ class ProgressDrawer():
         if not self.show_axes:
             self.ax_stat.axis('off')
 
-        if self.save_interval>0 and generation%self.save_interval==0:
-            filename = os.path.join(self.save_dir,'progress%d.png'%generation)
-            plt.savefig(filename)
-
         pcm = self.ax_map.pcolormesh(self.axis1, self.axis2, self.bd_map_2d)
         cb = self.fig_map.colorbar(pcm, ax=self.ax_map)
+
+        if self.save_interval>0 and generation%self.save_interval==0:
+            filename = os.path.join(self.save_dir,'progress_maze%d.png'%generation)
+            self.fig_stat.savefig(filename)
+
+            filename = os.path.join(self.save_dir,'progress_map%d.png'%generation)
+            self.fig_map.savefig(filename)
 
         plt.pause(0.1)
 
