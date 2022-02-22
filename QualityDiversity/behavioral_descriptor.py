@@ -29,7 +29,6 @@ class PositionY(BehavioralDescriotir):
 class Velocity(BehavioralDescriotir):
     def __init__(self, time_steps, sample_rate, **args):
         self.sample_rate = sample_rate
-        self.time = int(time_steps/sample_rate)
         super().__init__(**args)
 
     def evaluate(self, points, **args):
@@ -39,14 +38,13 @@ class Velocity(BehavioralDescriotir):
             point = points_sampled[i]
             next_point = points_sampled[i+1]
             distance += point.distance(next_point)
-        velocity = distance/((len(points_sampled)-1)*self.time)
+        velocity = distance/((len(points_sampled)-1)*self.sample_rate)
         index = self.get_index(velocity)
         return index
 
 class Rotation(BehavioralDescriotir):
     def __init__(self, time_steps, sample_rate, **args):
         self.sample_rate = sample_rate
-        self.time = int(time_steps/sample_rate)
         super().__init__(**args)
 
     def evaluate(self, headings, **args):
@@ -57,6 +55,6 @@ class Rotation(BehavioralDescriotir):
             next_heading = headings_sampled[i+1]
             diff = abs(next_heading-heading)
             rotation += min(diff,360-diff)
-        rotation = rotation/((len(headings_sampled)-1)*self.time)
+        rotation = rotation/((len(headings_sampled)-1)*self.sample_rate)
         index = self.get_index(rotation)
         return index
