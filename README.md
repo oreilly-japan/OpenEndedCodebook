@@ -3,7 +3,7 @@
 ```
 brew install graphviz
 conda create -n openevo python=3.8
-conda activate oreilly
+conda activate openevo
 conda install matplotlib==3.0.3
 pip install -r requirements.txt
 ```
