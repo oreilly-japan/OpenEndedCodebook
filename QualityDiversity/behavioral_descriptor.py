@@ -10,7 +10,7 @@ class BehavioralDescriotir:
 
     def get_index(self, bd):
         index = int((bd-self.value_range[0])/self.bin_width)
-        index = max(0,min(index,self.resolution-1))
+        index = max(0,min(index,self.resolution))
         return index
 
     def evaluate(self, data):

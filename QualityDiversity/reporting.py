@@ -102,7 +102,7 @@ class MapElitesReporter(object):
         best_bd_str = '(' + ', '.join(map(str, list(best_genome.bd.values()))) + ')'
         print('Population size {}'.format(len(population)))
         print("Population's average fitness: {0:3.5f} stdev: {1:3.5f}".format(fit_mean, fit_std))
-        print('Best fitness: {0:3.5f} - size: {1!r}  bd {2} - id {3}'.format(best_genome.fitness, best_genome.size(), best_bd_str, best_genome.key))
+        print('Best fitness: {0:3.5f} - size: {1!r} - bd {2} - id {3}'.format(best_genome.fitness, best_genome.size(), best_bd_str, best_genome.key))
 
     def found_solution(self, config, generation, best):
         print('\nBest individual in generation {0} meets fitness threshold - complexity: {1!r}'.format(self.generation, best.size()))

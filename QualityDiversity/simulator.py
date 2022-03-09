@@ -3,6 +3,7 @@ import time
 import random
 import numpy as np
 
+import multiprocessing
 from multiprocessing import Process
 
 from stable_baselines3 import PPO
@@ -75,6 +76,7 @@ class SimulateProcess:
         self.process = None
 
     def init_process(self):
+        multiprocessing.set_start_method("spawn", force=True)
         self.process = Process(
             target=run_process,
             args=(self.env_id, self.log_file, self.save_dir, self.generations, self.deterministic))
