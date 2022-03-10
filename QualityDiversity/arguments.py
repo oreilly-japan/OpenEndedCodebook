@@ -54,9 +54,9 @@ def get_args():
     parser.add_argument(
         '--width', default=5, type=int, help='robot width')
     parser.add_argument(
-        '--no-plot', action='store_false', default=False, help='not plot progress figure')
+        '--no-plot', action='store_true', default=False, help='not plot progress figure')
     parser.add_argument(
-        '--no-view', action='store_false', default=False, help='not view simulation of best robot')
+        '--no-view', action='store_true', default=False, help='not view simulation of best robot')
     args = parser.parse_args()
 
     if args.name=='':

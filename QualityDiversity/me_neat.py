@@ -98,7 +98,7 @@ class Population:
                     self.reporters.found_solution(self.config, self.generation, best)
                     break
 
-            self.reporters.end_generation(self.config, self.population_map)
+            self.reporters.end_generation(self.config, self.population_pool)
 
             self.generation += 1
 

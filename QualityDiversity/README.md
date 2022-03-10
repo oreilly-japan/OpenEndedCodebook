@@ -1,6 +1,6 @@
 # Quality Diversity
 
-### excution
+### execution
 ```
 $python run.py
 ```
@@ -15,3 +15,15 @@ $python run.py
 - --width         : width of robot structure (default: 5)
 - --no_plot       : not plot progress figure
 - --no_view       : not view simulation of best robot
+
+### make gif
+after robot search, make gif file of each robot
+```
+$python make_gifs.py -n {target experiment name}
+```
+#### options
+- -n --name             : target experiment name
+- -r --resolution-ratio : image resolution ratio (default: 0.2 -> (256,144))
+- --num-cores           : num of multiprocesses (default: 1)
+- --deterministic       : robot act deterministic (default: probabilistic)
+- --not-overwrite       : skip process if already gif exists (default: overwrite)

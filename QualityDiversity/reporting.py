@@ -54,12 +54,12 @@ class SaveResultReporter(object):
         self.generation = None
 
         with open(self.history_pop_file, 'w') as f:
-            writer = csv.writer(f)
-            writer.writerow(self.history_pop_header)
+            writer = csv.DictWriter(f, fieldnames=self.history_pop_header)
+            writer.writeheader()
 
         with open(self.history_best_file, 'w') as f:
-            writer = csv.writer(f)
-            writer.writerow(self.history_best_header)
+            writer = csv.DictWriter(f, fieldnames=self.history_best_header)
+            writer.writeheader()
 
     def start_generation(self, generation):
         self.generation = generation
@@ -72,13 +72,13 @@ class SaveResultReporter(object):
         with open(self.history_pop_file, 'a', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.history_pop_header)
 
-            for genome in population_pool.values():
+            for key,genome in population_pool.items():
                 items = {
-                    'birth': genome.key[0],
-                    'number': genome.key[1],
+                    'birth': key[0],
+                    'number': key[1],
                     'fitness': genome.fitness
                 }
-                items.update(genome.bd)
+                items.update(**genome.bd)
 
                 writer.writerow(items)
 

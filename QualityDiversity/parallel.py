@@ -47,8 +47,8 @@ class ParallelEvaluator(object):
 
     def evaluate_fitness(self, genomes, config, generation):
         jobs = []
-        for _, genome in genomes:
-            jobs.append(self.pool.apply_async(self.fitness_function, (genome, config, genome.key[1], generation)))
+        for key, genome in genomes:
+            jobs.append(self.pool.apply_async(self.fitness_function, (genome, config, key[1], key[0])))
 
         # assign the fitness back to each genome
         for job, (_, genome) in zip(jobs, genomes):

@@ -42,8 +42,8 @@ class Simulator:
                 structure_file = os.path.join(path_generation, 'structure', f'{latest[2]}.npz')
                 controller_file = os.path.join(path_generation, 'controller', f'{latest[2]}.zip')
 
-                robot = np.load(structure_file)
-                self.robot = (robot['robot'] ,robot['connectivity'])
+                structure = np.load(structure_file)
+                self.robot = (structure['robot'], structure['connectivity'])
                 self.model = PPO.load(controller_file)
                 if self.env is not None:
                     self.env.close()
