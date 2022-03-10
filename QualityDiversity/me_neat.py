@@ -95,12 +95,12 @@ class Population:
                     self.reporters.found_solution(self.config, self.generation, best)
                     break
 
-            # Create the next generation from the current generation.
-            self.reproduction()
-
             self.reporters.end_generation(self.config, self.population_map)
 
             self.generation += 1
+            
+            # Create the next generation from the current generation.
+            self.reproduction()
 
         if self.config.no_fitness_termination:
             self.reporters.found_solution(self.config, self.generation, self.best_genome)
