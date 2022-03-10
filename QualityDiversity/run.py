@@ -1,5 +1,6 @@
 import os
 import shutil
+import json
 import random
 import numpy as np
 import torch
@@ -91,6 +92,10 @@ def main():
             return None, None
         print()
 
+    argument_file = os.path.join(save_path, 'arguments.json')
+    with open(argument_file, 'w') as f:
+        json.dump(args.__dict__, f, indent=4)
+
     bd_dictionary = {
         'block density': BD.BlockDensity(name='block density', value_range=[0,1], resolution=25),
         'rigid density': BD.RigidDensity(name='rigid density', value_range=[0,1], resolution=25),
@@ -111,7 +116,7 @@ def main():
     structure_hashes = {}
 
     experiment_config = {
-        'environment': args.env,
+        'environment': args.task,
         'structure_shape': (args.height, args.width),
         'train_iters': args.ppo_iters,
         'save_path': save_path,
@@ -124,16 +129,20 @@ def main():
     pop = me_neat.Population(
         neat_config_path,
         experiment_config,
+        args.pop_size,
         evaluator.evaluate_fitness,
         eval_genome_constraint)
-    pop.add_reporter(me_neat.MapElitesReporter())
-    best_log_file = os.path.join(save_path, 'best_log.txt')
-    pop.add_reporter(me_neat.SaveResultReporter(save_path, best_log_file))
+
+    reporters = [
+        me_neat.MapElitesReporter(),
+        me_neat.SaveResultReporter(save_path, list(bd_dictionary.keys()))
+    ]
+    for reporter in reporters:
+        pop.add_reporter(reporter)
 
     if not args.no_view:
         simulator = SimulateProcess(
-            args.env,
-            best_log_file,
+            args.task,
             save_path,
             args.generation,
             deterministic=False)

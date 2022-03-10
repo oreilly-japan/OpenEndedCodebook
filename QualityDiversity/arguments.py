@@ -1,6 +1,6 @@
 import argparse
 
-Environments = [
+Tasks = [
     'Walker-v0',
     'BridgeWalker-v0',
     'CaveCrawler-v0',
@@ -38,9 +38,11 @@ Environments = [
 def get_args():
     parser = argparse.ArgumentParser(description='MapElites experiment')
     parser.add_argument(
-        '-n', '--name', default='', type=str, help='experiment name (default: env id)')
+        '-n', '--name', default='', type=str, help='experiment name (default: task id)')
     parser.add_argument(
-        '-e', '--env', default='Walker-v0', type=str, help='target environment id')
+        '-t', '--task', default='Walker-v0', type=str, help='target task id')
+    parser.add_argument(
+        '-p', '--pop-size', default=4, type=int, help='population size of neat')
     parser.add_argument(
         '-g', '--generation', default=100, type=int, help='neat iterations')
     parser.add_argument(
@@ -58,9 +60,9 @@ def get_args():
     args = parser.parse_args()
 
     if args.name=='':
-        args.name = args.env
+        args.name = args.task
 
-    assert args.env in Environments,\
-        f'argumented environment "{args.env}" is not prepared, so pick from ['+', '.join(Environments)+'].'
+    assert args.task in Tasks,\
+        f'argumented task id "{args.task}" is not prepared, so pick from ['+', '.join(Tasks)+'].'
 
     return args

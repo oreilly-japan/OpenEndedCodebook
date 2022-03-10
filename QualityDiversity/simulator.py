@@ -1,4 +1,5 @@
 import os
+import csv
 import time
 import random
 import numpy as np
@@ -11,10 +12,10 @@ from stable_baselines3 import PPO
 from ppo.utils import make_vec_envs
 
 class Simulator:
-    def __init__(self, env_id, log_file, save_dir, deterministic=False):
+    def __init__(self, env_id, save_dir, deterministic=False):
         self.env_id = env_id
-        self.log_file = log_file
         self.save_dir = save_dir
+        self.history_file = os.path.join(self.save_dir, 'history_best.csv')
         self.deterministic = deterministic
         self.generation = -1
         self.robot = None
@@ -22,15 +23,21 @@ class Simulator:
         self.env = None
 
     def update(self):
-        if not os.path.exists(self.log_file):
+        if not os.path.exists(self.history_file):
             return
 
         lines = []
-        with open(self.log_file, 'r') as f:
-            lines = f.readlines()
+        with open(self.history_file, 'r') as f:
+            reader = csv.reader(f)
+            lines = list(reader)
+
+        columns = lines[0]
+        assert columns[0]=='generation' and columns[1]=='birth' and columns[2]=='number',\
+            'simulator error: best_history_file columns is supposed to [generation, birh, number, ...]'
+
         if len(lines)>1:
-            latest = list(map(int,lines[-1].split()))
-            if self.generation<latest[0]:
+            latest = lines[-1]
+            if self.generation<int(latest[0]):
                 path_generation = os.path.join(self.save_dir, f'generation_{latest[1]}')
                 structure_file = os.path.join(path_generation, 'structure', f'{latest[2]}.npz')
                 controller_file = os.path.join(path_generation, 'controller', f'{latest[2]}.zip')
@@ -41,7 +48,7 @@ class Simulator:
                 if self.env is not None:
                     self.env.close()
                 self.env = make_vec_envs(self.env_id, self.robot, 0, 1)
-                self.generation = latest[0]
+                self.generation = int(latest[0])
         else:
             time.sleep(1)
 
@@ -57,8 +64,8 @@ class Simulator:
             self.env.render()
 
 
-def run_process(env_id, log_file, save_dir, generations, deterministic=False):
-    simulator = Simulator(env_id, log_file, save_dir, deterministic=deterministic)
+def run_process(env_id, save_dir, generations, deterministic=False):
+    simulator = Simulator(env_id, save_dir, deterministic=deterministic)
     while True:
         simulator.update()
         simulator.simulate()
@@ -67,9 +74,8 @@ def run_process(env_id, log_file, save_dir, generations, deterministic=False):
             break
 
 class SimulateProcess:
-    def __init__(self, env_id, log_file, save_dir, generations, deterministic=False):
+    def __init__(self, env_id, save_dir, generations, deterministic=False):
         self.env_id = env_id
-        self.log_file = log_file
         self.save_dir = save_dir
         self.generations = generations
         self.deterministic = deterministic
@@ -79,7 +85,7 @@ class SimulateProcess:
         multiprocessing.set_start_method("spawn", force=True)
         self.process = Process(
             target=run_process,
-            args=(self.env_id, self.log_file, self.save_dir, self.generations, self.deterministic))
+            args=(self.env_id, self.save_dir, self.generations, self.deterministic))
 
     def start(self):
         self.process.start()

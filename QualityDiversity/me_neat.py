@@ -7,11 +7,12 @@ from reporting import ReporterSet, SaveResultReporter, MapElitesReporter, Statis
 
 class Population:
 
-    def __init__(self, config_file, extra_info, fitness_function, constraint_function=None):
+    def __init__(self, config_file, extra_info, pop_size, fitness_function, constraint_function=None):
         self.reporters = ReporterSet()
         self.config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                   neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                                  config_file, extra_info=extra_info)
+                                  config_file, extra_info=extra_info,
+                                  custom_config=[('NEAT', 'pop_size', pop_size)])
         self.generation = 0
         self.best_genome = None
         self.population_pool = None
@@ -27,22 +28,23 @@ class Population:
         self.reporters.remove(reporter)
 
     def create_init_population(self):
-        self.population_pool = {}
-        while len(self.population_pool) < self.config.pop_size:
-            key = (self.generation, len(self.population_pool))
+        population_pool = {}
+        while len(population_pool) < self.config.pop_size:
+            key = (self.generation, len(population_pool))
             genome = self.config.genome_type(key)
             genome.configure_new(self.config.genome_config)
 
             if self.constraint_function is not None:
                 if self.constraint_function(genome, self.config):
-                    self.population_pool[key] = genome
+                    population_pool[key] = genome
             else:
-                self.population_pool[key] = genome
+                population_pool[key] = genome
+        self.population_pool = population_pool
 
     def reproduction(self):
-        self.population_pool = {}
-        while len(self.population_pool) < self.config.pop_size:
-            key = (self.generation, len(self.population_pool))
+        population_pool = {}
+        while len(population_pool) < self.config.pop_size:
+            key = (self.generation, len(population_pool))
 
             if len(self.population_map)>1:
                 parents = self.random_selection(2)
@@ -57,9 +59,10 @@ class Population:
 
             if self.constraint_function is not None:
                 if self.constraint_function(child, self.config):
-                    self.population_pool[key] = child
+                    population_pool[key] = child
             else:
-                self.population_pool[key] = child
+                population_pool[key] = child
+        self.population_pool = population_pool
 
     def run(self, n=None):
         if self.population_pool is None:
@@ -98,11 +101,11 @@ class Population:
             self.reporters.end_generation(self.config, self.population_map)
 
             self.generation += 1
-            
+
             # Create the next generation from the current generation.
             self.reproduction()
 
-        if self.config.no_fitness_termination:
+        if not self.config.no_fitness_termination:
             self.reporters.found_solution(self.config, self.generation, self.best_genome)
 
         return self.best_genome
