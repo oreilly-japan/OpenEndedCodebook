@@ -8,13 +8,13 @@ from ppo import run_ppo
 import evogym.envs
 from evogym import sample_robot, get_full_connectivity
 
-from attachments import Environments, Structures
+from attachments import Tasks, Structures
 
 
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--env', default='Walker-v0', help='evogym environment id')
+        '-t', '--task', default='Walker-v0', help='evogym environment id')
     parser.add_argument(
         '--random', action='store_true', default=False, help='sample robot randomly')
     parser.add_argument(
@@ -22,7 +22,7 @@ def get_args():
     parser.add_argument(
         '--width', type=int, default=5, help="robor's width")
     parser.add_argument(
-        '--probabilistic', action='store_true', default=False, help='probabilistic action in evaluation')
+        '--deterministic', action='store_true', default=False, help='robot simulation deterministic')
 
     args = parser.parse_args()
     return args
@@ -36,20 +36,20 @@ if __name__=='__main__':
 
     robot_shape = (args.height, args.width)
 
-    assert args.env in Environments, \
-        f'argumented environment "{args.env}" is not prepared, so pick from ['+', '.join(Environments)+'].'
+    assert args.task in Tasks, \
+        f'argumented task "{args.task}" is not prepared, so pick from ['+', '.join(Tasks)+'].'
 
     if args.random:
         robot = sample_robot(robot_shape)
     else:
-        if args.env in Structures:
-            structure = Structures[args.env]
+        if args.task in Structures:
+            structure = Structures[args.task]
             connections = get_full_connectivity(structure)
             robot = (structure, connections)
         else:
-            print(f'robot on the environment "{args.env}" is not defined, so sample robot randomly.')
+            print(f'robot on the task "{args.task}" is not defined, so sample robot randomly.')
             robot = sample_robot(robot_shape)
 
     print('robot structure: \n',robot[0].astype(int))
 
-    run_ppo(args.env,robot,args.probabilistic)
+    run_ppo(args.task,robot,args.deterministic)

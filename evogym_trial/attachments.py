@@ -1,6 +1,6 @@
 import numpy as np
 
-Environments = [
+Tasks = [
     'Walker-v0',
     'BridgeWalker-v0',
     'CaveCrawler-v0',
