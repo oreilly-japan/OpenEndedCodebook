@@ -13,6 +13,7 @@ $python run.py
 - --ppo-iters     : learning iterations of PPO algo (default: 5). on the other environment, need more.
 - --height        : height of robot structure (default: 5)
 - --width         : width of robot structure (default: 5)
+- --deterministic : evaluate robot deterministic (default: probabilistic)
 - --no_plot       : not plot progress figure
 - --no_view       : not view simulation of best robot
 

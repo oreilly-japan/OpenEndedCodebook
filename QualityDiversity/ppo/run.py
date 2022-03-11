@@ -7,7 +7,7 @@ from stable_baselines3.common.utils import get_linear_fn
 from ppo.utils import make_vec_envs
 import ppo.config as config
 
-def evaluate(model, envs, num_eval=1, deterministic=True):
+def evaluate(model, envs, num_eval=1, deterministic=False):
     if deterministic:
         num_eval = 1
     obs = envs.reset()
@@ -28,7 +28,7 @@ def run_ppo(
     train_iter,
     saving_convention,
     num_eval=1,
-    deterministic=True):
+    deterministic=False):
 
     controller_save_path = os.path.join(saving_convention[0], f'{saving_convention[1]}.zip')
 

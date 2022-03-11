@@ -6,6 +6,7 @@ import random
 import os
 
 import matplotlib
+from matplotlib.colors import LinearSegmentedColormap
 matplotlib.use('TkAgg')
 import graphviz
 import matplotlib.pyplot as plt
@@ -13,6 +14,7 @@ import matplotlib.lines as mlines
 import matplotlib.patches as patches
 
 import numpy as np
+import cv2
 
 def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.svg'):
     """ Plots the population's average and best fitness. """
@@ -129,6 +131,32 @@ def draw_net(config, genome, view=False, filename=None, directory=None, node_nam
     return dot
 
 
+def make_colormap():
+    size = 50
+    h_idx = [0,5,12,17,20,33,34,50]
+    h_value = [-0.09,-0.23,-0.3,-0.43,-0.53,-0.715,-0.805,-1.0]
+    H = np.zeros(size+1)
+    for i in range(len(h_idx)-1):
+        H[h_idx[i]:h_idx[i+1]+1] = np.linspace(h_value[i],h_value[i+1],h_idx[i+1]-h_idx[i]+1)
+    H = ( (H-0.05)%1.0 )*180
+
+    l_idx = [0,5,10,17,32,40,50]
+    l_value = [0,80,110,130,160,180,255]
+    L = np.zeros(size+1)
+    for i in range(len(l_idx)-1):
+        L[l_idx[i]:l_idx[i+1]+1] = np.linspace(l_value[i],l_value[i+1],l_idx[i+1]-l_idx[i]+1)
+
+    s_idx = [0,5,30,50]
+    s_value = [0,90,120,180]
+    S = np.zeros(size+1)
+    for i in range(len(s_idx)-1):
+        S[s_idx[i]:s_idx[i+1]+1] = np.linspace(s_value[i],s_value[i+1],s_idx[i+1]-s_idx[i]+1)
+
+    colors = cv2.cvtColor(np.expand_dims(np.vstack([H ,L, S]).T,axis=0).astype('uint8'),cv2.COLOR_HLS2RGB)[0]
+    CMAP = LinearSegmentedColormap.from_list("custom", colors/256)
+    return CMAP
+
+
 class ProgressDrawer:
 
     def __init__(self, width=400, height=400, fig_height=6, show_axes=False, no_plot=False):
@@ -140,6 +168,7 @@ class ProgressDrawer:
         self.no_plot = no_plot
         self.fig_map = None
         self.ax_map = None
+        self.cmap = make_colormap()
 
     def initialize_figure(self, save_dir):
         self.save_dir = save_dir
@@ -155,7 +184,8 @@ class ProgressDrawer:
         self.bd2_key, bd2 = bd2_item
 
         self.axis2, self.axis1 = np.meshgrid(np.array(bd2.bins), np.array(bd1.bins))
-        self.bd_map_2d = np.full(self.axis1.shape, -np.inf)
+        self.bd_map_2d = np.full(self.axis1.shape, -1e6)
+        self.vmin = 0
 
         self.ax_map.set_xlabel(bd1.name)
         self.ax_map.set_ylabel(bd2.name)
@@ -166,10 +196,11 @@ class ProgressDrawer:
             bd2 = genome.bd[self.bd2_key]
             if genome.fitness > self.bd_map_2d[(bd1, bd2)]:
                 self.bd_map_2d[(bd1, bd2)] = genome.fitness
+                self.vmin = min(self.vmin,genome.fitness)
 
     def draw(self, generation):
 
-        pcm = self.ax_map.pcolormesh(self.axis1, self.axis2, self.bd_map_2d)
+        pcm = self.ax_map.pcolormesh(self.axis1, self.axis2, self.bd_map_2d, cmap=self.cmap, vmin=self.vmin)
         cb = self.fig_map.colorbar(pcm, ax=(self.ax_map))
 
         filename = os.path.join(self.save_dir, 'progress_map%d.png' % generation)

@@ -55,7 +55,7 @@ def eval_genome_fitness(genome, config, genome_id, generation):
         structure=(robot, connectivity),
         train_iter=config.extra_info['train_iters'],
         saving_convention=(save_path_controller, genome_id),
-        deterministic=False
+        deterministic=config.extra_info['deterministic']
     )
     bd = evaluate_bd(robot, connectivity, config)
     return fitness, bd
@@ -119,6 +119,7 @@ def main():
         'environment': args.task,
         'structure_shape': (args.height, args.width),
         'train_iters': args.ppo_iters,
+        'deterministic': args.deterministic,
         'save_path': save_path,
         'structure_hashes': structure_hashes,
         'behavioral_descriptors': bd_dictionary,

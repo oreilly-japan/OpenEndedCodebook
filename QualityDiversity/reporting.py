@@ -48,9 +48,9 @@ class SaveResultReporter(object):
     def __init__(self, save_path, bd_names):
         self.save_path = save_path
         self.history_pop_file = os.path.join(self.save_path, 'history_pop.csv')
-        self.history_pop_header = ['birth', 'number'] + bd_names + ['fitness']
+        self.history_pop_header = ['birth', 'no.'] + bd_names + ['fitness']
         self.history_best_file = os.path.join(self.save_path, 'history_best.csv')
-        self.history_best_header = ['generation', 'birth', 'number', 'fitness']
+        self.history_best_header = ['generation', 'birth', 'no.', 'fitness']
         self.generation = None
 
         with open(self.history_pop_file, 'w') as f:
@@ -75,7 +75,7 @@ class SaveResultReporter(object):
             for key,genome in population_pool.items():
                 items = {
                     'birth': key[0],
-                    'number': key[1],
+                    'no.': key[1],
                     'fitness': genome.fitness
                 }
                 items.update(**genome.bd)
@@ -86,7 +86,7 @@ class SaveResultReporter(object):
         items = {
             'generation': self.generation,
             'birth': best_genome.key[0],
-            'number': best_genome.key[1],
+            'no.': best_genome.key[1],
             'fitness': best_genome.fitness
         }
         with open(self.history_best_file, 'a', newline='') as f:
