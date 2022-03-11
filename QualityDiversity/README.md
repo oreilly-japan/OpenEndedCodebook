@@ -22,7 +22,7 @@ after robot search, make gif file of each robot
 ```
 $python make_gifs.py -n {target experiment name}
 ```
-#### options
+#### options:
 - -n --name             : target experiment name
 - -r --resolution-ratio : image resolution ratio (default: 0.2 -> (256,144))
 - --num-cores           : number of parallel processes (default: 1)

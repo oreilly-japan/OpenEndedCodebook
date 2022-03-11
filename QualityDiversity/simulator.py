@@ -32,8 +32,8 @@ class Simulator:
             lines = list(reader)
 
         columns = lines[0]
-        assert columns[0]=='generation' and columns[1]=='birth' and columns[2]=='number',\
-            'simulator error: best_history_file columns is supposed to [generation, birh, number, ...]'
+        assert columns[0]=='generation' and columns[1]=='birth' and columns[2]=='no.',\
+            'simulator error: best_history_file columns is supposed to [generation, birh, no., ...]'
 
         if len(lines)>1:
             latest = lines[-1]
