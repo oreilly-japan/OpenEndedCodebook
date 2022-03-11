@@ -11,4 +11,4 @@ $python run.py --env env_id
 - --random        : sampling robot randomly
 - --height        : height of robot structure (default: 5)
 - --width         : width of robot structure (default: 5)
-- --deterministic : deterministic robot simulation
+- --deterministic : robot act deterministically in simulation
