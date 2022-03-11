@@ -1,5 +1,6 @@
 
 num_processes   = 4
+eval_processes  = 4
 seed            = 1
 
 steps           = 128

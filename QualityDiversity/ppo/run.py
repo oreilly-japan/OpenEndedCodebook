@@ -27,7 +27,6 @@ def run_ppo(
     structure,
     train_iter,
     saving_convention,
-    num_eval=1,
     deterministic=False):
 
     controller_save_path = os.path.join(saving_convention[0], f'{saving_convention[1]}.zip')
@@ -35,7 +34,7 @@ def run_ppo(
     train_envs = make_vec_envs(env_id, structure, config.seed, config.num_processes)
     train_envs.reset()
 
-    eval_envs = make_vec_envs(env_id, structure, config.seed, 1)
+    eval_envs = make_vec_envs(env_id, structure, config.seed, config.eval_processes)
 
     model = PPO(
         "MlpPolicy",
@@ -57,7 +56,7 @@ def run_ppo(
 
         model.learn(total_timesteps=steps_by_iter)
 
-        reward = evaluate(model, eval_envs, num_eval=num_eval, deterministic=deterministic)
+        reward = evaluate(model, eval_envs, num_eval=config.eval_processes, deterministic=deterministic)
         if reward > max_reward:
             max_reward = reward
             model.save(controller_save_path)
