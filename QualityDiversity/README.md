@@ -18,8 +18,8 @@ $python run.py
 - --no_view       : not view simulation of best robot
 
 ### make gif
-after searching robot structures, make gif file of each robot.
-output to ./out/{expt name}/generation_{n}/gif/
+after searching robot structures, make gif file for each of all robots.
+output to "./out/{expt name}/generation_{n}/gif/"
 ```
 $python make_gifs.py -n {target experiment name}
 ```
