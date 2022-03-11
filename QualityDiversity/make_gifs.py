@@ -27,8 +27,9 @@ def get_args():
     parser.add_argument(
         '--deterministic', action='store_true', default=False, help='robot act deterministic')
     parser.add_argument(
-        '--not-overwrite', action='store_true', default=False, help='skip process if already gif exists (default: overwrite)'
-    )
+        '--not-overwrite', action='store_true', default=False, help='skip process if already gif exists (default: overwrite)')
+    parser.add_argument(
+        '--no-multi', action='store_true', default=False, help='do without using multiprocess. if error occur, try this option.')
 
     args = parser.parse_args()
 
@@ -101,16 +102,29 @@ if __name__=='__main__':
         robot_history = list(reader)[1:]
 
 
-    pool = mp.Pool(args.num_cores)
-    jobs = []
+    if not args.no_multi:
 
-    for robot in robot_history:
-        generation = robot[0]
-        number = robot[1]
+        pool = mp.Pool(args.num_cores)
+        jobs = []
 
-        func_args = (exp_path, exp_args['task'], generation, number, resolution, args.deterministic, args.not_overwrite)
+        for robot in robot_history:
+            generation = robot[0]
+            number = robot[1]
 
-        jobs.append(pool.apply_async(save_robot_gif, func_args))
+            func_args = (exp_path, exp_args['task'], generation, number, resolution, args.deterministic, args.not_overwrite)
 
-    for job in jobs:
-        job.get(timeout=None)
+            jobs.append(pool.apply_async(save_robot_gif, func_args))
+
+        for job in jobs:
+            job.get(timeout=None)
+
+
+    else:
+
+        for robot in robot_history:
+            generation = robot[0]
+            number = robot[1]
+
+            func_args = (exp_path, exp_args['task'], generation, number, resolution, args.deterministic, args.not_overwrite)
+
+            save_robot_gif(*func_args)
