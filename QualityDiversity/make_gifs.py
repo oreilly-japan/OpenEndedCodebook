@@ -19,9 +19,11 @@ import evogym.envs
 def get_args():
     parser = argparse.ArgumentParser(description='make robot gifs')
     parser.add_argument(
-        '-n', '--name', default='', type=str, help='experiment name')
+        '-n', '--name', type=str, help='experiment name')
     parser.add_argument(
         '-r', '--resolution-ratio', default=0.2, type=float, help='image resolution ratio (default: 0.2 -> 256:144)')
+    parser.add_argument(
+        '-s', '--specific', nargs='+', type=int, help='make gif for only specified robot (how to: "-s {generation} {no.}")')
     parser.add_argument(
         '--num-cores', default=1, type=int, help='num of multiprocesses')
     parser.add_argument(
@@ -33,7 +35,10 @@ def get_args():
 
     args = parser.parse_args()
 
-    assert args.name!='', 'argumented error: input "--name {experiment name}"'
+    assert args.name is not None, 'argumented error: input "--name {experiment name}"'
+
+    if args.specific is not None:
+        assert len(args.specific)==2, 'argument error: use "-s --specified" option as "-s {generation} {no.}"'
 
     return args
 
@@ -100,6 +105,9 @@ if __name__=='__main__':
     with open(history_file, 'r') as f:
         reader = csv.reader(f)
         robot_history = list(reader)[1:]
+
+    if args.specific is not None:
+        robot_history = [args.specific]
 
 
     if not args.no_multi:

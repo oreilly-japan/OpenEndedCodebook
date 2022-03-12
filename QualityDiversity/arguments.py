@@ -50,9 +50,7 @@ def get_args():
     parser.add_argument(
         '--ppo-iters', default=5, type=int, help='ppo iterations')
     parser.add_argument(
-        '--height', default=5, type=int, help='robot height')
-    parser.add_argument(
-        '--width', default=5, type=int, help='robot width')
+        '--shape', default=[5,5], nargs='+', type=int, help='robot shape (useage: "--shape {height} {width}", default: (5,5))')
     parser.add_argument(
         '--deterministic', action='store_true', default=False, help='evaluate robot deterministic')
     parser.add_argument(
@@ -66,5 +64,7 @@ def get_args():
 
     assert args.task in Tasks,\
         f'argumented task id "{args.task}" is not prepared, so pick from ['+', '.join(Tasks)+'].'
+
+    assert len(args.shape)==2, 'argument error: use "--shape" option as "--shape {height} {width}"'
 
     return args

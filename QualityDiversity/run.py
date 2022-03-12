@@ -117,7 +117,7 @@ def main():
 
     experiment_config = {
         'environment': args.task,
-        'structure_shape': (args.height, args.width),
+        'structure_shape': tuple(args.shape),
         'train_iters': args.ppo_iters,
         'deterministic': args.deterministic,
         'save_path': save_path,

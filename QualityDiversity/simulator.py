@@ -66,12 +66,10 @@ class Simulator:
 
 def run_process(env_id, save_dir, generations, deterministic=False):
     simulator = Simulator(env_id, save_dir, deterministic=deterministic)
-    while True:
+    while simulator.generation < generations-1:
         simulator.update()
         simulator.simulate()
 
-        if simulator.generation > generations:
-            break
 
 class SimulateProcess:
     def __init__(self, env_id, save_dir, generations, deterministic=False):
