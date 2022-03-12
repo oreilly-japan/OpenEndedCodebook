@@ -96,11 +96,13 @@ def main():
     with open(argument_file, 'w') as f:
         json.dump(args.__dict__, f, indent=4)
 
+    area_size = args.shape[0]*args.shape[1]
+
     bd_dictionary = {
-        'block density': BD.BlockDensity(name='block density', value_range=[0,1], resolution=25),
-        'rigid density': BD.RigidDensity(name='rigid density', value_range=[0,1], resolution=25),
-        # 'soft density': BD.SoftDensity(name='soft density', value_range=[0,1], resolution=25),
-        # 'actuator density': BD.ActuatorDensity(name='actuator density', value_range=[0,1], resolution=25),
+        'block density': BD.BlockDensity(name='block density', value_range=[0,1], resolution=area_size),
+        'rigid density': BD.RigidDensity(name='rigid density', value_range=[0,1], resolution=area_size),
+        # 'soft density': BD.SoftDensity(name='soft density', value_range=[0,1], resolution=area_size),
+        # 'actuator density': BD.ActuatorDensity(name='actuator density', value_range=[0,1], resolution=area_size),
     }
     bd_axis = ['block density','rigid density']
 

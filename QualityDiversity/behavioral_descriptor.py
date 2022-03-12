@@ -18,7 +18,8 @@ class BehavioralDescriotir:
 
 class BlockDensity(BehavioralDescriotir):
     def evaluate(self, robot, connections):
-        x = 1-np.mean(robot==0)
+        # x = 1-np.mean(robot==0)
+        x = np.mean(robot>0)
         index = self.get_index(x)
         return index
 
