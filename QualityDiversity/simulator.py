@@ -49,6 +49,7 @@ class Simulator:
                     self.env.close()
                 self.env = make_vec_envs(self.env_id, self.robot, 0, 1)
                 self.generation = int(latest[0])
+                print(f'simulator update robot: generation {latest[1]}, no. {latest[2]}')
         else:
             time.sleep(1)
 

@@ -96,6 +96,7 @@ def main():
     with open(argument_file, 'w') as f:
         json.dump(args.__dict__, f, indent=4)
 
+
     area_size = args.shape[0]*args.shape[1]
 
     bd_dictionary = {

@@ -4,6 +4,7 @@ import time
 import os
 import shutil
 import csv
+from functools import reduce
 
 from neat.math_util import mean, stdev, median2
 from neat.reporting import BaseReporter
@@ -82,16 +83,19 @@ class SaveResultReporter(object):
 
                 writer.writerow(items)
 
-    def post_evaluate(self, config, population, best_genome):
+        current_best = reduce(lambda x,y: x if x.fitness>y.fitness else y,population_pool.values())
         items = {
             'generation': self.generation,
-            'birth': best_genome.key[0],
-            'no.': best_genome.key[1],
-            'fitness': best_genome.fitness
+            'birth': current_best.key[0],
+            'no.': current_best.key[1],
+            'fitness': current_best.fitness
         }
         with open(self.history_best_file, 'a', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.history_best_header)
             writer.writerow(items)
+
+    def post_evaluate(self, config, population, best_genome):
+        pass
 
     def found_solution(self, config, generation, best):
         pass
