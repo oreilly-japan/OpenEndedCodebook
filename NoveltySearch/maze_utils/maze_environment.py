@@ -6,17 +6,50 @@
 #
 import math
 
-import agent
 import geometry
 
 # The maximal allowed speed for the maze solver agent
 MAX_AGENT_SPEED = 3.0
 
+class Agent:
+    """
+    This is the maze navigating agent
+    """
+    def __init__(self, location, heading=0, speed=0, angular_vel=0, radius=8.0, range_finder_range=100.0):
+        """
+        Creates new Agent with specified parameters.
+        Arguments:
+            location:               The agent initial position within maze
+            heading:                The heading direction in degrees.
+            speed:                  The linear velocity of the agent.
+            angular_vel:            The angular velocity of the agent.
+            radius:                 The agent's body radius.
+            range_finder_range:     The maximal detection range for range finder sensors.
+        """
+        self.heading = heading
+        self.speed = speed
+        self.angular_vel = angular_vel
+        self.radius = radius
+        self.range_finder_range = range_finder_range
+        self.location = location
+
+        # defining the range finder sensors
+        self.range_finder_angles = [-90.0, -45.0, 0.0, 45.0, 90.0, -180.0]
+
+        # defining the radar sensors
+        self.radar_angles = [(315.0, 405.0), (45.0, 135.0), (135.0, 225.0), (225.0, 315.0)]
+
+        # the list to hold range finders activations
+        self.range_finders = [None] * len(self.range_finder_angles)
+        # the list to hold pie-slice radar activations
+        self.radar = [None] * len(self.radar_angles)
+
+
 class MazeEnvironment:
     """
     This class encapsulates the maze simulation environment.
     """
-    def __init__(self, agent, walls, exit_point, exit_range=5.0):
+    def __init__(self, init_location, init_heading, walls, exit_point, exit_range=5.0):
         """
         Creates new maze environment with specified walls and exit point.
         Arguments:
@@ -28,15 +61,18 @@ class MazeEnvironment:
         self.walls = walls
         self.exit_point = exit_point
         self.exit_range = exit_range
-        # The maze navigating agent
-        self.agent = agent
-        # The flag to indicate if exit was found
+        self.init_location = init_location
+        self.init_heading = init_heading
+        self.agent = None
+        self.location_sample_rate = -1
+        self.exit_found = None
+
+    def reset(self):
+        self.agent = Agent(location=self.init_location, heading=self.init_heading)
+
         self.exit_found = False
         # The initial distance of agent from exit
         self.initial_distance = self.agent_distance_to_exit()
-
-        # The sample rate of agent position points saving during simulation steps.
-        self.location_sample_rate = -1
 
         # Update sensors
         self.update_rangefinder_sensors()
@@ -245,10 +281,9 @@ def read_environment(file_path):
             elif index == 1:
                 # read the agent's position
                 loc = geometry.read_point(line)
-                maze_agent = agent.Agent(location=loc)
             elif index == 2:
                 # read the agent's initial heading
-                maze_agent.heading = float(line)
+                heading = float(line)
             elif index == 3:
                 # read the maze exit location
                 maze_exit = geometry.read_point(line)
@@ -264,79 +299,4 @@ def read_environment(file_path):
 
     print("Maze environment configured successfully from the file: %s" % file_path)
     # create and return the maze environment
-    return MazeEnvironment(agent=maze_agent, walls=walls, exit_point=maze_exit)
-
-def maze_simulation_evaluate(env, net, time_steps, mcns=0.0, item=None, path_points=None):
-    """
-    The function to evaluate maze simulation for specific environment
-    and controll ANN provided. The results will be saved into provided
-    agent record holder.
-    Arguments:
-        env:            The maze configuration environment.
-        net:            The maze solver agent's control ANN.
-        time_steps:     The number of time steps for maze simulation.
-        mcns:           The minimal criteria fitness value.
-        item:           The NoveltyItem to store evaluation results.
-        path_points:    The holder for path points collected during simulation. If
-                        provided None then nothing will be collected.
-    Returns:
-        The goal-oriented fitness value, i.e., how close is agent to the exit at
-        the end of simulation.
-    """
-    exit_found = False
-    for i in range(time_steps):
-        if maze_simulation_step(env, net):
-            print("Maze solved in %d steps" % (i + 1))
-            exit_found = True
-            break
-
-        if path_points is not None:
-            # collect current position
-            path_points.append(geometry.Point(env.agent.location.x, env.agent.location.y))
-
-        # store agent path points at a given sample size rate
-        if (time_steps - i) % env.location_sample_rate == 0 and item is not None:
-            item.data.append(env.agent.location.x)
-            item.data.append(env.agent.location.y)
-
-    # store final agent coordinates as genome's novelty characteristics
-    if item is not None:
-        item.data.append(env.agent.location.x)
-        item.data.append(env.agent.location.y)
-
-    # Calculate the fitness score based on distance from exit
-    fitness = 0.0
-    if exit_found:
-        fitness = 1.0
-    else:
-        # Normalize distance to range (0,1]
-        distance = env.agent_distance_to_exit()
-        fitness = (env.initial_distance - distance) / env.initial_distance
-        if fitness <= 0:
-            fitness = 0.01
-
-    # Use minimal criteria fitness value to signal if genome should be included into population
-    if fitness < mcns:
-        fitness = -1 # mark genome to be excluded
-
-    if item is not None:
-        item.fitness = fitness
-
-    return fitness
-
-
-def maze_simulation_step(env, net):
-    """
-    The function to perform one step of maze simulation.
-    Arguments:
-        env: The maze configuration environment.
-        net: The maze solver agent's control ANN
-    Returns:
-        The True if maze agent solved the maze.
-    """
-    # create inputs from the current state of the environment
-    inputs = env.create_net_inputs()
-    # load inputs into controll ANN and get results
-    output = net.activate(inputs)
-    # apply control signal to the environment and update
-    return env.update(output)
+    return MazeEnvironment(init_location=loc, init_heading=heading, walls=walls, exit_point=maze_exit)
