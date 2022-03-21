@@ -72,7 +72,6 @@ def main():
 
     args = get_args()
 
-    # root_dir = os.path.dirname(os.path.abspath(__file__))
     save_path = os.path.join(CURR_DIR, 'evogym_out', args.name)
 
     try:
@@ -97,7 +96,7 @@ def main():
     # os.makedirs(figure_save_path)
     # Drawer = visualize.ProgressDrawer(no_plot=args.no_plot)
     # Drawer.initialize_figure(save_dir=figure_save_path)
-    Drawer = None
+    # Drawer = None
 
     robot = np.array([
         [3,3,3,3,3],
@@ -128,10 +127,10 @@ def main():
     config_path = os.path.join(UTIL_DIR, 'neat_config.ini')
     novelty_config = {
         'metric': distances.manhattan,
-        'threshold_init': 0.1,
-        'threshold_floor': 0.1,
+        'threshold_init': args.ns_threshold,
+        'threshold_floor': 0.05,
         'neighbors': 15,
-        'MCNS': 0.0
+        'MCNS': args.mcns
     }
     overwrite_config = [
         ('NEAT', 'pop_size', args.pop_size),
