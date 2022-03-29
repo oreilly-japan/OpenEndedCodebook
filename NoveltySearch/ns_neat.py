@@ -162,7 +162,7 @@ class Population(neat.Population):
         else:
             self.time_out += 1
 
-        if self.time_out >= 10:
+        if self.time_out >= 5:
             self.novelty_threshold *= 0.95
             if self.novelty_threshold < self.config.extra_info['threshold_floor']:
                 self.novelty_threshold = self.config.extra_info['threshold_floor']

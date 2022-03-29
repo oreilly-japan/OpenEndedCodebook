@@ -28,6 +28,14 @@ from simulator import SimulateProcess
 # from drawer import ProgressDrawer
 
 
+PI = 3.1415926
+
+def calc_covar(vec):
+    ave = np.mean(vec,axis=0)
+    vec0 = (vec-ave).T
+    comb_indices = np.tril_indices(vec.shape[1],k=0)
+    covar = np.mean(vec0[comb_indices[0]]*vec0[comb_indices[1]],axis=1)
+    return np.hstack([ave,covar])
 
 def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
     controller = FeedForwardNetwork.create(genome, config)
@@ -36,36 +44,60 @@ def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
 
     obs = env.reset()
 
-    t = env.env_method('get_time')[0]
-    point = np.mean(
-        env.env_method('object_pos_at_time', time=t, object_name='robot')[0],
-        axis=1)
-    diff = np.zeros(point.shape)
+    # pos = env.env_method('get_pos_com_obs', object_name='robot')[0]
+    # vel = env.env_method('get_vel_com_obs', object_name='robot')[0]
+    # rad = env.env_method('get_ort_obs', object_name='robot')[0]
+    # pos_data = [0,0]
+    # rad_data = [0,0]
+
+    obs_data = [obs]
+    act_data = []
 
     episode_rewards = []
     episode_data = []
     while len(episode_rewards) < num_eval:
-        action = controller.activate(obs[0])
+        action = np.array(controller.activate(obs[0]))
+        act_data.append(action)
         obs, _, done, infos = env.step([np.array(action)])
 
-        t = env.env_method('get_time')[0]
-        point_ = np.mean(
-            env.env_method('object_pos_at_time', time=t, object_name='robot')[0],
-            axis=1)
+        # pos_ = env.env_method('get_pos_com_obs', object_name='robot')[0]
+        # vel_ = env.env_method('get_vel_com_obs', object_name='robot')[0]
+        # rad_ = env.env_method('get_ort_obs', object_name='robot')[0]
 
         if 'episode' in infos[0]:
             episode_rewards.append(infos[0]['episode']['r'])
-            episode_data.append(diff)
-            diff = np.zeros(point.shape)
+            obs_data = np.vstack(obs_data)
+            obs_data = calc_covar(obs_data)
+            act_data = np.clip(np.vstack(act_data),-1,1)
+            act_data = calc_covar(act_data)
+            # print(obs_data.shape, act_data.shape)
+            episode_data.append(np.hstack([obs_data,act_data]))
+            obs_data = [obs]
+            act_data = []
+            # episode_data.append(np.hstack(pos_data+rad_data))
+            # pos_data = [0,0]
+            # rad_data = [0,0]
         else:
-            diff += np.abs(point_-point)
+            # pass
+            obs_data.append(obs)
+            # pos_diff = pos_-pos
+            # pos_data[0] += np.maximum(pos_diff, 0)
+            # pos_data[1] += np.maximum(-pos_diff, 0)
+            # rad_diff = (rad_-rad)%(2*PI)
+            # if rad_diff<PI:
+            #     rad_data[0] += rad_diff
+            # else:
+            #     rad_data[1] += 2*PI-rad_diff
 
-        point = point_
+        # pos = pos_
+        # rad = rad_
 
-    reward = np.mean(episode_rewards)
-    data = list(np.mean(np.vstack(episode_data),axis=0))
-
-    return reward, data
+    results = {
+        'reward': np.mean(episode_rewards),
+        'data': list(np.mean(np.vstack(episode_data),axis=0))
+    }
+    # print(results)
+    return results
 
 
 def main():
@@ -99,11 +131,11 @@ def main():
     # Drawer = None
 
     robot = np.array([
-        [3,3,3,3,3],
-        [3,3,3,3,3],
-        [3,3,0,3,3],
-        [3,3,0,3,3],
-        [3,3,0,3,3]
+        [2,0,0,0,0],
+        [1,0,0,1,1],
+        [4,3,3,3,4],
+        [4,3,1,3,4],
+        [4,0,0,0,4]
     ])
     connectivity = get_full_connectivity(robot)
     structure = (robot, connectivity)
@@ -128,8 +160,8 @@ def main():
     novelty_config = {
         'metric': distances.manhattan,
         'threshold_init': args.ns_threshold,
-        'threshold_floor': 0.05,
-        'neighbors': 15,
+        'threshold_floor': 0.001,
+        'neighbors': args.num_knn,
         'MCNS': args.mcns
     }
     overwrite_config = [

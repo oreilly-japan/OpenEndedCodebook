@@ -46,9 +46,11 @@ def eval_genome(genome, config, env, timesteps, **kwargs):
         distance = env.agent_distance_to_exit()
         reward = (env.initial_distance - distance) / env.initial_distance
 
-    data = [env.agent.location.x, env.agent.location.y]
-
-    return reward, data
+    results = {
+        'reward': reward,
+        'data': [env.agent.location.x, env.agent.location.y]
+    }
+    return results
 
 
 def main():
@@ -90,7 +92,7 @@ def main():
         'metric': distances.manhattan,
         'threshold_init': args.ns_threshold,
         'threshold_floor': 0.25,
-        'neighbors': 15,
+        'neighbors': args.num_knn,
         'MCNS': args.mcns
     }
     overwrite_config = [

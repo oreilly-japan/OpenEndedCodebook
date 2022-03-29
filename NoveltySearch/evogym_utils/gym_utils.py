@@ -22,5 +22,5 @@ def make_vec_envs(env_id, robot, seed, num_processes, allow_early_resets=True):
         envs = SubprocVecEnv(envs)
     else:
         envs = DummyVecEnv(envs)
-    envs = VecNormalize(envs, norm_reward=False)
+    # envs = VecNormalize(envs, norm_reward=False)
     return envs

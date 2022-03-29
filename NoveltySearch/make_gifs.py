@@ -130,10 +130,10 @@ if __name__=='__main__':
     structure = (structure_data['robot'], structure_data['connectivity'])
 
 
-    robot_history = []
+    robot_ids = []
 
     if args.specific is not None:
-        robot_history = [(0,args.specific)]
+        robot_ids = [specific]
 
     else:
         files = [
@@ -145,16 +145,17 @@ if __name__=='__main__':
             history_file = os.path.join(exp_path, file)
             with open(history_file, 'r') as f:
                 reader = csv.reader(f)
-                robot_history.extend(list(reader)[1:])
+                histories = list(reader)[1:]
+                robot_ids.extend([hist[1] for hist in histories])
 
+    robot_ids = list(set(robot_ids))
 
     if not args.no_multi:
 
         pool = mp.Pool(args.num_cores)
         jobs = []
 
-        for robot in robot_history:
-            key = robot[1]
+        for key in robot_ids:
 
             func_args = (exp_path, exp_args['task'], structure, key, resolution, args.not_overwrite, neat_config)
 
@@ -166,8 +167,7 @@ if __name__=='__main__':
 
     else:
 
-        for robot in robot_history:
-            key = robot[1]
+        for key in robot_ids:
 
             func_args = (exp_path, exp_args['task'], structure, key, resolution, args.not_overwrite, neat_config)
 

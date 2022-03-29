@@ -56,13 +56,18 @@ def get_args():
     )
     parser.add_argument(
         '-g', '--generation',
-        default=200, type=int,
+        default=500, type=int,
         help='neat iterations'
     )
     parser.add_argument(
         '--ns-threshold',
-        default=0.1, type=float,
+        default=0.01, type=float,
         help='initial threshold for novelty archive'
+    )
+    parser.add_argument(
+        '--num-knn',
+        default=10, type=int,
+        help='num of nearest neighbors'
     )
     parser.add_argument(
         '--mcns',

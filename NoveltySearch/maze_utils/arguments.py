@@ -32,6 +32,11 @@ def get_args():
         help='initial threshold for novelty archive'
     )
     parser.add_argument(
+        '--num-knn',
+        default=15, type=int,
+        help='num of nearest neighbors'
+    )
+    parser.add_argument(
         '--mcns',
         default=0.01, type=float,
         help='minimal goal fitness criterion'
