@@ -60,7 +60,7 @@ class Population(neat.Population):
                 if reward is None:
                     raise RuntimeError("Reward not assigned to genome {}".format(g.key))
 
-                if best is None or g.fitness > best.reward:
+                if best is None or reward > best.reward:
                     best = g
             self.reporters.post_evaluate(self.config, self.population, self.species, best)
 

@@ -30,12 +30,16 @@ from simulator import SimulateProcess
 
 PI = 3.1415926
 
-def calc_covar(vec):
+def calc_covar(vec, align=True):
     ave = np.mean(vec,axis=0)
-    vec0 = (vec-ave).T
+    if align:
+        vec_align = (vec-ave).T
+    else:
+        vec_align = vec.T
     comb_indices = np.tril_indices(vec.shape[1],k=0)
-    covar = np.mean(vec0[comb_indices[0]]*vec0[comb_indices[1]],axis=1)
-    return np.hstack([ave,covar])
+    covar = np.mean(vec_align[comb_indices[0]]*vec_align[comb_indices[1]],axis=1)
+    # return np.hstack([ave,covar])
+    return covar
 
 def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
     controller = FeedForwardNetwork.create(genome, config)
@@ -44,10 +48,10 @@ def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
 
     obs = env.reset()
 
-    # pos = env.env_method('get_pos_com_obs', object_name='robot')[0]
+    pos = env.env_method('get_pos_com_obs', object_name='robot')[0]
     # vel = env.env_method('get_vel_com_obs', object_name='robot')[0]
     # rad = env.env_method('get_ort_obs', object_name='robot')[0]
-    # pos_data = [0,0]
+    pos_data = [0,0]
     # rad_data = [0,0]
 
     obs_data = [obs]
@@ -60,36 +64,49 @@ def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
         act_data.append(action)
         obs, _, done, infos = env.step([np.array(action)])
 
-        # pos_ = env.env_method('get_pos_com_obs', object_name='robot')[0]
+        pos_ = env.env_method('get_pos_com_obs', object_name='robot')[0]
         # vel_ = env.env_method('get_vel_com_obs', object_name='robot')[0]
         # rad_ = env.env_method('get_ort_obs', object_name='robot')[0]
 
         if 'episode' in infos[0]:
-            episode_rewards.append(infos[0]['episode']['r'])
             obs_data = np.vstack(obs_data)
-            obs_data = calc_covar(obs_data)
+            obs_cov = calc_covar(obs_data)
+            # obs_diff = np.mean(np.abs(np.diff(obs_data,axis=0)),axis=0)
             act_data = np.clip(np.vstack(act_data),-1,1)
-            act_data = calc_covar(act_data)
-            # print(obs_data.shape, act_data.shape)
-            episode_data.append(np.hstack([obs_data,act_data]))
+            act_cov = calc_covar(act_data, align=False)
+            # act_diff = np.mean(np.abs(np.diff(act_data,axis=0)),axis=0)
+            # data = np.hstack([obs_data, act_data])
+            # data = calc_covar(data)
+            # data = np.hstack([obs_diff,act_diff])
+            # data = act_diff
+            data = np.hstack([obs_cov,act_cov])
+            episode_data.append(data)
+            # episode_data.append(np.hstack([data,data2]))
+            # episode_data.append(np.hstack([obs_data,act_data]))
             obs_data = [obs]
             act_data = []
             # episode_data.append(np.hstack(pos_data+rad_data))
+            pos_data = np.hstack(pos_data)
             # pos_data = [0,0]
             # rad_data = [0,0]
+            reward = infos[0]['episode']['r']
+            # print('{: =.8f}'.format(np.mean(pos_data)))
+            if np.mean(pos_data)<0.3:
+                reward = -3.
+            episode_rewards.append(reward)
         else:
             # pass
             obs_data.append(obs)
-            # pos_diff = pos_-pos
-            # pos_data[0] += np.maximum(pos_diff, 0)
-            # pos_data[1] += np.maximum(-pos_diff, 0)
+            pos_diff = pos_-pos
+            pos_data[0] += np.maximum(pos_diff, 0)
+            pos_data[1] += np.maximum(-pos_diff, 0)
             # rad_diff = (rad_-rad)%(2*PI)
             # if rad_diff<PI:
             #     rad_data[0] += rad_diff
             # else:
             #     rad_data[1] += 2*PI-rad_diff
 
-        # pos = pos_
+        pos = pos_
         # rad = rad_
 
     results = {

@@ -65,16 +65,13 @@ def get_args():
     return args
 
 
-def save_robot_gif(exp_path, env_id, structure, key, resolution, not_overwrite, neat_config):
+def save_robot_gif(exp_path, save_path, env_id, structure, key, resolution, neat_config, overwrite=True):
 
     genome_file = os.path.join(exp_path, 'genome', f'{key}.pickle')
 
-    gif_path = os.path.join(exp_path, 'gif')
-    os.makedirs(gif_path, exist_ok=True)
+    gif_file = os.path.join(save_path, f'{key}.gif')
 
-    gif_file = os.path.join(gif_path, f'{key}.gif')
-
-    if os.path.exists(gif_file) and not_overwrite:
+    if os.path.exists(gif_file) and not overwrite:
         return
 
     with open(genome_file, 'rb') as f:
@@ -130,36 +127,46 @@ if __name__=='__main__':
     structure = (structure_data['robot'], structure_data['connectivity'])
 
 
-    robot_ids = []
+    gif_path = os.path.join(exp_path, 'gif')
+    os.makedirs(gif_path, exist_ok=True)
+
+
+    robot_ids = {}
 
     if args.specific is not None:
-        robot_ids = [specific]
+        robot_ids = {
+            'specified': [args.specific]
+        }
 
     else:
-        files = [
-            'history_reward.csv',
-            'history_novelty.csv'
-        ]
-        for file in files:
+        files = {
+            'reward': 'history_reward.csv',
+            'novelty': 'history_novelty.csv'
+        }
+        for mtric,file in files.items():
 
             history_file = os.path.join(exp_path, file)
             with open(history_file, 'r') as f:
                 reader = csv.reader(f)
                 histories = list(reader)[1:]
-                robot_ids.extend([hist[1] for hist in histories])
+                ids = sorted(list(set([hist[1] for hist in histories])))
+                robot_ids[metric] = ids
 
-    robot_ids = list(set(robot_ids))
 
-    if not args.no_multi:
+    if not args.no_multi and args.specific is None:
 
         pool = mp.Pool(args.num_cores)
         jobs = []
 
-        for key in robot_ids:
-
-            func_args = (exp_path, exp_args['task'], structure, key, resolution, args.not_overwrite, neat_config)
-
-            jobs.append(pool.apply_async(save_robot_gif, func_args))
+        for metric,ids in robot_ids.items():
+            save_path = os.path.join(gif_path, metric)
+            os.makedirs(save_path, exist_ok=True)
+            for key in ids:
+                func_args = (exp_path, save_path, exp_args['task'], structure, key, resolution, neat_config)
+                func_kwargs = {
+                    'overwrite': not args.not_overwrite
+                }
+                jobs.append(pool.apply_async(save_robot_gif, args=func_args, kwargs=func_kwargs))
 
         for job in jobs:
             job.get(timeout=None)
@@ -167,8 +174,13 @@ if __name__=='__main__':
 
     else:
 
-        for key in robot_ids:
+        for metric,ids in robot_ids.items():
+            save_path = os.path.join(gif_path, metric)
+            os.makedirs(save_path, exist_ok=True)
+            for key in ids:
+                func_args = (exp_path, save_path, exp_args['task'], structure, key, resolution, neat_config)
+                func_kwargs = {
+                    'overwrite': not args.not_overwrite
+                }
 
-            func_args = (exp_path, exp_args['task'], structure, key, resolution, args.not_overwrite, neat_config)
-
-            save_robot_gif(*func_args)
+                save_robot_gif(*func_args, **func_kwargs)

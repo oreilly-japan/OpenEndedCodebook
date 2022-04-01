@@ -61,12 +61,12 @@ def get_args():
     )
     parser.add_argument(
         '--ns-threshold',
-        default=0.01, type=float,
+        default=0.1, type=float,
         help='initial threshold for novelty archive'
     )
     parser.add_argument(
         '--num-knn',
-        default=10, type=int,
+        default=5, type=int,
         help='num of nearest neighbors'
     )
     parser.add_argument(
