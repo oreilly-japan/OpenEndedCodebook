@@ -4,6 +4,9 @@ import neat
 
 from reporting import SaveResultReporter, NoveltySearchReporter
 
+class CompleteExtinctionException(Exception):
+    pass
+
 def make_config(config_file, extra_info, custom_config):
     config = neat.Config(neat.DefaultGenome,
                          neat.DefaultReproduction,

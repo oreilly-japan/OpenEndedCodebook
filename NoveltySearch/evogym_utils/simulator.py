@@ -64,8 +64,15 @@ class Simulator:
 
 def run_process(env_id, structure, save_dir, neat_config, generations):
     simulator = Simulator(env_id, structure, save_dir, neat_config)
+    count = 0
     while simulator.generation < generations-1:
-        simulator.update()
+        try:
+            simulator.update()
+            count = 0
+        except:
+            count += 1
+            if count>10:
+                raise RuntimeError('simulater has something problem.')
         simulator.simulate()
 
 
