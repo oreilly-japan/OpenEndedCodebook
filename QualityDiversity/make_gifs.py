@@ -49,10 +49,10 @@ def save_robot_gif(exp_path, env_id, generation, number, resolution, determinist
     structure_file = os.path.join(generation_path, 'structure', f'{number}.npz')
     controller_file = os.path.join(generation_path, 'controller', f'{number}.zip')
 
-    gif_path = os.path.join(generation_path, 'gif')
+    gif_path = os.path.join(exp_path, 'gif')
     os.makedirs(gif_path, exist_ok=True)
 
-    gif_file = os.path.join(gif_path, f'{number}.gif')
+    gif_file = os.path.join(gif_path, f'{generation}_{number}.gif')
 
     if os.path.exists(gif_file) and not_overwrite:
         return

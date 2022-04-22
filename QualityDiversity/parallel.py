@@ -52,7 +52,9 @@ class ParallelEvaluator(object):
 
         # assign the fitness back to each genome
         for job, (_, genome) in zip(jobs, genomes):
-            genome.fitness,genome.bd = job.get(timeout=self.timeout)
+            fitness,bd = job.get(timeout=self.timeout)
+            genome.fitness = fitness
+            setattr(genome,'bd',bd)
         # for i, (_, genome) in enumerate(genomes):
             # genome.fitness,genome.bd = self.fitness_function(genome, config, i, generation)
 

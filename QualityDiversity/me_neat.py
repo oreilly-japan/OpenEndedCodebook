@@ -3,7 +3,7 @@ import random
 import neat
 from neat import nn
 
-from reporting import ReporterSet, SaveResultReporter, MapElitesReporter, StatisticsReporter
+from reporting import ReporterSet, SaveResultReporter, MapElitesReporter
 
 class Population:
 
@@ -115,10 +115,14 @@ class Population:
         self.fitness_function(list(self.population_pool.items()), self.config, self.generation)
 
         for g in self.population_pool.values():
-            bd = tuple(list(g.bd.values()))
-            old = self.population_map.get(bd)
+            bd = getattr(g,'bd',None)
+            if bd is None:
+                raise RuntimeError("bd not assigned to genome {}".format(g.key))
+
+            bd_key = tuple(list(bd.values()))
+            old = self.population_map.get(bd_key)
             if old is None or g.fitness > old.fitness:
-                self.population_map[bd] = g
+                self.population_map[bd_key] = g
 
 
     def random_selection(self, num):

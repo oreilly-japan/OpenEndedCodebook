@@ -13,8 +13,8 @@ $python run.py
 - --ppo-iters     : learning iterations of PPO algo (default: 5). on the other task, need more.
 - --shape         : robot shape (usage: "--shape {height} {width}", default: (5,5))
 - --deterministic : evaluate robot deterministically (default: probabilistic)
-- --no_plot       : not plot progress figure
-- --no_view       : not view simulation of best robot
+- --no-plot       : not plot progress figure
+- --no-view       : not view simulation of best robot
 
 ### make gif
 after searching robot structures, make gif file for each of all robots.

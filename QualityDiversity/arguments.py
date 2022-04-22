@@ -36,27 +36,49 @@ Tasks = [
 ]
 
 def get_args():
-    parser = argparse.ArgumentParser(description='MapElites experiment')
+    parser = argparse.ArgumentParser(
+        description='MapElites experiment')
+
     parser.add_argument(
-        '-n', '--name', default='', type=str, help='experiment name (default: task id)')
+        '-n', '--name',
+        default='', type=str,
+        help='experiment name (default: task id)')
     parser.add_argument(
-        '-t', '--task', default='Walker-v0', type=str, help='target task id')
+        '-t', '--task',
+        default='Walker-v0', type=str,
+        help='target task id')
     parser.add_argument(
-        '-p', '--pop-size', default=4, type=int, help='population size of neat')
+        '-p', '--pop-size',
+        default=4, type=int,
+        help='population size of neat')
     parser.add_argument(
-        '-g', '--generation', default=100, type=int, help='neat iterations')
+        '-g', '--generation',
+        default=100, type=int,
+        help='neat iterations')
     parser.add_argument(
-        '--num-cores', default=1, type=int, help='num of multiprocesses')
+        '--num-cores',
+        default=1, type=int,
+        help='num of multiprocesses')
     parser.add_argument(
-        '--ppo-iters', default=5, type=int, help='ppo iterations')
+        '--ppo-iters',
+        default=5, type=int,
+        help='ppo iterations')
     parser.add_argument(
-        '--shape', default=[5,5], nargs='+', type=int, help='robot shape (useage: "--shape {height} {width}", default: (5,5))')
+        '--shape',
+        default=[5,5], nargs='+', type=int,
+        help='robot shape (useage: "--shape {height} {width}", default: (5,5))')
     parser.add_argument(
-        '--deterministic', action='store_true', default=False, help='evaluate robot deterministic')
+        '--deterministic',
+        action='store_true', default=False,
+        help='evaluate robot deterministic')
     parser.add_argument(
-        '--no-plot', action='store_true', default=False, help='not plot progress figure')
+        '--no-plot',
+        action='store_true', default=False,
+        help='not plot progress figure')
     parser.add_argument(
-        '--no-view', action='store_true', default=False, help='not view simulation of best robot')
+        '--no-view',
+        action='store_true', default=False,
+        help='not view simulation of best robot')
     args = parser.parse_args()
 
     if args.name=='':
