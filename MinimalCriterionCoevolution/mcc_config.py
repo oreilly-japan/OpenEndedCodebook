@@ -6,11 +6,15 @@ from neat.config import ConfigParameter, UnknownConfigItemError
 class MCCConfig(object):
     """A simple container for user-configurable parameters of MCC."""
 
-    __params = [ConfigParameter('pop_size', int),
-                ConfigParameter('fitness_criterion', str),
-                ConfigParameter('fitness_threshold', float),
-                ConfigParameter('no_fitness_termination', bool, False),
-                ConfigParameter('resource_limit', int)]
+    __params = [ConfigParameter('generation', int),
+                ConfigParameter('genome1_pop_size', int),
+                ConfigParameter('genome2_pop_size', int),
+                ConfigParameter('genome1_criteria', int),
+                ConfigParameter('genome2_criteria', int),
+                ConfigParameter('genome1_offspring_size', int),
+                ConfigParameter('genome2_offspring_size', int),
+                ConfigParameter('genome1_limit', int),
+                ConfigParameter('genome2_limit', int)]
 
     def __init__(self, genome1_type, genome2_type, filename, extra_info=None, custom_config=None):
         # Check that the provided types have the required methods.
@@ -64,6 +68,11 @@ class MCCConfig(object):
                                              "\n\t".join(unknown_list))
             raise UnknownConfigItemError(
                 "Unknown (section 'MCC') configuration item {!s}".format(unknown_list[0]))
+
+        if self.genome1_limit is None or self.genome1_limit<=0:
+            self.genome1_limit = self.genome1_offspring_size
+        if self.genome2_limit is None or self.genome2_limit<=0:
+            self.genome2_limit = self.genome2_offspring_size
 
         # Parse type sections.
         genome1_dict = dict(parameters.items(genome1_type.__name__))

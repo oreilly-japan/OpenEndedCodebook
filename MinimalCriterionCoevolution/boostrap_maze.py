@@ -4,10 +4,10 @@ import shutil
 import json
 import random
 import pickle
-import numpy as np
 import warnings
 warnings.simplefilter('ignore')
 
+from neat import DefaultGenome
 from neat.nn import FeedForwardNetwork
 
 import mcc
@@ -18,19 +18,40 @@ from parallel import ParallelEvaluator
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 UTIL_DIR = os.path.join(CURR_DIR, 'maze_utils')
 sys.path.append(UTIL_DIR)
-from boostrap_arguments import get_args
+from arguments import get_boostrap_args
 from utils import make_config
 from maze_genome import MazeGenome
 from maze_genome_decoder import MazeGenomeDecoder
 
 from maze_environment import MazeEnvironment
 
-from neat import DefaultGenome
+
+import time
+from neat import BaseReporter
+
+class RewardReporter(BaseReporter):
+
+    def __init__(self):
+        self.generation = 0
+        self.best = float('-inf')
+        self.start_time = time.time()
+
+    def start_generation(self, generation):
+        self.generation = generation
+
+    def post_evaluate(self, config, population, species, best_genome):
+        self.best = max(self.best, best_genome.reward)
+        elapsed = time.time()-self.start_time
+        hours = int(elapsed//3600)
+        minutes = int(elapsed%3600//60)
+        seconds = elapsed%60
+        print(f'\rgeneration: {self.generation :3}  best: {self.best: =.3f}  elapsed: {hours:0=2}:{minutes:0=2}:{seconds:0=4.1f}',end='')
 
 
 
 def eval_genome(genome, config, env, timesteps, **kwargs):
     controller = FeedForwardNetwork.create(genome, config)
+
     env.reset()
 
     done = False
@@ -55,7 +76,7 @@ def eval_genome(genome, config, env, timesteps, **kwargs):
 
 
 def make_random_maze(config, maze_num, wall_gene_num, path_gene_num):
-    genomes = []
+    genomes = {}
     for m_i in range(maze_num):
         genome = config.genome2_type(m_i)
         genome.configure_new(config.genome2_config)
@@ -66,14 +87,15 @@ def make_random_maze(config, maze_num, wall_gene_num, path_gene_num):
         for __ in range(path_gene_num):
             genome.mutate_add_path(config.genome2_config)
 
-        genomes.append(genome)
+        setattr(genome, 'success_keys', [])
+        genomes[m_i] = genome
 
     return genomes
 
 
 
 def main():
-    args = get_args()
+    args = get_boostrap_args()
 
     save_path = os.path.join(CURR_DIR, 'maze_out', 'boostrap', args.name)
 
@@ -102,11 +124,7 @@ def main():
     ns_config = ns_neat.make_config(ns_config_path, None, None)
 
 
-    MazeDecoder = MazeGenomeDecoder(
-        (mcc_config.genome2_config.region_max_width, mcc_config.genome2_config.region_max_height),
-        (mcc_config.genome2_config.region_min_width, mcc_config.genome2_config.region_min_height),
-        mcc_config.genome2_config.maze_scaler)
-
+    MazeDecoder = MazeGenomeDecoder(mcc_config.genome2_config)
 
     maze_genomes = make_random_maze(
         mcc_config,
@@ -114,29 +132,49 @@ def main():
         args.wall_gene_num,
         args.path_gene_num)
 
-    perMaze = min(mcc_config.resource_limit, args.agent_num//args.maze_num)
+    perMaze = min(mcc_config.genome2_limit, args.agent_num//args.maze_num)
 
-    agent_genomes = []
+    agent_genomes = {}
+    a_i = 0
+    for m_i,maze_genome in enumerate(maze_genomes.values()):
 
-    for m_i,maze_genome in enumerate(maze_genomes):
+        print(f'maze {m_i+1}')
 
-        print(f'maze genome {m_i+1}')
-
-        maze_env, timesteps, _ = MazeDecoder.decode(maze_genome, save=os.path.join(save_path, f'{m_i+1}.jpg'))
+        maze_env, timesteps = MazeDecoder.decode(maze_genome, mcc_config, save=os.path.join(save_path, f'maze{m_i+1}.jpg'))
 
         evaluator_kwargs = {
             'env': maze_env,
             'timesteps': timesteps}
         evaluator = ParallelEvaluator(evaluator_kwargs, args.num_cores, eval_genome)
 
-        for a_i in range(perMaze):
+        print(f'serch {perMaze} solver agent')
+        while len(agent_genomes) < perMaze*(m_i+1):
 
             pop = ns_neat.Population(ns_config)
-            agent_genome = pop.run(evaluator.evaluate, n=None)
+            pop.add_reporter(RewardReporter())
+            agent_genome = pop.run(evaluator.evaluate, n=300)
 
-            agent_genomes.append(agent_genome)
-            print(f'\r\t found {a_i+1} / {perMaze}',end='')
+            if agent_genome.reward>=1.0:
+                print('  found')
+
+                setattr(agent_genome, 'success_keys', [m_i])
+                agent_genome.key = a_i
+                agent_genomes[a_i] = agent_genome
+
+                maze_genome.success_keys.append(a_i)
+                a_i += 1
+            else:
+                print('  reset')
         print()
+
+    maze_genome_file = os.path.join(save_path, 'maze_genomes.pickle')
+    with open(maze_genome_file, 'wb') as f:
+        pickle.dump(maze_genomes, f)
+
+    agent_genome_file = os.path.join(save_path, 'agent_genomes.pickle')
+    with open(agent_genome_file, 'wb') as f:
+        pickle.dump(agent_genomes, f)
+
 
 if __name__=='__main__':
     main()

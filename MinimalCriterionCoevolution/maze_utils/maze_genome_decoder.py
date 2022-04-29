@@ -6,18 +6,20 @@ from maze_environment import MazeEnvironment
 
 class MazeGenomeDecoder:
 
-    def __init__(self, region_max_size, region_min_size, maze_scaler):
-        self.region_max_size = region_max_size
-        self.region_min_size = region_min_size
-        self.maze_scaler = maze_scaler
+    def __init__(self, config):
+        self.region_max_size = (config.region_max_width, config.region_max_height)
+        self.region_min_size = (config.region_min_width, config.region_min_height)
+        self.maze_scaler = config.maze_scaler
+        self.max_timesteps = config.max_timesteps
 
-    # main function (maze genome -> wall list [(x1, y1, x2, y2)])
-    def decode(self, genome, save=None):
+    # main decode function (maze genome -> wall list [(x1, y1, x2, y2)])
+    def decode(self, genome, config, save=None, return_env=True):
         maze_size = genome.maze_size
+        # print(maze_size)
         wall_genes = genome.wall_genes
-        print([(w.wall_location, w.passage_location, w.horizontal) for w in wall_genes])
+        # print([(w.wall_location, w.passage_location, w.horizontal) for w in wall_genes])
         path_genes = genome.path_genes
-        print([(p.pathpoint,p.horizontal) for p in path_genes])
+        # print([(p.pathpoint,p.horizontal) for p in path_genes])
 
         pathway_map = np.zeros((maze_size[1], maze_size[0]), dtype=int)
         horizontal_wall_map = np.zeros((maze_size[1]+1, maze_size[0]), dtype=bool)
@@ -27,31 +29,39 @@ class MazeGenomeDecoder:
 
         regions = self.divide_maze(maze_size, pathway_map)
 
-        max_wall_gene_num = self.map_walls_of_regions(wall_genes, regions, maze_size, pathway_map, horizontal_wall_map, vertical_wall_map)
+        self.surround_regions(regions, horizontal_wall_map, vertical_wall_map)
+
+        subregion_num = self.map_walls_of_regions(wall_genes, regions, maze_size, pathway_map, horizontal_wall_map, vertical_wall_map)
+        genome.subregion_num = subregion_num
 
         self.surround_maze(horizontal_wall_map, vertical_wall_map)
 
         if save is not None:
             self.plot(save, maze_size, pathway_map, horizontal_wall_map, vertical_wall_map)
 
-        walls = self.extract_walls(maze_size, horizontal_wall_map, vertical_wall_map)
+        if return_env:
+            walls = self.extract_walls(maze_size, horizontal_wall_map, vertical_wall_map)
 
-        start_point = (self.maze_scaler//2, self.maze_scaler//2)
-        exit_point = (maze_size[0]*self.maze_scaler - self.maze_scaler//2,
-                      maze_size[1]*self.maze_scaler - self.maze_scaler//2)
-        direction = 0 if pathway_map[0,0]==4 else 90 if pathway_map[0,0]==1 else None
-        assert direction is not None
-        env = MazeEnvironment.make_environment(start_point, walls, exit_point, init_heading=direction)
+            start_point = (self.maze_scaler//2, self.maze_scaler//2)
+            exit_point = (maze_size[0]*self.maze_scaler - self.maze_scaler//2,
+                          maze_size[1]*self.maze_scaler - self.maze_scaler//2)
+            # direction = 0 if pathway_map[0,0]==4 else 90 if pathway_map[0,0]==1 else None
+            direction = 45
+            # assert direction is not None
 
-        timesteps = int(path_length*self.maze_scaler)
+            timesteps = min(self.max_timesteps, int(path_length*self.maze_scaler*0.6))
 
-        return env, timesteps, max_wall_gene_num
+            env = MazeEnvironment.make_environment(start_point, walls, exit_point, init_heading=direction)
 
+            return env, timesteps
+
+        else:
+            return
 
     # track path reversely
     def track_pathway(self, maze_size, path_genes, path_map, h_wall_map, v_wall_map):
         path_length = 0
-        end_p = (maze_size[1]-1, maze_size[0]-1)
+        end_p = (maze_size[0]-1, maze_size[1]-1)
         for gene in path_genes[::-1]:
             start_p = gene.pathpoint
             horizontal = gene.horizontal
@@ -61,7 +71,8 @@ class MazeGenomeDecoder:
 
             end_p = start_p
 
-        if path_genes[-1].horizontal:
+        if (path_genes[-1].horizontal and path_genes[-1].pathpoint[1]!=maze_size[1]-1) or \
+            (not path_genes[-1].horizontal and path_genes[-1].pathpoint[0]==maze_size[0]-1):
             v_wall_map[-1, -2] = True
             path_map[-1, -1] = 1
         else:
@@ -166,6 +177,17 @@ class MazeGenomeDecoder:
         return regions
 
 
+    def surround_regions(self, regions, h_wall_map, v_wall_map):
+        for region in regions.values():
+            start_p = region['point']
+            end_p = (start_p[0]+region['size'][0], start_p[1]+region['size'][1])
+
+            h_wall_map[start_p[1], start_p[0]:end_p[0]] = True
+            h_wall_map[end_p[1]  , start_p[0]:end_p[0]] = True
+            v_wall_map[start_p[1]:end_p[1], start_p[0]] = True
+            v_wall_map[start_p[1]:end_p[1], end_p[0]  ] = True
+
+
     def map_walls_of_regions(self, wall_genes, regions, maze_size, path_map, h_wall_map, v_wall_map):
 
         subregion_queue = list(regions.values())
@@ -185,7 +207,6 @@ class MazeGenomeDecoder:
 
             if r_width<self.region_min_size[0] or r_height<self.region_min_size[1]:
                 if r_depth==1:
-                    self.surround_region(r_start, r_end, h_wall_map, v_wall_map)
                     v_point = r_start
                     h_point = r_start
                     self.make_entrance(h_point, v_point, r_start, r_end, maze_size, path_map, h_wall_map, v_wall_map)
@@ -229,7 +250,6 @@ class MazeGenomeDecoder:
                     })
 
                 if r_depth==1:
-                    self.surround_region(r_start, r_end, h_wall_map, v_wall_map)
                     v_point = (r_start[0]+passage_x, r_start[1])
                     h_point = (r_start[0], r_start[1]+wall_y)
                     self.make_entrance(h_point, v_point, r_start, r_end, maze_size, path_map, h_wall_map, v_wall_map)
@@ -240,7 +260,7 @@ class MazeGenomeDecoder:
 
                 if passage_y>0:
                     v_wall_map[r_start[1]:r_start[1]+passage_y, r_start[0]+wall_x] = True
-                if passage_y<r_height-1:
+                if passage_y+1<r_height:
                     v_wall_map[r_start[1]+passage_y+1:r_start[1]+r_height, r_start[0]+wall_x] = True
 
                 if wall_x>=2:
@@ -263,18 +283,11 @@ class MazeGenomeDecoder:
                     })
 
                 if r_depth==1:
-                    self.surround_region(r_start, r_end, h_wall_map, v_wall_map)
                     v_point = (r_start[0]+wall_x, r_start[1])
                     h_point = (r_start[0], r_start[1]+passage_y)
                     self.make_entrance(h_point, v_point, r_start, r_end, maze_size, path_map, h_wall_map, v_wall_map)
 
         return region_idx
-
-    def surround_region(self, start_p, end_p, h_wall_map, v_wall_map):
-        h_wall_map[start_p[1], start_p[0]:end_p[0]] = True
-        h_wall_map[end_p[1]  , start_p[0]:end_p[0]] = True
-        v_wall_map[start_p[1]:end_p[1], start_p[0]] = True
-        v_wall_map[start_p[1]:end_p[1], end_p[0]  ] = True
 
     def make_entrance(self, h_point, v_point, start_p, end_p, maze_size, path_map, h_wall_map, v_wall_map):
         step = 1
@@ -338,8 +351,8 @@ class MazeGenomeDecoder:
 
         arrow_args = {'width':0.05/(maze_size[1]/15),'head_width':0.2/(maze_size[1]/15),'head_length':0.2,'fc':'k','length_includes_head':True}
         for j,i in zip(*np.where(path_map>0)):
-            if (i,j)==(0,0) or (i,j)==(maze_size[0],maze_size[1]):
-                continue
+            # if (i,j)==(0,0) or (i,j)==(maze_size[0]-1,maze_size[1]-1):
+            #     continue
             if path_map[j,i]==1:
                 plt.arrow(x=i+0.5,y=j+0.25,dx=0,dy=0.5,**arrow_args)
             elif path_map[j,i]==2:

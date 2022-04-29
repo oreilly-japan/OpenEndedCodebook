@@ -1,10 +1,8 @@
-import random
-
 import neat
 import distances
 
 from ns_config import NSConfig
-from reporting import SaveResultReporter, NoveltySearchReporter
+# from reporting import SaveResultReporter, NoveltySearchReporter
 
 
 class CompleteExtinctionException(Exception):
@@ -72,7 +70,6 @@ class Population(neat.Population):
                 if best is None or reward > best.reward:
                     best = g
             self.reporters.post_evaluate(self.config, self.population, self.species, best)
-            print(best.reward)
 
             # Track the best genome ever seen.
             if self.best_genome is None or best.reward > self.best_genome.reward:

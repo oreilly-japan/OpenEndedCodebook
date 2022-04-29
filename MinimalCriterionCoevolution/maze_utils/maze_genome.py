@@ -11,6 +11,10 @@ class PathGene():
         self.pathpoint = None
         self.horizontal = None
 
+    def __str__(self):
+        s = f'(({self.pathpoint[0]},{self.pathpoint[1]}),{self.horizontal})'
+        return s
+
     def copy(self):
         new_gene = self.__class__(self.key, self.start_gene)
         new_gene.pathpoint = self.pathpoint
@@ -38,6 +42,10 @@ class WallGene():
         self.passage_location = None
         self.horizontal = None
 
+    def __str__(self):
+        s = f'({self.wall_location: =.3f},{self.passage_location: =.3f},{self.horizontal})'
+        return s
+
     def copy(self):
         new_gene = self.__class__(self.key, self.depth)
         new_gene.wall_location = self.wall_location
@@ -49,10 +57,10 @@ class WallGene():
         self.passage_location = min(0.9999, random.random())
         self.horizontal = bool(random.getrandbits(1))
 
-    def mutate(self, depth, cofig):
-        scale = config['wall_mutate_scale']*depth
-        self.wall_location = max(0, min(0.9999, wall_gene[0] + random.uniform(-scale,scale)))
-        self.passage_location = max(0, min(0.9999, wall_gene[0] + random.uniform(-scale,scale)))
+    def mutate(self, depth, config):
+        scale = config.wall_mutate_scale * depth
+        self.wall_location = max(0, min(0.9999, self.wall_location + random.uniform(-scale,scale)))
+        self.passage_location = max(0, min(0.9999, self.passage_location + random.uniform(-scale,scale)))
         self.horizontal = bool(random.getrandbits(1))
 
 
@@ -79,7 +87,8 @@ class MazeGenomeConfig(object):
                         ConfigParameter('region_max_height', int),
                         ConfigParameter('region_min_width', int),
                         ConfigParameter('region_min_height', int),
-                        ConfigParameter('maze_scaler', int)]
+                        ConfigParameter('maze_scaler', int),
+                        ConfigParameter('max_timesteps', int)]
 
 
         # Use the configuration data to interpret the supplied parameters.
@@ -149,6 +158,17 @@ class MazeGenome():
     def write_config(cls, f, config):
         config.save(f)
 
+    def __str__(self):
+        s = f'Key: {self.key}\nFitness: {self.fitness: =.3f}'
+        s += f'\nMaze size: ({self.maze_size[0]},{self.maze_size[1]})'
+        s += '\nWall:'
+        for wall_gene in self.wall_genes:
+            s += f' {wall_gene}'
+        s += '\nPath:'
+        for path_gene in self.path_genes:
+            s += f' {path_gene}'
+        return s
+
     def __init__(self, key):
         self.key = key
         self.maze_size = None
@@ -156,10 +176,10 @@ class MazeGenome():
         self.path_genes = []
         self.fitness = None
 
-        self.mutate_options = None
+        self.subregion_num = None
 
     def configure_new(self, config):
-        self.maze_size = (config.init_maze_width, config.init_maze_height)
+        self.maze_size = [config.init_maze_width, config.init_maze_height]
         self.wall_genes.append(self.create_wall(config.get_new_wall_key()))
         self.path_genes.insert(0, self.create_path(0, start_gene=True))
 
@@ -178,7 +198,7 @@ class MazeGenome():
             options = [option['func_name'] for option in config.mutate_options.values()]
             weights = [option['prob'] for option in config.mutate_options.values()]
 
-            muatte_func_name = random.choices(choice_options)
+            mutate_func_name = random.choices(options, k=1, weights=weights)[0]
 
             mutate_func = getattr(self, mutate_func_name, None)
             assert mutate_func is not None, f'{mutate_func_name} is not defined in MazeGenome class'
@@ -220,13 +240,13 @@ class MazeGenome():
         while not valid:
             path_attrs = [(path_gene.pathpoint, path_gene.horizontal) for path_gene in self.path_genes]
 
-            mutate_idx = random.randrange(0,len(path_genes))
+            mutate_idx = random.randrange(0,len(self.path_genes))
 
             clone = self.path_genes[mutate_idx].copy()
             clone.mutate()
 
-            path_attrs[mutate_idx] = (clone.path_point, clone.horizontal)
-            valid = self.check_path_validity(path_attrs)
+            path_attrs[mutate_idx] = (clone.pathpoint, clone.horizontal)
+            valid = self.check_path_validity(path_attrs, self.maze_size)
 
         self.path_genes[mutate_idx] = clone
 
@@ -244,52 +264,61 @@ class MazeGenome():
             new_gene = self.create_path(key)
             path_attrs.insert(insert_idx, (new_gene.pathpoint, new_gene.horizontal))
 
-            valid = self.check_path_validity(path_attrs)
+            valid = self.check_path_validity(path_attrs, self.maze_size)
 
         self.path_genes.insert(insert_idx, new_gene)
 
     def mutate_delete_path(self, config):
-        if len(path_genes)<2:
+        if len(self.path_genes)<2:
             return
 
         valid = False
         while not valid:
             path_attrs = [(path_gene.pathpoint, path_gene.horizontal) for path_gene in self.path_genes]
 
-            delete_idx = random.randrange(1,len(path_genes))
+            delete_idx = random.randrange(1,len(self.path_genes))
             path_attrs.pop(delete_idx)
 
-            valid = self.check_path_validity(path_attrs)
+            valid = self.check_path_validity(path_attrs, self.maze_size)
 
-        del path_genes[delete_idx]
+        del self.path_genes[delete_idx]
 
     def mutate_expand_width(self, config):
-        self.size[0] += 1
+        self.maze_size[0] += 1
 
     def mutate_expand_height(self, config):
-        self.size[1] += 1
+        self.maze_size[1] += 1
 
-    def check_path_validity(self, pathways):
+    @staticmethod
+    def check_path_validity(pathways, maze_size):
 
         point_history = []
-        end_p = (self.maze_size[0]-1, self.maze_size[1]-1)
+        end_p = (maze_size[0]-1, maze_size[1]-1)
 
-        if any([pathway[0]==end_p for pathway in pathways]):
-            return False
-        if any([pathway[0]==(0,0) for pathway in pathways[1:]]):
-            return False
+        # if any([pathway[0]==end_p for pathway in pathways]):
+        #     return False
+        # if any([pathway[0]==(0,0) for pathway in pathways[1:]]):
+        #     return False
+        # if any([pathways[i][0][0]==pathways[i+1][0][0] or pathways[i][0][1]==pathways[i+1][0][1] \
+        #     for i in range(len(pathways)-1)]):
+        #     return False
 
         for pathway in pathways[::-1]:
             cur_p = pathway[0]
             horizontal = pathway[1]
 
+            if cur_p[0]<0 or cur_p[1]<0 or cur_p[0]>=maze_size[0] or cur_p[1]>=maze_size[1] or\
+               end_p==(0,0) or cur_p==(maze_size[0]-1, maze_size[1]-1) or\
+               cur_p[0]==end_p[0] or cur_p[1]==end_p[1]:
+                return False
+
             points = []
             if horizontal:
-                points.extend([x+cur_p[1]*self.maze_size[1] for x in range(cur_p[0], end_p[0], 1 if cur_p[0]<end_p[0] else -1)])
-                points.extend([end_p[0]+y*self.maze_size[1] for y in range(cur_p[1], end_p[1], 1 if cur_p[1]<end_p[1] else -1)])
+                points.extend([x+cur_p[1]*maze_size[1] for x in range(cur_p[0], end_p[0], 1 if cur_p[0]<end_p[0] else -1)])
+                points.extend([end_p[0]+y*maze_size[1] for y in range(cur_p[1], end_p[1], 1 if cur_p[1]<end_p[1] else -1)])
             else:
-                points.extend([cur_p[0]+y*self.maze_size[1] for y in range(cur_p[1], end_p[1], 1 if cur_p[1]<end_p[1] else -1)])
-                points.extend([x+end_p[1]*self.maze_size[1] for x in range(cur_p[0], end_p[0], 1 if cur_p[0]<end_p[0] else -1)])
+                points.extend([cur_p[0]+y*maze_size[1] for y in range(cur_p[1], end_p[1], 1 if cur_p[1]<end_p[1] else -1)])
+                points.extend([x+end_p[1]*maze_size[1] for x in range(cur_p[0], end_p[0], 1 if cur_p[0]<end_p[0] else -1)])
             for p in points:
                 if p in point_history:
                     return False

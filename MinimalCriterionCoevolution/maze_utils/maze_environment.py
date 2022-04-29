@@ -9,13 +9,14 @@ import math
 import geometry
 
 # The maximal allowed speed for the maze solver agent
-MAX_AGENT_SPEED = 3.0
+MAX_AGENT_SPEED = 5.0
+MAX_ANGULAR_VELOCITY = 8.0
 
 class Agent:
     """
     This is the maze navigating agent
     """
-    def __init__(self, location, heading=0, speed=0, angular_vel=0, radius=5.0, range_finder_range=100.0):
+    def __init__(self, location, heading=0, speed=0, angular_vel=0, radius=5.0, range_finder_range=80.0):
         """
         Creates new Agent with specified parameters.
         Arguments:
@@ -125,8 +126,8 @@ class MazeEnvironment:
         Arguments:
             control_signals: The control signals received from the control ANN
         """
-        self.agent.angular_vel  += (control_signals[0] - 0.5)
-        self.agent.speed        += (control_signals[1] - 0.5)
+        self.agent.angular_vel  += (control_signals[0] - 0.5) * 3
+        self.agent.speed        += (control_signals[1] - 0.5) * 3
 
         # constrain the speed & angular velocity
         if self.agent.speed > MAX_AGENT_SPEED:
@@ -135,11 +136,11 @@ class MazeEnvironment:
         if self.agent.speed < -MAX_AGENT_SPEED:
             self.agent.speed = -MAX_AGENT_SPEED
 
-        if self.agent.angular_vel > MAX_AGENT_SPEED:
-            self.agent.angular_vel = MAX_AGENT_SPEED
+        if self.agent.angular_vel > MAX_ANGULAR_VELOCITY:
+            self.agent.angular_vel = MAX_ANGULAR_VELOCITY
 
-        if self.agent.angular_vel < -MAX_AGENT_SPEED:
-            self.agent.angular_vel = -MAX_AGENT_SPEED
+        if self.agent.angular_vel < -MAX_ANGULAR_VELOCITY:
+            self.agent.angular_vel = -MAX_ANGULAR_VELOCITY
 
     def update_rangefinder_sensors(self):
         """
@@ -174,7 +175,7 @@ class MazeEnvironment:
                         min_range = found_range
 
             # Update sensor value
-            self.agent.range_finders[i] = min_range
+            self.agent.range_finders[i] = min_range/self.agent.range_finder_range
 
     def update_radars(self):
         """
@@ -242,6 +243,7 @@ class MazeEnvironment:
         # check if agent reached exit point
         distance = self.agent_distance_to_exit()
         self.exit_found = (distance < self.exit_range)
+
         return self.exit_found
 
     def __str__(self):
@@ -256,8 +258,8 @@ class MazeEnvironment:
 
         return str
 
-    @classmethod
-    def read_environment(cls, file_path):
+    @staticmethod
+    def read_environment(file_path):
         """
         The function to read maze environment configuration from provided
         file.
@@ -302,8 +304,8 @@ class MazeEnvironment:
         # create and return the maze environment
         return MazeEnvironment(init_location=loc, init_heading=heading, walls=walls, exit_point=maze_exit)
 
-    @classmethod
-    def make_environment(cls, start_point, walls, exit_point, init_heading=0):
+    @staticmethod
+    def make_environment(start_point, walls, exit_point, init_heading=0):
         return MazeEnvironment(
             init_location=geometry.read_point(' '.join(list(map(str, start_point)))),
             init_heading=init_heading,
