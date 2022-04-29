@@ -195,15 +195,18 @@ class MazeGenome():
 
     def mutate(self, config):
         if config.single_structural_mutation:
+
             options = [option['func_name'] for option in config.mutate_options.values()]
             weights = [option['prob'] for option in config.mutate_options.values()]
 
-            mutate_func_name = random.choices(options, k=1, weights=weights)[0]
+            valid = False
+            while not valid:
+                mutate_func_name = random.choices(options, k=1, weights=weights)[0]
 
-            mutate_func = getattr(self, mutate_func_name, None)
-            assert mutate_func is not None, f'{mutate_func_name} is not defined in MazeGenome class'
+                mutate_func = getattr(self, mutate_func_name, None)
+                assert mutate_func is not None, f'{mutate_func_name} is not defined in MazeGenome class'
 
-            mutate_func(config)
+                valid = mutate_func(config)
 
         else:
             for mutate_option in config.mutate_options.values():
@@ -223,17 +226,22 @@ class MazeGenome():
             if values[i] < config.wall_mutate_prob_individ:
                 depth = int(math.log2(i+1)+1)
                 self.wall_genes[i].mutate(depth, config)
+        return True
 
     def mutate_add_wall(self, config):
+        if self.subregion_num is not None and len(self.wall_genes)>=self.subregion_num:
+            return False
         key = config.get_new_wall_key()
         self.wall_genes.append(self.create_wall(key))
+        return True
 
     def mutate_delete_wall(self, config):
         if len(self.wall_genes)<2:
-            return
+            return False
 
         delete_idx = random.randrange(0,len(self.wall_genes))
         del self.wall_genes[delete_idx]
+        return True
 
     def mutate_path_attr(self, config):
         valid = False
@@ -249,6 +257,7 @@ class MazeGenome():
             valid = self.check_path_validity(path_attrs, self.maze_size)
 
         self.path_genes[mutate_idx] = clone
+        return True
 
     def mutate_add_path(self, config):
         key = config.get_new_path_key()
@@ -267,10 +276,11 @@ class MazeGenome():
             valid = self.check_path_validity(path_attrs, self.maze_size)
 
         self.path_genes.insert(insert_idx, new_gene)
+        return True
 
     def mutate_delete_path(self, config):
         if len(self.path_genes)<2:
-            return
+            return False
 
         valid = False
         while not valid:
@@ -282,26 +292,21 @@ class MazeGenome():
             valid = self.check_path_validity(path_attrs, self.maze_size)
 
         del self.path_genes[delete_idx]
+        return True
 
     def mutate_expand_width(self, config):
         self.maze_size[0] += 1
+        return True
 
     def mutate_expand_height(self, config):
         self.maze_size[1] += 1
+        return True
 
     @staticmethod
     def check_path_validity(pathways, maze_size):
 
         point_history = []
         end_p = (maze_size[0]-1, maze_size[1]-1)
-
-        # if any([pathway[0]==end_p for pathway in pathways]):
-        #     return False
-        # if any([pathway[0]==(0,0) for pathway in pathways[1:]]):
-        #     return False
-        # if any([pathways[i][0][0]==pathways[i+1][0][0] or pathways[i][0][1]==pathways[i+1][0][1] \
-        #     for i in range(len(pathways)-1)]):
-        #     return False
 
         for pathway in pathways[::-1]:
             cur_p = pathway[0]
