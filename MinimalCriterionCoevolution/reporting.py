@@ -63,8 +63,11 @@ class SaveReporter():
         self.write_history(self.history2_file, self.history_header, survivors2, self.generation)
         self.save_genomes(self.genome2_path, survivors1)
 
-        for s in survivors2.values():
-            print(s)
+        if len(survivors2)>0:
+            print('survive mazes')
+            for s in survivors2.values():
+                print(s)
+                print()
 
     @staticmethod
     def write_history(file, headers, genomes, generation):

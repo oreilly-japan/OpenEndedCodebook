@@ -26,7 +26,7 @@ $python run_maze.py
 - --maze-criteria   : minimal number of agent to solve for each maze to survive (default: 1)
 - --agent-pop       : maximum size of agent population (default: 250)
 - --maze-pop        : maximum size of maze population (default: 50)
-- --agent-limit     : resource limit of agent (default: 0)
+- --agent-limit     : resource limit of agent (default: 0, it means no limit)
 - --maze-limit      : resource limit of maze (default: 5)
 - --agent-batch     : batch size of agent (default: 40)
 - --maze-batch      : batch size of maze (default: 10)

@@ -43,7 +43,7 @@ class WallGene():
         self.horizontal = None
 
     def __str__(self):
-        s = f'({self.wall_location: =.3f},{self.passage_location: =.3f},{self.horizontal})'
+        s = f'({self.wall_location: =.2f},{self.passage_location: =.2f},{self.horizontal})'
         return s
 
     def copy(self):
