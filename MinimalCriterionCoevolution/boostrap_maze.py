@@ -139,6 +139,7 @@ def main():
     for m_i,maze_genome in enumerate(maze_genomes.values()):
 
         print(f'maze {m_i+1}')
+        print(maze_genome)
 
         maze_env, timesteps = MazeDecoder.decode(maze_genome, mcc_config, save=os.path.join(save_path, f'maze{m_i+1}.jpg'))
 

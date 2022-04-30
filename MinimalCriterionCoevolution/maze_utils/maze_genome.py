@@ -210,7 +210,7 @@ class MazeGenome():
 
         else:
             for mutate_option in config.mutate_options.values():
-                if random.random()>mutate_option['prob']:
+                if random.random()<mutate_option['prob']:
                     mutate_func_name = mutate_option['func_name']
 
                     mutate_func = getattr(self, mutate_func_name, None)
@@ -245,7 +245,8 @@ class MazeGenome():
 
     def mutate_path_attr(self, config):
         valid = False
-        while not valid:
+        invalid_count = 0
+        while not valid and invalid_count<50:
             path_attrs = [(path_gene.pathpoint, path_gene.horizontal) for path_gene in self.path_genes]
 
             mutate_idx = random.randrange(0,len(self.path_genes))
@@ -256,13 +257,17 @@ class MazeGenome():
             path_attrs[mutate_idx] = (clone.pathpoint, clone.horizontal)
             valid = self.check_path_validity(path_attrs, self.maze_size)
 
-        self.path_genes[mutate_idx] = clone
-        return True
+            invalid_count += 1
+
+        if valid:
+            self.path_genes[mutate_idx] = clone
+        return valid
 
     def mutate_add_path(self, config):
         key = config.get_new_path_key()
         valid = False
-        while not valid:
+        invalid_count = 0
+        while not valid and invalid_count<50:
             path_attrs = [(path_gene.pathpoint, path_gene.horizontal) for path_gene in self.path_genes]
 
             if len(self.path_genes)>1:
@@ -275,15 +280,19 @@ class MazeGenome():
 
             valid = self.check_path_validity(path_attrs, self.maze_size)
 
-        self.path_genes.insert(insert_idx, new_gene)
-        return True
+            invalid_count += 1
+
+        if valid:
+            self.path_genes.insert(insert_idx, new_gene)
+        return valid
 
     def mutate_delete_path(self, config):
         if len(self.path_genes)<2:
             return False
 
         valid = False
-        while not valid:
+        invalid_count = 0
+        while not valid and invalid_count<50:
             path_attrs = [(path_gene.pathpoint, path_gene.horizontal) for path_gene in self.path_genes]
 
             delete_idx = random.randrange(1,len(self.path_genes))
@@ -291,8 +300,11 @@ class MazeGenome():
 
             valid = self.check_path_validity(path_attrs, self.maze_size)
 
-        del self.path_genes[delete_idx]
-        return True
+            invalid_count += 1
+
+        if valid:
+            del self.path_genes[delete_idx]
+        return valid
 
     def mutate_expand_width(self, config):
         self.maze_size[0] += 1
