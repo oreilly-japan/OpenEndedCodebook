@@ -89,31 +89,48 @@ class MCCParallelEvaluator(object):
 
         lock = mp.Lock()
         self.pool = NonDaemonPool(num_workers, initargs=(lock,))
+        self.manager = mp.Manager()
 
 
     def __del__(self):
         self.pool.close() # should this be terminate?
         self.pool.join()
 
-    def evaluate(self, genomes1, genomes2, config, generation):
+    def evaluate(self, offsprings1, offsprings2, population1, population2, config, generation):
         kwargs = dict(**self.kwargs, config=config, generation=generation, evaluate_function=self.evaluate_function)
 
-        genomes1_decoded = [self.decode_function1(genome1, config.genome1_config) for (_,genome1) in genomes1]
-        genomes2_decoded = [self.decode_function2(genome2, config.genome2_config) for (_,genome2) in genomes2]
+        offsprings1_decoded = [self.decode_function1(genome1, config.genome1_config) for (_,genome1) in offsprings1]
+        offsprings2_decoded = [self.decode_function2(genome2, config.genome2_config) for (_,genome2) in offsprings2]
 
-        manager = mp.Manager()
-        genome1_success_nums = [manager.Value('i', 0) for _ in range(len(genomes1))]
-        genome2_success_nums = [manager.Value('i', 0) for _ in range(len(genomes2))]
+        population1_decoded = [self.decode_function1(genome1, config.genome1_config) for (_,genome1) in population1]
+        population2_decoded = [self.decode_function2(genome2, config.genome2_config) for (_,genome2) in population2]
 
-        # genome1_success_nums = [0 for _ in range(len(genomes1))]
-        # genome2_success_nums = [0 for _ in range(len(genomes2))]
+        offsprings1_success_num = [self.manager.Value('i', 0) for _ in range(len(offsprings1))]
+        offsprings2_success_num = [self.manager.Value('i', 0) for _ in range(len(offsprings2))]
 
+        population1_success_num = [self.manager.Value('i', len(genome1.success_keys)) for (_,genome1) in population1]
+        population2_success_num = [self.manager.Value('i', len(genome2.success_keys)) for (_,genome2) in population2]
+
+
+        # evaluate genome1
+        self.evalute_one_side(offsprings1, offsprings1_decoded, offsprings1_success_num,
+                              population2, population2_decoded, population2_success_num, kwargs)
+        # evaluate genome2
+        self.evalute_one_side(population1, population1_decoded, population1_success_num,
+                              offsprings2, offsprings2_decoded, offsprings2_success_num, kwargs)
+
+        for (_,genome1), num in zip(offsprings1, offsprings1_success_num):
+            genome1.fitness = num.value
+        for (_,genome2), num in zip(offsprings2, offsprings2_success_num):
+            genome2.fitness = num.value
+
+    def evalute_one_side(self, genomes1, phenos1, nums1, genomes2, phenos2, nums2, kwargs):
         jobs = []
-        for g1_i in range(len(genomes1)):
-            for g2_i in range(len(genomes2)):
-                args = (genomes1_decoded[g1_i], genome1_success_nums[g1_i],
-                        genomes2_decoded[g2_i], genome2_success_nums[g2_i])
-                jobs.append(self.pool.apply_async(self.evaluation_conditioning, args=args, kwds=kwargs))
+        for g1_i in range(len(phenos1)):
+            for g2_i in range(len(phenos2)):
+                args = (phenos1[g1_i], nums1[g1_i],
+                        phenos2[g2_i], nums2[g2_i])
+                jobs.append(self.pool.apply_async(self.conditioned_evaluation, args=args, kwds=kwargs))
 
         for g1_key, genome1 in genomes1:
             for g2_key, genome2 in genomes2:
@@ -123,16 +140,8 @@ class MCCParallelEvaluator(object):
                     genome1.success_keys.append(g2_key)
                     genome2.success_keys.append(g1_key)
 
-        # for job in jobs:
-        #     job.get(timeout=self.timeout)
-
-        for (_,genome1), num in zip(genomes1, genome1_success_nums):
-            genome1.fitness = num.value
-        for (_,genome2), num in zip(genomes2, genome2_success_nums):
-            genome2.fitness = num.value
-
     @staticmethod
-    def evaluation_conditioning(pheno1, achieve1, pheno2, achieve2, config, evaluate_function, **kwargs):
+    def conditioned_evaluation(pheno1, achieve1, pheno2, achieve2, config, evaluate_function, **kwargs):
         count_up = False
 
         if achieve1.value >= config.genome1_limit or achieve2.value >= config.genome2_limit:
@@ -143,7 +152,6 @@ class MCCParallelEvaluator(object):
         success = evaluate_function(pheno1, pheno2)
 
         if success:
-            # print('success')
             if (achieve1.value < config.genome1_criteria and achieve2.value < config.genome2_limit) or \
                (achieve2.value < config.genome2_criteria and achieve1.value < config.genome1_limit):
 
