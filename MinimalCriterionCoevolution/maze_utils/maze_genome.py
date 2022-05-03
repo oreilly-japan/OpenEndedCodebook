@@ -28,10 +28,9 @@ class PathGene():
             self.pathpoint = (random.randrange(0,width), random.randrange(0,height))
         self.horizontal = bool(random.getrandbits(1))
 
-    def mutate(self):
+    def mutate(self, config):
         if not self.start_gene:
-            shift_candidates = [(0,-1),(-1,0),(0,1),(1,0)]
-            shift = random.choice(shift_candidates)
+            shift = random.choice(config.path_shift_candidates)
             self.pathpoint = (self.pathpoint[0]+shift[0], self.pathpoint[1]+shift[1])
         self.horizontal = bool(random.getrandbits(1))
 
@@ -43,7 +42,7 @@ class WallGene():
         self.horizontal = None
 
     def __str__(self):
-        s = f'({self.wall_location: =.2f},{self.passage_location: =.2f},{self.horizontal})'
+        s = f'({self.wall_location: =.1f},{self.passage_location: =.1f},{self.horizontal})'
         return s
 
     def copy(self):
@@ -58,7 +57,7 @@ class WallGene():
         self.horizontal = bool(random.getrandbits(1))
 
     def mutate(self, depth, config):
-        scale = config.wall_mutate_scale * depth
+        scale = config.wall_mutate_scale# * depth
         self.wall_location = max(0, min(0.9999, self.wall_location + random.uniform(-scale,scale)))
         self.passage_location = max(0, min(0.9999, self.passage_location + random.uniform(-scale,scale)))
         self.horizontal = bool(random.getrandbits(1))
@@ -82,6 +81,7 @@ class MazeGenomeConfig(object):
                         ConfigParameter('expand_height_prob', float),
                         ConfigParameter('wall_mutate_prob_individ', float),
                         ConfigParameter('wall_mutate_scale', float),
+                        ConfigParameter('path_shift_range', int),
                         ConfigParameter('single_structural_mutation', bool, 'true'),
                         ConfigParameter('region_max_width', int),
                         ConfigParameter('region_max_height', int),
@@ -132,6 +132,10 @@ class MazeGenomeConfig(object):
                 'prob': self.expand_height_prob,
             },
         }
+
+        rng = self.path_shift_range
+        rad = 2*rng+1
+        self.path_shift_candidates = [(i//rad-rng, i%rad-rng) for i in range(rad**2) if i!=(2*rad+rng)]
 
     def save(self, f):
         write_pretty_params(f, self, self._params)
@@ -252,7 +256,7 @@ class MazeGenome():
             mutate_idx = random.randrange(0,len(self.path_genes))
 
             clone = self.path_genes[mutate_idx].copy()
-            clone.mutate()
+            clone.mutate(config)
 
             path_attrs[mutate_idx] = (clone.pathpoint, clone.horizontal)
             valid = self.check_path_validity(path_attrs, self.maze_size)
@@ -270,10 +274,7 @@ class MazeGenome():
         while not valid and invalid_count<50:
             path_attrs = [(path_gene.pathpoint, path_gene.horizontal) for path_gene in self.path_genes]
 
-            if len(self.path_genes)>1:
-                insert_idx = random.randint(1,len(self.path_genes))
-            else:
-                insert_idx = 1
+            insert_idx = random.randint(1,len(self.path_genes))
 
             new_gene = self.create_path(key)
             path_attrs.insert(insert_idx, (new_gene.pathpoint, new_gene.horizontal))
@@ -307,30 +308,40 @@ class MazeGenome():
         return valid
 
     def mutate_expand_width(self, config):
-        self.maze_size[0] += 1
-        return True
+        if self.path_genes[-1].pathpoint[0]<self.maze_size[0]-4:
+            return False
+        else:
+            self.maze_size[0] += 1
+            return True
 
     def mutate_expand_height(self, config):
-        self.maze_size[1] += 1
-        return True
+        if self.path_genes[-1].pathpoint[1]<self.maze_size[1]-4:
+            return False
+        else:
+            self.maze_size[1] += 1
+            return True
 
     @staticmethod
     def check_path_validity(pathways, maze_size):
 
         point_history = []
         end_p = (maze_size[0]-1, maze_size[1]-1)
+        end_horizontal = None
 
         for pathway in pathways[::-1]:
             cur_p = pathway[0]
-            horizontal = pathway[1]
+            cur_horizontal = pathway[1]
 
-            if cur_p[0]<0 or cur_p[1]<0 or cur_p[0]>=maze_size[0] or cur_p[1]>=maze_size[1] or\
-               end_p==(0,0) or cur_p==(maze_size[0]-1, maze_size[1]-1) or\
-               cur_p[0]==end_p[0] or cur_p[1]==end_p[1]:
+            if cur_p[0]<0 or cur_p[1]<0 or cur_p[0]>=maze_size[0] or cur_p[1]>=maze_size[1]\
+               or end_p==(0,0) or cur_p==(maze_size[0]-1, maze_size[1]-1)\
+               or cur_p[0]==end_p[0] or cur_p[1]==end_p[1]:
+               # or cur_p==end_p\
+               # or (cur_p[1]==end_p[1] and cur_horizontal==True and end_horizontal==True)\
+               # or (cur_p[0]==end_p[0] and cur_horizontal==False and end_horizontal==False):
                 return False
 
             points = []
-            if horizontal:
+            if cur_horizontal:
                 points.extend([x+cur_p[1]*maze_size[1] for x in range(cur_p[0], end_p[0], 1 if cur_p[0]<end_p[0] else -1)])
                 points.extend([end_p[0]+y*maze_size[1] for y in range(cur_p[1], end_p[1], 1 if cur_p[1]<end_p[1] else -1)])
             else:
@@ -341,4 +352,5 @@ class MazeGenome():
                     return False
             point_history.extend(points)
             end_p = cur_p
+            end_horizontal = cur_horizontal
         return True

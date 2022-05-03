@@ -18,7 +18,7 @@ from parallel import ParallelEvaluator
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 UTIL_DIR = os.path.join(CURR_DIR, 'maze_utils')
 sys.path.append(UTIL_DIR)
-from arguments import get_boostrap_args
+from arguments import get_bootstrap_args
 from utils import make_config
 from maze_genome import MazeGenome
 from maze_genome_decoder import MazeGenomeDecoder
@@ -75,34 +75,31 @@ def eval_genome(genome, config, env, timesteps, **kwargs):
     return results
 
 
-def make_random_maze(config, maze_num, wall_gene_num, path_gene_num):
-    genomes = {}
-    for m_i in range(maze_num):
-        genome = config.genome2_type(m_i)
-        genome.configure_new(config.genome2_config)
+def make_random_maze(config, key, wall_gene_num, path_gene_num):
+    genome = config.genome2_type(key)
+    genome.configure_new(config.genome2_config)
 
-        for __ in range(wall_gene_num-1):
-            genome.mutate_add_wall(config.genome2_config)
+    for __ in range(wall_gene_num-1):
+        genome.mutate_add_wall(config.genome2_config)
 
-        for __ in range(path_gene_num):
-            genome.mutate_add_path(config.genome2_config)
+    for __ in range(path_gene_num):
+        genome.mutate_add_path(config.genome2_config)
 
-        setattr(genome, 'success_keys', [])
-        genomes[m_i] = genome
-
-    return genomes
+    setattr(genome, 'success_keys', [])
+    genome.fitness = 0
+    return genome
 
 
 
 def main():
-    args = get_boostrap_args()
+    args = get_bootstrap_args()
 
-    save_path = os.path.join(CURR_DIR, 'maze_out', 'boostrap', args.name)
+    save_path = os.path.join(CURR_DIR, 'maze_out', 'bootstrap', args.name)
 
     try:
         os.makedirs(save_path)
     except:
-        print(f'THIS BOOSTRAP ({args.name}) ALREADY EXISTS')
+        print(f'THIS BOOTSTRAP ({args.name}) ALREADY EXISTS')
         print('Override? (y/n): ', end='')
         ans = input()
         if ans.lower() == 'y':
@@ -126,46 +123,55 @@ def main():
 
     MazeDecoder = MazeGenomeDecoder(mcc_config.genome2_config)
 
-    maze_genomes = make_random_maze(
-        mcc_config,
-        args.maze_num,
-        args.wall_gene_num,
-        args.path_gene_num)
-
     perMaze = min(mcc_config.genome2_limit, args.agent_num//args.maze_num)
 
+    maze_genomes = {}
     agent_genomes = {}
     a_i = 0
-    for m_i,maze_genome in enumerate(maze_genomes.values()):
+    while len(maze_genomes) < args.maze_num:
 
-        print(f'maze {m_i+1}')
+        maze_genome = make_random_maze(mcc_config, len(maze_genomes), args.wall_gene_num, args.path_gene_num)
+
+        print(f'maze {maze_genome.key+1}')
         print(maze_genome)
 
-        maze_env, timesteps = MazeDecoder.decode(maze_genome, mcc_config, save=os.path.join(save_path, f'maze{m_i+1}.jpg'))
+        maze_env, timesteps = MazeDecoder.decode(maze_genome, mcc_config, save=os.path.join(save_path, f'maze{maze_genome.key+1}.jpg'))
 
         evaluator_kwargs = {
             'env': maze_env,
             'timesteps': timesteps}
         evaluator = ParallelEvaluator(evaluator_kwargs, args.num_cores, eval_genome)
 
-        print(f'serch {perMaze} solver agent')
-        while len(agent_genomes) < perMaze*(m_i+1):
+        agent_genomes_tmp = {}
+        not_found_count = 0
+        print(f'search for {perMaze} solver agents')
+        while len(agent_genomes_tmp) < perMaze:
 
             pop = ns_neat.Population(ns_config)
             pop.add_reporter(RewardReporter())
-            agent_genome = pop.run(evaluator.evaluate, n=300)
+            agent_genome = pop.run(evaluator.evaluate, n=250)
 
             if agent_genome.reward>=1.0:
                 print('  found')
 
-                setattr(agent_genome, 'success_keys', [m_i])
+                setattr(agent_genome, 'success_keys', [maze_genome.key])
                 agent_genome.key = a_i
-                agent_genomes[a_i] = agent_genome
+                agent_genomes_tmp[a_i] = agent_genome
 
                 maze_genome.success_keys.append(a_i)
                 a_i += 1
+                not_found_count = 0
             else:
-                print('  reset')
+                print()
+                not_found_count += 1
+                if not_found_count>=5:
+                    break
+
+        if len(agent_genomes_tmp)==perMaze:
+            maze_genomes[maze_genome.key] = maze_genome
+            agent_genomes.update(agent_genomes_tmp)
+        else:
+            print('release this maze genome')
         print()
 
     maze_genome_file = os.path.join(save_path, 'maze_genomes.pickle')

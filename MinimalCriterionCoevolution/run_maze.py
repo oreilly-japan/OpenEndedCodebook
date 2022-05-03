@@ -2,6 +2,7 @@ import sys
 import os
 import shutil
 import json
+import numpy as np
 import warnings
 warnings.simplefilter('ignore')
 
@@ -20,6 +21,20 @@ from maze_genome import MazeGenome
 from maze_genome_decoder import MazeGenomeDecoder
 
 from maze_environment import MazeEnvironment
+
+
+class MazeReporter():
+    def __init__(self):
+        pass
+
+    def start_generation(self, generation):
+        pass
+
+    def post_evaluate(self, config, agent_survivors, maze_survivors):
+        pass
+
+    def end_generation(self, config, agent_genomes, maze_genomes):
+        pass
 
 
 def simulate_maze(controller, maze):
@@ -82,13 +97,13 @@ def main():
         decode_function1=FeedForwardNetwork.create,
         decode_function2=MazeDecoder.decode)
 
-    boostrap_path = os.path.join(CURR_DIR, 'maze_out', 'boostrap', args.boostrap)
-    agent_boostrap_file = os.path.join(boostrap_path, 'agent_genomes.pickle')
-    maze_boostrap_file = os.path.join(boostrap_path, 'maze_genomes.pickle')
-    assert os.path.exists(agent_boostrap_file) or not os.path.exists(maze_boostrap_file),\
-        f'boostrap {args.boostrap} is incomplete, run "python boostrap_maze.py -n {args.boostrap}".'
+    bootstrap_path = os.path.join(CURR_DIR, 'maze_out', 'bootstrap', args.bootstrap)
+    agent_bootstrap_file = os.path.join(bootstrap_path, 'agent_genomes.pickle')
+    maze_bootstrap_file = os.path.join(bootstrap_path, 'maze_genomes.pickle')
+    assert os.path.exists(agent_bootstrap_file) or not os.path.exists(maze_bootstrap_file),\
+        f'bootstrap {args.bootstrap} is incomplete, run "python bootstrap_maze.py -n {args.bootstrap}".'
 
-    pop = mcc.Population(config, agent_boostrap_file, maze_boostrap_file)
+    pop = mcc.Population(config, agent_bootstrap_file, maze_bootstrap_file)
 
     # figure_path = os.path.join(save_path, 'progress')
     reporters = [

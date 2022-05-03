@@ -3,7 +3,7 @@ import argparse
 
 def get_mcc_args():
     parser = argparse.ArgumentParser(
-        description='boostrap maze MCC experiment'
+        description='MCC experiment'
     )
 
     parser.add_argument(
@@ -12,9 +12,9 @@ def get_mcc_args():
         help='experiment name'
     )
     parser.add_argument(
-        '-b', '--boostrap',
+        '-b', '--bootstrap',
         default='default', type=str,
-        help='boostrap name to use'
+        help='bootstrap name to use'
     )
     parser.add_argument(
         '-g', '--generation',
@@ -70,20 +70,20 @@ def get_mcc_args():
     args = parser.parse_args()
 
     if args.name==None:
-        args.name = args.boostrap
+        args.name = args.bootstrap
 
     return args
 
 
-def get_boostrap_args():
+def get_bootstrap_args():
     parser = argparse.ArgumentParser(
-        description='boostrap maze MCC experiment'
+        description='bootstrap maze MCC experiment'
     )
 
     parser.add_argument(
         '-n', '--name',
         default='default', type=str,
-        help='experiment name'
+        help='bootstrap name'
     )
     parser.add_argument(
         '--agent-num',

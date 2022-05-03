@@ -368,7 +368,7 @@ class MazeGenomeDecoder:
             prev_i = 0
             for now_i in no_walls:
                 if prev_i<now_i:
-                    plt.plot([prev_i, now_i], [h_i, h_i], marker='s', c='k', markersize=3/(maze_size[1]/15), linewidth=1.5/(maze_size[1]/15))
+                    plt.plot([prev_i, now_i], [h_i, h_i], c='k', markersize=3/(maze_size[1]/15), linewidth=1.5/(maze_size[1]/15))
                 prev_i = now_i+1
 
         for w_i in range(maze_size[0]+1):
@@ -377,7 +377,7 @@ class MazeGenomeDecoder:
             prev_i = 0
             for now_i in no_walls:
                 if prev_i<now_i:
-                    plt.plot([w_i, w_i], [prev_i, now_i], marker='s', c='k', markersize=3/(maze_size[1]/15), linewidth=1.5/(maze_size[1]/15))
+                    plt.plot([w_i, w_i], [prev_i, now_i], c='k', markersize=3/(maze_size[1]/15), linewidth=1.5/(maze_size[1]/15))
                 prev_i = now_i+1
 
         plt.xlim([0-maze_size[0]/100,maze_size[0]+maze_size[0]/100])

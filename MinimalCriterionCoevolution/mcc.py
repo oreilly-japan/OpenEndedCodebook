@@ -73,7 +73,8 @@ class Population(neat.Population):
             genome2_offsprings = self.genome2_reproduction.create_offsprings(self.genome2_pop, self.config.genome2_offspring_size, self.generation)
 
             # Evaluate all genomes using the user-provided function.
-            evaluate_function(list(genome1_offsprings.items()), list(genome2_offsprings.items()), self.config, self.generation)
+            evaluate_function(list(genome1_offsprings.items()), list(genome2_offsprings.items()),
+                              list(self.genome1_pop.items()), list(self.genome2_pop.items()), self.config, self.generation)
 
             genome1_survivors = {key: genome for key,genome in genome1_offsprings.items() if genome.fitness>=1}
             genome2_survivors = {key: genome for key,genome in genome2_offsprings.items() if genome.fitness>=1}
@@ -92,6 +93,6 @@ class Population(neat.Population):
     @staticmethod
     def update_pop(pop, survivors, pop_size, config):
         pop_unite = list(pop.values()) + list(survivors.values())
-        pop_unite = sorted(pop_unite, key=lambda g: -g.generation)
-        pop_alive = {g.key: g for g in pop_unite[:pop_size]}
+        pop_unite = sorted(pop_unite, key=lambda g: g.generation)
+        pop_alive = {g.key: g for g in pop_unite[-pop_size:]}
         return pop_alive

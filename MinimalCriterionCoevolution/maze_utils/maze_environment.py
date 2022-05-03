@@ -9,14 +9,14 @@ import math
 import geometry
 
 # The maximal allowed speed for the maze solver agent
-MAX_AGENT_SPEED = 5.0
-MAX_ANGULAR_VELOCITY = 8.0
+MAX_AGENT_SPEED = 6.0
+MAX_ANGULAR_VELOCITY = 10.0
 
 class Agent:
     """
     This is the maze navigating agent
     """
-    def __init__(self, location, heading=0, speed=0, angular_vel=0, radius=5.0, range_finder_range=80.0):
+    def __init__(self, location, heading=0, speed=0, angular_vel=0, radius=5.0, range_finder_range=100.0):
         """
         Creates new Agent with specified parameters.
         Arguments:

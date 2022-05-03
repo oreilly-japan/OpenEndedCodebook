@@ -1,13 +1,13 @@
 # Minimal Criterion Coevolution
 
 ## Maze
-### boostrap
+### bootstrap
 To execute before main mcc process. It prepare initial population.
 ```
-$python boostrap_maze.py
+$python bootstrap_maze.py
 ```
 #### options:
-- -n --name           : boostrap name (default: default)
+- -n --name           : bootstrap name (default: default)
 - --agent-num         : number of agent to prepare (default: 20)
 - --maze-num          : number of maze to prepare (default: 10)
 - --wall-gene-num     : initial number of wall gene (default: 2)
@@ -20,7 +20,7 @@ $python run_maze.py
 ```
 #### options:
 - -n --name         : experiment name (default: default)
-- -b --boostrap     : to use boostrap namze (default: default)
+- -b --bootstrap    : to use bootstrap maze (default: default)
 - -g --generation   : number of iteration (default: 2000)
 - --agent-criteria  : minimal number to solve maze for each agent to survive (default: 1)
 - --maze-criteria   : minimal number of agent to solve for each maze to survive (default: 1)
