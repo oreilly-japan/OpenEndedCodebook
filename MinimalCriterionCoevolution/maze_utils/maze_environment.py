@@ -9,8 +9,8 @@ import math
 import geometry
 
 # The maximal allowed speed for the maze solver agent
-MAX_AGENT_SPEED = 6.0
-MAX_ANGULAR_VELOCITY = 10.0
+MAX_AGENT_SPEED = 10.0
+MAX_ANGULAR_VELOCITY = 15.0
 
 class Agent:
     """
@@ -126,8 +126,8 @@ class MazeEnvironment:
         Arguments:
             control_signals: The control signals received from the control ANN
         """
-        self.agent.angular_vel  += (control_signals[0] - 0.5) * 3
-        self.agent.speed        += (control_signals[1] - 0.5) * 3
+        self.agent.angular_vel  += (control_signals[0] - 0.5) * 5
+        self.agent.speed        += (control_signals[1] - 0.5) * 5
 
         # constrain the speed & angular velocity
         if self.agent.speed > MAX_AGENT_SPEED:

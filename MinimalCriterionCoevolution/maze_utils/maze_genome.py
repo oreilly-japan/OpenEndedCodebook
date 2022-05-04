@@ -12,7 +12,8 @@ class PathGene():
         self.horizontal = None
 
     def __str__(self):
-        s = f'(({self.pathpoint[0]},{self.pathpoint[1]}),{self.horizontal})'
+        direction = 'h' if self.horizontal else 'v'
+        s = f'(({self.pathpoint[0]},{self.pathpoint[1]}),{direction})'
         return s
 
     def copy(self):
@@ -42,7 +43,8 @@ class WallGene():
         self.horizontal = None
 
     def __str__(self):
-        s = f'({self.wall_location: =.1f},{self.passage_location: =.1f},{self.horizontal})'
+        direction = 'h' if self.horizontal else 'v'
+        s = f'({self.wall_location: =.1f},{self.passage_location: =.1f},{direction})'
         return s
 
     def copy(self):
@@ -236,7 +238,9 @@ class MazeGenome():
         if self.subregion_num is not None and len(self.wall_genes)>=self.subregion_num:
             return False
         key = config.get_new_wall_key()
-        self.wall_genes.append(self.create_wall(key))
+        insert_idx = random.randint(0,len(self.wall_genes))
+        new_gene = self.create_wall(key)
+        self.wall_genes.insert(insert_idx, new_gene)
         return True
 
     def mutate_delete_wall(self, config):

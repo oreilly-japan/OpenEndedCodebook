@@ -2,7 +2,6 @@ import sys
 import os
 import shutil
 import json
-import random
 import pickle
 import warnings
 warnings.simplefilter('ignore')
@@ -70,7 +69,8 @@ def eval_genome(genome, config, env, timesteps, **kwargs):
 
     results = {
         'reward': reward,
-        'data': [env.agent.location.x, env.agent.location.y]
+        'data': [env.agent.location[0], env.agent.location[1]]
+        # 'data': [env.agent.location.x, env.agent.location.y]
     }
     return results
 
@@ -149,7 +149,7 @@ def main():
 
             pop = ns_neat.Population(ns_config)
             pop.add_reporter(RewardReporter())
-            agent_genome = pop.run(evaluator.evaluate, n=250)
+            agent_genome = pop.run(evaluator.evaluate, n=400)
 
             if agent_genome.reward>=1.0:
                 print('  found')

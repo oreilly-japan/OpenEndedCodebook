@@ -2,7 +2,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-from maze_environment import MazeEnvironment
+# from maze_environment import MazeEnvironment
+from maze_environment_numpy  import MazeEnvironment
 
 class MazeGenomeDecoder:
 
@@ -15,11 +16,8 @@ class MazeGenomeDecoder:
     # main decode function (maze genome -> wall list [(x1, y1, x2, y2)])
     def decode(self, genome, config, save=None, return_env=True):
         maze_size = genome.maze_size
-        # print(maze_size)
         wall_genes = genome.wall_genes
-        # print([(w.wall_location, w.passage_location, w.horizontal) for w in wall_genes])
         path_genes = genome.path_genes
-        # print([(p.pathpoint,p.horizontal) for p in path_genes])
 
         pathway_map = np.zeros((maze_size[1], maze_size[0]), dtype=int)
         horizontal_wall_map = np.zeros((maze_size[1]+1, maze_size[0]), dtype=bool)
@@ -45,9 +43,7 @@ class MazeGenomeDecoder:
             start_point = (self.maze_scaler//2, self.maze_scaler//2)
             exit_point = (maze_size[0]*self.maze_scaler - self.maze_scaler//2,
                           maze_size[1]*self.maze_scaler - self.maze_scaler//2)
-            # direction = 0 if pathway_map[0,0]==4 else 90 if pathway_map[0,0]==1 else None
             direction = 45
-            # assert direction is not None
 
             timesteps = min(self.max_timesteps, int(path_length*self.maze_scaler*0.6))
 

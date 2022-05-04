@@ -16,11 +16,9 @@ CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 UTIL_DIR = os.path.join(CURR_DIR, 'maze_utils')
 sys.path.append(UTIL_DIR)
 from arguments import get_mcc_args
-from utils import make_config
 from maze_genome import MazeGenome
 from maze_genome_decoder import MazeGenomeDecoder
 
-from maze_environment import MazeEnvironment
 
 
 class MazeReporter():
