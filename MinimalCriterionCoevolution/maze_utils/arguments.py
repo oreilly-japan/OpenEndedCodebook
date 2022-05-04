@@ -33,12 +33,12 @@ def get_mcc_args():
     )
     parser.add_argument(
         '--agent-pop',
-        default=250, type=int,
+        default=160, type=int,
         help='max agent population size'
     )
     parser.add_argument(
         '--maze-pop',
-        default=50, type=int,
+        default=40, type=int,
         help='max maze population size'
     )
     parser.add_argument(
@@ -48,7 +48,7 @@ def get_mcc_args():
     )
     parser.add_argument(
         '--maze-limit',
-        default=5, type=int,
+        default=4, type=int,
         help='recourse limit of maze'
     )
     parser.add_argument(

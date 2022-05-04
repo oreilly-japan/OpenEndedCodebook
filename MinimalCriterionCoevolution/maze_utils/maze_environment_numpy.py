@@ -29,7 +29,7 @@ class Agent:
         return obs
 
     def apply_control_signals(self, control_signals):
-        self.angular_vel  += (control_signals[0] - 0.5) * 2
+        self.angular_vel  += (control_signals[0] - 0.5) * 4
         self.speed        += (control_signals[1] - 0.5) * 2
 
         self.speed = np.clip(self.speed, -MAX_AGENT_SPEED, MAX_AGENT_SPEED)

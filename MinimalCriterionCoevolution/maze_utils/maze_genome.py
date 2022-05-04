@@ -312,18 +312,18 @@ class MazeGenome():
         return valid
 
     def mutate_expand_width(self, config):
-        if self.path_genes[-1].pathpoint[0]<self.maze_size[0]-4:
-            return False
-        else:
-            self.maze_size[0] += 1
-            return True
+        # if self.path_genes[-1].pathpoint[0]<self.maze_size[0]-4:
+            # return False
+        # else:
+        self.maze_size[0] += 1
+        return True
 
     def mutate_expand_height(self, config):
-        if self.path_genes[-1].pathpoint[1]<self.maze_size[1]-4:
-            return False
-        else:
-            self.maze_size[1] += 1
-            return True
+        # if self.path_genes[-1].pathpoint[1]<self.maze_size[1]-4:
+            # return False
+        # else:
+        self.maze_size[1] += 1
+        return True
 
     @staticmethod
     def check_path_validity(pathways, maze_size):
