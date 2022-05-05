@@ -45,7 +45,7 @@ class MazeGenomeDecoder:
                           maze_size[1]*self.maze_scaler - self.maze_scaler//2)
             direction = 45
 
-            timesteps = min(self.max_timesteps, int(path_length*self.maze_scaler*0.6))
+            timesteps = min(self.max_timesteps, int(path_length*self.maze_scaler*0.5))
 
             env = MazeEnvironment.make_environment(start_point, walls, exit_point, init_heading=direction)
 

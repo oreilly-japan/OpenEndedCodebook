@@ -275,7 +275,7 @@ class MazeGenome():
         key = config.get_new_path_key()
         valid = False
         invalid_count = 0
-        while not valid and invalid_count<50:
+        while not valid and invalid_count<5:
             path_attrs = [(path_gene.pathpoint, path_gene.horizontal) for path_gene in self.path_genes]
 
             insert_idx = random.randint(1,len(self.path_genes))

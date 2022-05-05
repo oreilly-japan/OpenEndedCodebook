@@ -18,7 +18,7 @@ def get_mcc_args():
     )
     parser.add_argument(
         '-g', '--generation',
-        default=2000, type=int,
+        default=1000, type=int,
         help='generation num'
     )
     parser.add_argument(
