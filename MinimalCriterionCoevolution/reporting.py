@@ -29,8 +29,8 @@ class ReporterSet():
 
 class SaveReporter():
 
-    def __init__(self, save_path, genome1_name, genome2_name):
-        self.generation = None
+    def __init__(self, save_path, genome1_name, genome2_name, init_pop1, init_pop2):
+        self.generation = 0
 
         self.save_path = save_path
         self.genome1_name = genome1_name
@@ -52,6 +52,12 @@ class SaveReporter():
             writer = csv.DictWriter(f, fieldnames=self.history_header)
             writer.writeheader()
 
+        self.write_history(self.history1_file, self.history_header, init_pop1, self.generation)
+        self.save_genomes(self.genome1_path, init_pop1)
+
+        self.write_history(self.history2_file, self.history_header, init_pop2, self.generation)
+        self.save_genomes(self.genome2_path, init_pop2)
+
 
     def start_generation(self, generation):
         self.generation = generation
@@ -61,13 +67,7 @@ class SaveReporter():
         self.save_genomes(self.genome1_path, survivors1)
 
         self.write_history(self.history2_file, self.history_header, survivors2, self.generation)
-        self.save_genomes(self.genome2_path, survivors1)
-
-        if len(survivors2)>0:
-            print('survive mazes')
-            for s in survivors2.values():
-                print(s)
-                print()
+        self.save_genomes(self.genome2_path, survivors2)
 
     @staticmethod
     def write_history(file, headers, genomes, generation):
@@ -96,9 +96,12 @@ class SaveReporter():
 
 class MCCReporter():
 
-    def __init__(self, genome1_name, genome2_name):
-        self.genome1_name = genome1_name
-        self.genome2_name = genome2_name
+    def __init__(self, genome1_name, genome2_name, print_genome1=False, print_genome2=False):
+        max_str_size = max(len(genome1_name), len(genome2_name))
+        self.genome1_name = genome1_name.ljust(max_str_size)
+        self.genome2_name = genome2_name.ljust(max_str_size)
+        self.print_genome1 = print_genome1
+        self.print_genoem2 = print_genome2
         self.generation = None
         self.generation_start_time = None
         self.generation_times = []
@@ -109,12 +112,33 @@ class MCCReporter():
         self.generation_start_time = time.time()
 
     def post_evaluate(self, config, survivors1, survivors2):
-        print(f'{len(survivors1)} {self.genome1_name} survived')
-        print(f'{len(survivors2)} {self.genome2_name} survived')
+        if self.print_genome1 and len(survivors1)>0:
+            print(f'survived {self.genome1_name}')
+            for s in survivors1.values():
+                print(s+'\n')
+                
+        if self.print_genome2 and len(survivors2)>0:
+            print(f'survived {self.genome2_name}')
+            for s in survivors2.values():
+                print(s+'\n')
+
+        print(f'{self.genome1_name} survived: {len(survivors1): =3}')
+        print(f'{self.genome2_name} survived: {len(survivors2): =3}')
 
     def end_generation(self, config, population1, population2):
-        print(f'{self.genome1_name} population size: {len(population1)}')
-        print(f'{self.genome2_name} population size: {len(population2)}')
+        print(f'{self.genome1_name}  population size: {len(population1): =3}', end='')
+        if config.genome1_limit>0:
+            limited_genomes1 = [genome1 for genome1 in population1.values() if len(genome1.success_keys)>=config.genome1_limit]
+            print(f'  limited: {len(limited_genomes1): =3}')
+        else:
+            print()
+
+        print(f'{self.genome2_name}  population size: {len(population2): =3}', end='')
+        if config.genome2_limit>0:
+            limited_genomes2 = [genome2 for genome2 in population2.values() if len(genome2.success_keys)>=config.genome2_limit]
+            print(f'  limited: {len(limited_genomes2): =3}')
+        else:
+            print()
 
         elapsed = time.time() - self.generation_start_time
         self.generation_times.append(elapsed)

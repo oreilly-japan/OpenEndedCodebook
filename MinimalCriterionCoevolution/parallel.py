@@ -144,7 +144,8 @@ class MCCParallelEvaluator(object):
     def conditioned_evaluation(pheno1, achieve1, pheno2, achieve2, config, evaluate_function, **kwargs):
         count_up = False
 
-        if achieve1.value >= config.genome1_limit or achieve2.value >= config.genome2_limit:
+        if (config.genome1_limit > 0 and achieve1.value >= config.genome1_limit) or\
+           (config.genome2_limit > 0 and achieve2.value >= config.genome2_limit):
             return count_up
         if achieve1.value >= config.genome1_criteria and achieve2.value >= config.genome2_criteria:
             return count_up
@@ -152,8 +153,8 @@ class MCCParallelEvaluator(object):
         success = evaluate_function(pheno1, pheno2)
 
         if success:
-            if (achieve1.value < config.genome1_criteria and achieve2.value < config.genome2_limit) or \
-               (achieve2.value < config.genome2_criteria and achieve1.value < config.genome1_limit):
+            if (achieve1.value < config.genome1_criteria and (config.genome2_limit == 0 or achieve2.value < config.genome2_limit)) or \
+               (achieve2.value < config.genome2_criteria and (config.genome1_limit == 0 or achieve1.value < config.genome1_limit)):
 
                achieve1.value += 1
                achieve2.value += 1

@@ -66,6 +66,11 @@ def get_mcc_args():
         default=4, type=int,
         help='num of multiprocesses'
     )
+    parser.add_argument(
+        '--print-maze',
+        action='store_true', default=False,
+        help='print detail of survived maze genome every generation'
+    )
 
     args = parser.parse_args()
 

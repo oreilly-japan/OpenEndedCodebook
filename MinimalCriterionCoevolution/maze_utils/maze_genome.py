@@ -58,8 +58,8 @@ class WallGene():
         self.passage_location = min(0.9999, random.random())
         self.horizontal = bool(random.getrandbits(1))
 
-    def mutate(self, depth, config):
-        scale = config.wall_mutate_scale# * depth
+    def mutate(self, config):
+        scale = config.wall_mutate_scale
         self.wall_location = max(0, min(0.9999, self.wall_location + random.uniform(-scale,scale)))
         self.passage_location = max(0, min(0.9999, self.passage_location + random.uniform(-scale,scale)))
         self.horizontal = bool(random.getrandbits(1))
@@ -230,8 +230,7 @@ class MazeGenome():
         values[definitive_idx] = 1
         for i in range(len(self.wall_genes)):
             if values[i] < config.wall_mutate_prob_individ:
-                depth = int(math.log2(i+1)+1)
-                self.wall_genes[i].mutate(depth, config)
+                self.wall_genes[i].mutate(config)
         return True
 
     def mutate_add_wall(self, config):
@@ -260,7 +259,8 @@ class MazeGenome():
             mutate_idx = random.randrange(0,len(self.path_genes))
 
             clone = self.path_genes[mutate_idx].copy()
-            clone.mutate(config)
+            # clone.mutate(config)
+            clone.init_attributes(self.maze_size[0], self.maze_size[1])
 
             path_attrs[mutate_idx] = (clone.pathpoint, clone.horizontal)
             valid = self.check_path_validity(path_attrs, self.maze_size)
@@ -275,10 +275,12 @@ class MazeGenome():
         key = config.get_new_path_key()
         valid = False
         invalid_count = 0
-        while not valid and invalid_count<5:
+        idx_candidates = list(range(1,len(self.path_genes)+1))
+        while not valid and invalid_count<10:
             path_attrs = [(path_gene.pathpoint, path_gene.horizontal) for path_gene in self.path_genes]
 
-            insert_idx = random.randint(1,len(self.path_genes))
+            # insert_idx = random.randint(1,len(self.path_genes))
+            insert_idx = random.choices(idx_candidates, k=1, weights=idx_candidates)[0]
 
             new_gene = self.create_path(key)
             path_attrs.insert(insert_idx, (new_gene.pathpoint, new_gene.horizontal))
@@ -312,18 +314,25 @@ class MazeGenome():
         return valid
 
     def mutate_expand_width(self, config):
-        # if self.path_genes[-1].pathpoint[0]<self.maze_size[0]-4:
-            # return False
-        # else:
         self.maze_size[0] += 1
         return True
 
     def mutate_expand_height(self, config):
-        # if self.path_genes[-1].pathpoint[1]<self.maze_size[1]-4:
-            # return False
-        # else:
         self.maze_size[1] += 1
         return True
+
+    def get_maze_area(self):
+        return self.maze_size[0]*self.maze_size[1]
+
+    def get_juncture_num(self):
+        return len(self.path_genes) + \
+            len([1 for i in range(len(self.path_genes)-1) if self.path_genes[i].horizontal==self.path_genes[i+1].horizontal])
+
+    def get_path_length(self):
+        return sum([abs(self.path_genes[i+1].pathpoint[0]-self.path_genes[i].pathpoint[0]) + \
+                    abs(self.path_genes[i+1].pathpoint[1]-self.path_genes[i].pathpoint[1])\
+                    for i in range(len(self.path_genes)-1)]) + \
+                abs(self.maze_size[0]-1-self.path_genes[-1].pathpoint[0]) + abs(self.maze_size[1]-1-self.path_genes[-1].pathpoint[1])
 
     @staticmethod
     def check_path_validity(pathways, maze_size):
@@ -339,9 +348,6 @@ class MazeGenome():
             if cur_p[0]<0 or cur_p[1]<0 or cur_p[0]>=maze_size[0] or cur_p[1]>=maze_size[1]\
                or end_p==(0,0) or cur_p==(maze_size[0]-1, maze_size[1]-1)\
                or cur_p[0]==end_p[0] or cur_p[1]==end_p[1]:
-               # or cur_p==end_p\
-               # or (cur_p[1]==end_p[1] and cur_horizontal==True and end_horizontal==True)\
-               # or (cur_p[0]==end_p[0] and cur_horizontal==False and end_horizontal==False):
                 return False
 
             points = []

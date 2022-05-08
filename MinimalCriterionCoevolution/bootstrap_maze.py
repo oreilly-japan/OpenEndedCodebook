@@ -83,7 +83,7 @@ def make_random_maze(config, key, wall_gene_num, path_gene_num):
         genome.mutate_add_wall(config.genome2_config)
 
     c = 0
-    while c < path_genome_num:
+    while c < path_gene_num:
     # for __ in range(path_gene_num):
         valid = genome.mutate_add_path(config.genome2_config)
         if valid:

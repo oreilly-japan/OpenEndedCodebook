@@ -32,7 +32,17 @@ class MazeReporter():
         pass
 
     def end_generation(self, config, agent_genomes, maze_genomes):
-        pass
+        maze_areas = [maze_genome.get_maze_area() for maze_genome in maze_genomes.values()]
+        maze_junctures = [maze_genome.get_juncture_num() for maze_genome in maze_genomes.values()]
+        maze_path_length = [maze_genome.get_path_length() for maze_genome in maze_genomes.values()]
+        nn_conns = [len([1 for conn_gene in agent_genome.connections.values() if conn_gene.enabled]) for agent_genome in agent_genomes.values()]
+
+        print( '   statistics         min      ave      max')
+        print( '                    =======  =======  =======')
+        print(f'maze area        :  {np.min(maze_areas): =7.1f}  {np.mean(maze_areas): =7.1f}  {np.max(maze_areas): =7.1f}')
+        print(f'maze junctures   :  {np.min(maze_junctures): =7.1f}  {np.mean(maze_junctures): =7.1f}  {np.max(maze_junctures): =7.1f}')
+        print(f'maze path length :  {np.min(maze_path_length): =7.1f}  {np.mean(maze_path_length): =7.1f}  {np.max(maze_path_length): =7.1f}')
+        print(f'nn connections   :  {np.min(nn_conns): =7.1f}  {np.mean(nn_conns): =7.1f}  {np.max(nn_conns): =7.1f}')
 
 
 def simulate_maze(controller, maze):
@@ -103,11 +113,10 @@ def main():
 
     pop = mcc.Population(config, agent_bootstrap_file, maze_bootstrap_file)
 
-    # figure_path = os.path.join(save_path, 'progress')
     reporters = [
-        mcc.SaveReporter(save_path, 'agent', 'maze'),
-        mcc.MCCReporter('agent', 'maze'),
-        # DrawReporter(maze_env, args.timesteps, figure_path, no_plot=args.no_plot)
+        mcc.SaveReporter(save_path, 'agent', 'maze', pop.genome1_pop, pop.genome2_pop),
+        mcc.MCCReporter('agent', 'maze', print_genome2=args.print_maze),
+        MazeReporter(),
     ]
     for reporter in reporters:
         pop.add_reporter(reporter)
