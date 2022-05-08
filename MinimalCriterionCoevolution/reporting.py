@@ -101,7 +101,7 @@ class MCCReporter():
         self.genome1_name = genome1_name.ljust(max_str_size)
         self.genome2_name = genome2_name.ljust(max_str_size)
         self.print_genome1 = print_genome1
-        self.print_genoem2 = print_genome2
+        self.print_genome2 = print_genome2
         self.generation = None
         self.generation_start_time = None
         self.generation_times = []
@@ -113,14 +113,14 @@ class MCCReporter():
 
     def post_evaluate(self, config, survivors1, survivors2):
         if self.print_genome1 and len(survivors1)>0:
-            print(f'survived {self.genome1_name}')
+            print(f'----- survived {self.genome1_name} -----')
             for s in survivors1.values():
-                print(s+'\n')
-                
+                print(str(s)+'\n')
+
         if self.print_genome2 and len(survivors2)>0:
-            print(f'survived {self.genome2_name}')
+            print(f'----- survived {self.genome2_name} -----')
             for s in survivors2.values():
-                print(s+'\n')
+                print(str(s)+'\n')
 
         print(f'{self.genome1_name} survived: {len(survivors1): =3}')
         print(f'{self.genome2_name} survived: {len(survivors2): =3}')
