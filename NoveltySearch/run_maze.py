@@ -4,19 +4,13 @@ import shutil
 import json
 import random
 import numpy as np
-import torch
 import warnings
 warnings.simplefilter('ignore')
-
-
-import evogym.envs
-from evogym import is_connected, has_actuator, get_full_connectivity
 
 
 from neat.nn import FeedForwardNetwork
 
 import ns_neat
-import distances
 from parallel import ParallelEvaluator
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -25,7 +19,7 @@ sys.path.append(UTIL_DIR)
 from arguments import get_args
 from drawer import DrawReporter
 
-from maze_environment import read_environment
+from maze_environment_numpy import MazeEnvironment
 
 
 def eval_genome(genome, config, env, timesteps, **kwargs):
@@ -34,7 +28,7 @@ def eval_genome(genome, config, env, timesteps, **kwargs):
 
     done = False
     for i in range(timesteps):
-        obs = env.create_net_inputs()
+        obs = env.get_observation()
         action = controller.activate(obs)
         done = env.update(action)
         if done:
@@ -43,12 +37,13 @@ def eval_genome(genome, config, env, timesteps, **kwargs):
     if done:
         reward = 1.0
     else:
-        distance = env.agent_distance_to_exit()
+        distance = env.get_distance_to_exit()
         reward = (env.initial_distance - distance) / env.initial_distance
 
+    last_loc = env.get_agent_location()
     results = {
         'reward': reward,
-        'data': [env.agent.location.x, env.agent.location.y]
+        'data': [last_loc[0], last_loc[1]]
     }
     return results
 
@@ -68,7 +63,7 @@ def main():
             shutil.rmtree(save_path)
             os.makedirs(save_path)
         else:
-            return None, None
+            return
         print()
 
     argument_file = os.path.join(save_path, 'arguments.json')
@@ -77,7 +72,7 @@ def main():
 
 
     maze_env_config = os.path.join(UTIL_DIR, f'{args.task}_maze.txt')
-    maze_env = read_environment(maze_env_config)
+    maze_env = MazeEnvironment.read_environment(maze_env_config)
 
 
     evaluator_kwargs = {
@@ -87,18 +82,18 @@ def main():
     evaluator = ParallelEvaluator(evaluator_kwargs, args.num_cores, eval_genome)
 
 
-    config_path = os.path.join(UTIL_DIR, 'neat_config.ini')
-    novelty_config = {
-        'metric': distances.manhattan,
-        'threshold_init': args.ns_threshold,
-        'threshold_floor': 0.25,
-        'neighbors': args.num_knn,
-        'MCNS': args.mcns
-    }
+    config_path = os.path.join(UTIL_DIR, 'ns_config.ini')
     overwrite_config = [
-        ('NEAT', 'pop_size', args.pop_size)
+        ('NEAT', 'pop_size', args.pop_size),
+        ('NEAT', 'metric', 'manhattan'),
+        ('NEAT', 'threshold_init', args.ns_threshold),
+        ('NEAT', 'threshold_floor', 0.25),
+        ('NEAT', 'neighbors', args.num_knn),
+        ('NEAT', 'mcns', args.mcns),
     ]
-    config = ns_neat.make_config(config_path, novelty_config, overwrite_config)
+    config = ns_neat.make_config(config_path, custom_config=overwrite_config)
+    config_out_path = os.path.join(save_path, 'ns_config.ini')
+    config.save(config_out_path)
 
     pop = ns_neat.Population(config)
 

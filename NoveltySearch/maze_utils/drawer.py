@@ -1,50 +1,52 @@
 import random
 import os
+import numpy as np
 
-import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
 from neat import BaseReporter
 from neat.nn import FeedForwardNetwork
 
-from visualize import _draw_maze_
-
 class DrawReporter(BaseReporter):
-    def __init__(
-            self,
-            env,
-            timesteps,
-            save_dir,
-            width=200,height=200,fig_height=6,
-            show_axes=False,
-            no_plot=False):
+    def __init__(self, env, timesteps, save_dir, no_plot=False):
 
         self.env = env
         self.timesteps = timesteps
         self.save_dir = save_dir
-        self.width = width
-        self.height = height
-        self.fig_height = fig_height
-        self.fig_width = fig_height
-        self.show_axes = show_axes
         self.no_plot = no_plot
+
         self.fig = None
         self.ax = None
+        self._init_figure()
+
         self.best_reward = float('-inf')
         self.best_path = None
         self.generation = -1
         self.update_in_generation = False
 
-        self.fig,self.ax = plt.subplots()
-        self.fig.set_dpi(100)
-        self.fig.set_size_inches(self.fig_width,self.fig_height)
-
-        self.ax.set_xlim(0, self.width)
-        self.ax.set_ylim(0, self.height)
-        self.ax.invert_yaxis()
 
         os.makedirs(save_dir, exist_ok=True)
+
+    def _init_figure(self):
+        walls = self.env.walls
+        
+        width = np.max(walls[:,:,0])-np.min(walls[:,:,0])
+        height = np.max(walls[:,:,1])-np.min(walls[:,:,1])
+
+        self.fig, self.ax = plt.subplots(figsize=(width/25,height/25))
+
+        for w_i in range(walls.shape[0]):
+            self.ax.plot(walls[w_i,:,0], walls[w_i,:,1], c='k', linewidth=3)
+
+        start_point = self.env.init_location
+        exit_point = self.env.exit_point
+        self.ax.scatter(start_point[0], start_point[1], color=[0.0,0.6,0.3], s=96, marker='s')
+        self.ax.scatter(exit_point[0], exit_point[1], color=[0.9,0.2,0.0], s=128, marker='*')
+
+        # self.ax.set_xlim(np.min(walls[:,:,0]), np.max(walls[:,:,0]))
+        # self.ax.set_ylim(np.min(walls[:,:,1]), np.max(walls[:,:,1]))
+
+        self.ax.axis('off')
 
     def start_generation(self, generation):
         self.generation = generation
@@ -65,50 +67,39 @@ class DrawReporter(BaseReporter):
 
         path = []
         for i in range(self.timesteps):
-            obs = self.env.create_net_inputs()
+            obs = self.env.get_observation()
             action = controller.activate(obs)
             done = self.env.update(action)
 
-            path.append((self.env.agent.location.x, self.env.agent.location.y))
+            path.append(self.env.get_agent_location())
 
             if done:
                 break
-        return path
+        return np.vstack(path)
 
     def post_evaluate(self, config, population, species, best_genome):
         self._update_path(population, config)
         self.ax.set_title(f'Generation : {self.generation}')
 
-        current_x,current_y = [],[]
-        for _, genome in population.items():
-            x,y = genome.data
-            circle = plt.Circle((x,y), 0.8, facecolor='y', alpha=0.5)
-            current_x.append(x)
-            current_y.append(y)
-            self.ax.add_patch(circle)
+        current_data = np.vstack([genome.data for genome in population.values()])
+        scatter_data = self.ax.scatter(current_data[:,0], current_data[:,1], s=2.0, color='y', alpha=0.5)
 
-        for x,y in self.best_path:
-            circle = plt.Circle((x, y), 1.0, facecolor='b', alpha=0.7)
-            self.ax.add_patch(circle)
+        line_best = self.ax.plot(self.best_path[:,0], self.best_path[:,1], linewidth=3, c='b', alpha=0.7)
 
-        for x,y in self.novelty_path:
-            circle = plt.Circle((x, y), 1.0, facecolor='orange', alpha=0.7)
-            self.ax.add_patch(circle)
+        line_novelty = self.ax.plot(self.novelty_path[:,0], self.novelty_path[:,1], linewidth=3, c='orange', alpha=0.7)
 
-        _draw_maze_(self.env,self.ax)
 
-        if not self.show_axes:
-            self.ax.axis('off')
-
-        filename = os.path.join(self.save_dir,f'{self.generation}.png')
-        plt.savefig(filename)
+        filename = os.path.join(self.save_dir,f'{self.generation}.jpg')
+        plt.savefig(filename, bbox_inches='tight')
 
         if not self.no_plot:
-            plt.pause(0.1)
+            plt.pause(0.01)
 
-        for _ in range(len(self.ax.patches)):
-            self.ax.patches.pop()
-        self.ax.scatter(current_x, current_y, s=1.0, facecolor='gray', alpha=0.7)
+        line_best.pop(0).remove()
+        line_novelty.pop(0).remove()
+        scatter_data.remove()
+
+        self.ax.scatter(current_data[:,0], current_data[:,1], s=1.0, facecolor='gray', alpha=0.7)
 
         self.update_in_generation = False
 

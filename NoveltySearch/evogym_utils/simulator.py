@@ -57,7 +57,7 @@ class Simulator:
         done = False
         obs = self.env.reset()
         while not done:
-            action = self.controller.activate(obs[0])
+            action = np.array(self.controller.activate(obs[0]))*2 - 1
             obs, _, done, infos = self.env.step([np.array(action)])
             self.env.render()
 

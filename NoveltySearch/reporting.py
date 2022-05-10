@@ -91,7 +91,6 @@ class SaveResultReporter(BaseReporter):
 class NoveltySearchReporter(StdOutReporter):
 
     def post_evaluate(self, config, population, species, best_genome):
-        # pylint: disable=no-self-use
         fitnesses = [c.fitness for c in population.values()]
         fit_mean = mean(fitnesses)
         fit_std = stdev(fitnesses)
@@ -101,7 +100,7 @@ class NoveltySearchReporter(StdOutReporter):
         rew_mean = mean(rewards)
         rew_std = stdev(rewards)
         best_species_id = species.get_species_id(best_genome.key)
-        print('Population\'s average reward: {0:3.5f} stdev: {1:3.5f}'.format(rew_mean, rew_std))
+        print('Population\'s average reward : {0:3.5f} stdev: {1:3.5f}'.format(rew_mean, rew_std))
         print(
             'Best reward: {0:3.5f} - size: {1!r} - species {2} - id {3}'.format(best_genome.reward,
                                                                                  best_genome.size(),

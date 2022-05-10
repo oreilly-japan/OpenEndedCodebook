@@ -3,7 +3,7 @@ import argparse
 
 def get_args():
     parser = argparse.ArgumentParser(
-        description='MapElites experiment'
+        description='Novelty Search experiment'
     )
 
     parser.add_argument(

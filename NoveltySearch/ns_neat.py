@@ -1,20 +1,22 @@
-import random
-
 import neat
+import distances
 
+from ns_config import NSConfig
 from reporting import SaveResultReporter, NoveltySearchReporter
+
 
 class CompleteExtinctionException(Exception):
     pass
 
-def make_config(config_file, extra_info, custom_config):
-    config = neat.Config(neat.DefaultGenome,
-                         neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet,
-                         neat.DefaultStagnation,
-                         config_file,
-                         extra_info=extra_info,
-                         custom_config=custom_config)
+
+def make_config(config_file, extra_info=None, custom_config=None):
+    config = NSConfig(neat.DefaultGenome,
+                      neat.DefaultReproduction,
+                      neat.DefaultSpeciesSet,
+                      neat.DefaultStagnation,
+                      config_file,
+                      extra_info=extra_info,
+                      custom_config=custom_config)
     return config
 
 class Population(neat.Population):
@@ -23,8 +25,10 @@ class Population(neat.Population):
         super().__init__(config, **kwargs)
 
         self.archive = {}
-        self.novelty_threshold = config.extra_info['threshold_init']
+        self.novelty_threshold = config.threshold_init
         self.time_out = 0
+        self.metric_func = getattr(distances, config.metric, None)
+        assert self.metric_func is not None, f'metric {config.metric} is not impelemented in distances.py'
 
     def run(self, evaluate_function, n=None):
         """
@@ -115,7 +119,7 @@ class Population(neat.Population):
             if reward is None:
                 raise RuntimeError("reward not assigned to genome {}".format(genome.key))
 
-            if reward < self.config.extra_info['MCNS']:
+            if reward < self.config.mcns:
                 genome.fitness = -1
                 continue
 
@@ -132,7 +136,7 @@ class Population(neat.Population):
             distances_current.update(distances_archive)
             novelty = self._knn(
                 list(distances_current.values()),
-                k=self.config.extra_info['neighbors'])
+                k=self.config.neighbors)
 
             genome.fitness = novelty
 
@@ -144,7 +148,7 @@ class Population(neat.Population):
             if key1==key2:
                 continue
 
-            d = self.config.extra_info['metric'](genome1.data, genome2.data)
+            d = self.metric_func(genome1.data, genome2.data)
             distances[key2] = d
 
         return distances
@@ -167,8 +171,8 @@ class Population(neat.Population):
 
         if self.time_out >= 5:
             self.novelty_threshold *= 0.95
-            if self.novelty_threshold < self.config.extra_info['threshold_floor']:
-                self.novelty_threshold = self.config.extra_info['threshold_floor']
+            if self.novelty_threshold < self.config.threshold_floor:
+                self.novelty_threshold = self.config.threshold_floor
             self.time_out = 0
 
         # if more than four individuals added in last generation then raise threshold

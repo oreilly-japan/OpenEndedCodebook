@@ -20,6 +20,7 @@ from gym_utils import make_vec_envs
 
 import evogym.envs
 
+from ns_neat import make_config
 from neat.nn import FeedForwardNetwork
 
 
@@ -88,8 +89,8 @@ def save_robot_gif(exp_path, save_path, env_id, structure, key, resolution, neat
     img = env.render(mode='img')
     imgs = [img]
     while not done:
-        action = controller.activate(obs[0])
-        obs, _, done, infos = env.step([np.array(action)])
+        action = np.array(controller.activate(obs[0]))*2 - 1
+        obs, _, done, infos = env.step([action])
         img = env.render(mode='img')
         imgs.append(img)
 
@@ -118,9 +119,11 @@ if __name__=='__main__':
     with open(os.path.join(exp_path, 'arguments.json'), 'r') as f:
         exp_args = json.load(f)
 
-    neat_config_file = os.path.join(exp_path, 'neat_config.pickle')
-    with open(neat_config_file, 'rb') as f:
-        neat_config = pickle.load(f)
+    ns_config_file = os.path.join(exp_path, 'ns_config.ini')
+    config = make_config(ns_config_file)
+    # neat_config_file = os.path.join(exp_path, 'neat_config.pickle')
+    # with open(neat_config_file, 'rb') as f:
+    #     neat_config = pickle.load(f)
 
     structure_file = os.path.join(exp_path, 'structure.npz')
     structure_data = np.load(structure_file)
@@ -143,7 +146,7 @@ if __name__=='__main__':
             'reward': 'history_reward.csv',
             'novelty': 'history_novelty.csv'
         }
-        for mtric,file in files.items():
+        for metric,file in files.items():
 
             history_file = os.path.join(exp_path, file)
             with open(history_file, 'r') as f:
@@ -162,11 +165,11 @@ if __name__=='__main__':
             save_path = os.path.join(gif_path, metric)
             os.makedirs(save_path, exist_ok=True)
             for key in ids:
-                func_args = (exp_path, save_path, exp_args['task'], structure, key, resolution, neat_config)
+                func_args = (exp_path, save_path, exp_args['task'], structure, key, resolution, config)
                 func_kwargs = {
                     'overwrite': not args.not_overwrite
                 }
-                jobs.append(pool.apply_async(save_robot_gif, args=func_args, kwargs=func_kwargs))
+                jobs.append(pool.apply_async(save_robot_gif, args=func_args, kwds=func_kwargs))
 
         for job in jobs:
             job.get(timeout=None)
@@ -178,7 +181,7 @@ if __name__=='__main__':
             save_path = os.path.join(gif_path, metric)
             os.makedirs(save_path, exist_ok=True)
             for key in ids:
-                func_args = (exp_path, save_path, exp_args['task'], structure, key, resolution, neat_config)
+                func_args = (exp_path, save_path, exp_args['task'], structure, key, resolution, config)
                 func_kwargs = {
                     'overwrite': not args.not_overwrite
                 }
