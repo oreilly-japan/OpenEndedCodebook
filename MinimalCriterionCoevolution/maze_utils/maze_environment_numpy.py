@@ -99,10 +99,13 @@ class MazeEnvironment:
         self.agent.update_rangefinder_sensors(self.walls)
         self.agent.update_radars(self.exit_point)
 
-    def agent_distance_to_exit(self):
+    def get_distance_to_exit(self):
         return self.agent.distance_to_exit(self.exit_point)
 
-    def create_net_inputs(self):
+    def get_agent_location(self):
+        return self.agent.location.copy()
+
+    def get_observation(self):
         return self.agent.get_obs()
 
     def test_wall_collision(self, location):
@@ -155,7 +158,7 @@ class MazeEnvironment:
         self.agent.update_radars(self.exit_point)
 
         # check if agent reached exit point
-        distance = self.agent.distance_to_exit(self.exit_point)
+        distance = self.get_distance_to_exit()
         self.exit_found = (distance < self.exit_range)
 
         return self.exit_found

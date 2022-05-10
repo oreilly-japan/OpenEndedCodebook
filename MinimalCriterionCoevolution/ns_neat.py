@@ -2,14 +2,14 @@ import neat
 import distances
 
 from ns_config import NSConfig
-# from reporting import SaveResultReporter, NoveltySearchReporter
+from reporting import SaveResultReporter, NoveltySearchReporter
 
 
 class CompleteExtinctionException(Exception):
     pass
 
 
-def make_config(config_file, extra_info, custom_config):
+def make_config(config_file, extra_info=None, custom_config=None):
     config = NSConfig(neat.DefaultGenome,
                       neat.DefaultReproduction,
                       neat.DefaultSpeciesSet,

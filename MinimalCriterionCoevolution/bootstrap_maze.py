@@ -55,7 +55,7 @@ def eval_genome(genome, config, env, timesteps, **kwargs):
 
     done = False
     for i in range(timesteps):
-        obs = env.create_net_inputs()
+        obs = env.get_observation()
         action = controller.activate(obs)
         done = env.update(action)
         if done:
@@ -64,13 +64,13 @@ def eval_genome(genome, config, env, timesteps, **kwargs):
     if done:
         reward = 1.0
     else:
-        distance = env.agent_distance_to_exit()
+        distance = env.get_distance_to_exit()
         reward = (env.initial_distance - distance) / env.initial_distance
 
+    last_loc = env.get_agent_location()
     results = {
         'reward': reward,
-        'data': [env.agent.location[0], env.agent.location[1]]
-        # 'data': [env.agent.location.x, env.agent.location.y]
+        'data': [last_loc[0], last_loc[1]]
     }
     return results
 
@@ -122,7 +122,7 @@ def main():
     mcc_config = mcc.make_config(DefaultGenome, MazeGenome, mcc_config_path, None, None)
 
     ns_config_path = os.path.join(UTIL_DIR, 'ns_config.ini')
-    ns_config = ns_neat.make_config(ns_config_path, None, None)
+    ns_config = ns_neat.make_config(ns_config_path)
 
 
     MazeDecoder = MazeGenomeDecoder(mcc_config.genome2_config)

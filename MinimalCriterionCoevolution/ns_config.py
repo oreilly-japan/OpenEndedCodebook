@@ -1,7 +1,7 @@
 import os
 from configparser import ConfigParser
 
-from neat.config import ConfigParameter, UnknownConfigItemError
+from neat.config import ConfigParameter, UnknownConfigItemError, write_pretty_params
 
 
 class NSConfig():

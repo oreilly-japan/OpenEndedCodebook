@@ -88,10 +88,10 @@ def make_figure(exp_path, save_path, maze_key, agent_key, config, colorbar=False
     maze.reset()
     data = [maze.agent.location]
     for i in range(timesteps):
-        obs = maze.create_net_inputs()
+        obs = maze.get_observation()
         action = controller.activate(obs)
         done = maze.update(action)
-        data.append(maze.agent.location)
+        data.append(maze.get_agent_location())
         if done:
             break
 

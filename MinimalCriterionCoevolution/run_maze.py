@@ -50,7 +50,7 @@ def simulate_maze(controller, maze):
     env.reset()
     done = False
     for i in range(timesteps):
-        obs = env.create_net_inputs()
+        obs = env.get_observation()
         action = controller.activate(obs)
         done = env.update(action)
         if done:
