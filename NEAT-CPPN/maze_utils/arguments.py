@@ -13,7 +13,7 @@ def get_args():
     )
     parser.add_argument(
         '-t', '--task',
-        default='hard', type=str,
+        default='medium', type=str,
         help='target maze name'
     )
     parser.add_argument(

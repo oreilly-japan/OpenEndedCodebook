@@ -8,7 +8,7 @@ $python run_maze.py
 ```
 #### options:
 - -n --name       : experiment name (default: task id)
-- -t --task       : task id (default: Walker-v0)
+- -t --task       : task id (default: medium)
 - -p --pop-size   : population size of neat (default: 500)
 - -g --generation : generations of neat (default: 500)
 - --timesteps     : maze solving simulator steps (default: 400)
@@ -23,7 +23,7 @@ $python run_evogym.py
 ```
 #### options:
 - -n --name       : experiment name (default: task id)
-- -t --task       : task id (default: hard)
+- -t --task       : task id (default: Walker-v0)
 - -p --pop-size   : population size of neat (default: 200)
 - -g --generation : generations of neat (default: 500)
 - --eval-num      : if probabilistic task, need a certain times (default: 1)
@@ -52,7 +52,7 @@ $python run_evogym_cppn.py
 ```
 #### options:
 - -n --name       : experiment name (default: task id)
-- -t --task       : task id (default: hard)
+- -t --task       : task id (default: Walker-v0)
 - -p --pop-size   : population size of neat (default: 4)
 - -g --generation : generations of neat (default: 300)
 - --num-cores     : number of parallel processes (default: 4)
