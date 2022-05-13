@@ -20,8 +20,7 @@ from gym_utils import make_vec_envs
 
 import evogym.envs
 
-from ns_neat import make_config
-from neat.nn import FeedForwardNetwork
+import ns_neat
 
 
 def get_args():
@@ -66,9 +65,9 @@ def get_args():
     return args
 
 
-def save_robot_gif(exp_path, save_path, env_id, structure, key, resolution, neat_config, overwrite=True):
+def save_robot_gif(expt_path, save_path, env_id, structure, key, resolution, neat_config, overwrite=True):
 
-    genome_file = os.path.join(exp_path, 'genome', f'{key}.pickle')
+    genome_file = os.path.join(expt_path, 'genome', f'{key}.pickle')
 
     gif_file = os.path.join(save_path, f'{key}.gif')
 
@@ -82,7 +81,7 @@ def save_robot_gif(exp_path, save_path, env_id, structure, key, resolution, neat
     env = make_vec_envs(env_id, structure, 1000, 1, allow_early_resets=False)
     env.get_attr("default_viewer", indices=None)[0].set_resolution(resolution)
 
-    controller = FeedForwardNetwork.create(genome, neat_config)
+    controller = ns_neat.nn.FeedForwardNetwork.create(genome, neat_config)
 
     done = False
     obs = env.reset()
@@ -98,39 +97,42 @@ def save_robot_gif(exp_path, save_path, env_id, structure, key, resolution, neat
 
     imageio.mimsave(gif_file, imgs, duration=(1/50.0))
 
-    gifsicle(sources=gif_file,
-             destination=gif_file,
-             optimize=False,
-             colors=64,
-             options=["--optimize=3","--no-warnings"])
+    with lock:
+        gifsicle(sources=gif_file,
+                 destination=gif_file,
+                 optimize=False,
+                 colors=64,
+                 options=["--optimize=3","--no-warnings"])
 
     print(f'genome {key} ... done')
     return
 
 
-if __name__=='__main__':
+def pool_init_func(lock_):
+    global lock
+    lock = lock_
+
+def main():
+
     args = get_args()
 
     resolution = (1280*args.resolution_ratio, 720*args.resolution_ratio)
 
+    expt_path = os.path.join(CURR_DIR, 'evogym_out', args.name)
 
-    exp_path = os.path.join(CURR_DIR, 'evogym_out', args.name)
+    with open(os.path.join(expt_path, 'arguments.json'), 'r') as f:
+        expt_args = json.load(f)
 
-    with open(os.path.join(exp_path, 'arguments.json'), 'r') as f:
-        exp_args = json.load(f)
+    ns_config_file = os.path.join(expt_path, 'ns_config.ini')
+    config = ns_neat.make_config(ns_config_file)
 
-    ns_config_file = os.path.join(exp_path, 'ns_config.ini')
-    config = make_config(ns_config_file)
-    # neat_config_file = os.path.join(exp_path, 'neat_config.pickle')
-    # with open(neat_config_file, 'rb') as f:
-    #     neat_config = pickle.load(f)
 
-    structure_file = os.path.join(exp_path, 'structure.npz')
+    structure_file = os.path.join(expt_path, 'structure.npz')
     structure_data = np.load(structure_file)
     structure = (structure_data['robot'], structure_data['connectivity'])
 
 
-    gif_path = os.path.join(exp_path, 'gif')
+    gif_path = os.path.join(expt_path, 'gif')
     os.makedirs(gif_path, exist_ok=True)
 
 
@@ -148,7 +150,7 @@ if __name__=='__main__':
         }
         for metric,file in files.items():
 
-            history_file = os.path.join(exp_path, file)
+            history_file = os.path.join(expt_path, file)
             with open(history_file, 'r') as f:
                 reader = csv.reader(f)
                 histories = list(reader)[1:]
@@ -158,14 +160,15 @@ if __name__=='__main__':
 
     if not args.no_multi and args.specific is None:
 
-        pool = mp.Pool(args.num_cores)
+        lock = mp.Lock()
+        pool = mp.Pool(args.num_cores, initializer=pool_init_func, initargs=(lock,))
         jobs = []
 
         for metric,ids in robot_ids.items():
             save_path = os.path.join(gif_path, metric)
             os.makedirs(save_path, exist_ok=True)
             for key in ids:
-                func_args = (exp_path, save_path, exp_args['task'], structure, key, resolution, config)
+                func_args = (expt_path, save_path, expt_args['task'], structure, key, resolution, config)
                 func_kwargs = {
                     'overwrite': not args.not_overwrite
                 }
@@ -181,9 +184,12 @@ if __name__=='__main__':
             save_path = os.path.join(gif_path, metric)
             os.makedirs(save_path, exist_ok=True)
             for key in ids:
-                func_args = (exp_path, save_path, exp_args['task'], structure, key, resolution, config)
+                func_args = (expt_path, save_path, expt_args['task'], structure, key, resolution, config)
                 func_kwargs = {
                     'overwrite': not args.not_overwrite
                 }
 
                 save_robot_gif(*func_args, **func_kwargs)
+
+if __name__=='__main__':
+    main()

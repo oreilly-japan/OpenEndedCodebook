@@ -5,15 +5,11 @@ import json
 import pickle
 import random
 import numpy as np
-import warnings
-warnings.simplefilter('ignore')
 
 
 import evogym.envs
 from evogym import is_connected, has_actuator, get_full_connectivity
 
-
-from neat.nn import FeedForwardNetwork
 
 import ns_neat
 from parallel import ParallelEvaluator
@@ -37,7 +33,7 @@ def calc_covar(vec, align=True):
     return covar
 
 def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
-    controller = FeedForwardNetwork.create(genome, config)
+    controller = ns_neat.nn.FeedForwardNetwork.create(genome, config)
 
     env = make_vec_envs(env_id, structure, random.randint(0,10000), 1)
 
@@ -46,13 +42,14 @@ def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
     # pos = env.env_method('get_pos_com_obs', object_name='robot')[0]
     # pos_data = [0,0]
 
-    obs_data = [obs]
+    obs_data = []
     act_data = []
 
     episode_rewards = []
     episode_data = []
     while len(episode_rewards) < num_eval:
         action = np.array(controller.activate(obs[0]))*2 - 1
+        obs_data.append(obs)
         act_data.append(action)
         obs, _, done, infos = env.step([np.array(action)])
 
@@ -61,11 +58,14 @@ def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
         if 'episode' in infos[0]:
             obs_data = np.vstack(obs_data)
             obs_cov = calc_covar(obs_data)
+
             act_data = np.clip(np.vstack(act_data),-1,1)
             act_cov = calc_covar(act_data, align=False)
+
             data = np.hstack([obs_cov,act_cov])
             episode_data.append(data)
-            obs_data = [obs]
+
+            obs_data = []
             act_data = []
             # pos_data = [0,0]
             # rad_data = [0,0]
@@ -73,8 +73,7 @@ def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
             # if np.mean(pos_data)<0.3:
                 # reward = -3.
             episode_rewards.append(reward)
-        else:
-            obs_data.append(obs)
+        # else:
             # pos_diff = pos_-pos
             # pos_data[0] += np.maximum(pos_diff, 0)
             # pos_data[1] += np.maximum(-pos_diff, 0)
@@ -125,11 +124,6 @@ def main():
     np.savez(robot_file, robot=robot, connectivity=connectivity)
 
 
-    env = make_vec_envs(args.task, structure, 0, 1)
-
-    num_inputs = env.observation_space.shape[0]
-    num_outputs = env.action_space.shape[0]
-
     evaluator_kwargs = {
         'env_id': args.task,
         'structure': structure,
@@ -137,6 +131,10 @@ def main():
     }
     evaluator = ParallelEvaluator(evaluator_kwargs, args.num_cores, eval_genome)
 
+
+    env = make_vec_envs(args.task, structure, 0, 1)
+    num_inputs = env.observation_space.shape[0]
+    num_outputs = env.action_space.shape[0]
 
     config_path = os.path.join(UTIL_DIR, 'ns_config.ini')
     overwrite_config = [
@@ -153,7 +151,9 @@ def main():
     config_out_path = os.path.join(save_path, 'ns_config.ini')
     config.save(config_out_path)
 
+
     pop = ns_neat.Population(config)
+
     reporters = [
         ns_neat.SaveResultReporter(save_path),
         ns_neat.NoveltySearchReporter(True),
@@ -164,11 +164,13 @@ def main():
 
     if not args.no_view:
         simulator = SimulateProcess(
-            args.task,
-            structure,
-            save_path,
-            pop.config,
-            args.generation)
+            env_id=args.task,
+            structure=structure,
+            load_path=save_path,
+            history_file='history_novelty.csv',
+            neat_config=pop.config,
+            generations=args.generation)
+
         simulator.init_process()
         simulator.start()
 

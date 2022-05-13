@@ -1,4 +1,3 @@
-import random
 import os
 import numpy as np
 
@@ -21,15 +20,14 @@ class DrawReporter(BaseReporter):
 
         self.best_reward = float('-inf')
         self.best_path = None
+        self.novelty_path = None
         self.generation = -1
-        self.update_in_generation = False
-
 
         os.makedirs(save_dir, exist_ok=True)
 
     def _init_figure(self):
         walls = self.env.walls
-        
+
         width = np.max(walls[:,:,0])-np.min(walls[:,:,0])
         height = np.max(walls[:,:,1])-np.min(walls[:,:,1])
 
@@ -43,9 +41,6 @@ class DrawReporter(BaseReporter):
         self.ax.scatter(start_point[0], start_point[1], color=[0.0,0.6,0.3], s=96, marker='s')
         self.ax.scatter(exit_point[0], exit_point[1], color=[0.9,0.2,0.0], s=128, marker='*')
 
-        # self.ax.set_xlim(np.min(walls[:,:,0]), np.max(walls[:,:,0]))
-        # self.ax.set_ylim(np.min(walls[:,:,1]), np.max(walls[:,:,1]))
-
         self.ax.axis('off')
 
     def start_generation(self, generation):
@@ -56,7 +51,6 @@ class DrawReporter(BaseReporter):
         if genome_reward.reward > self.best_reward:
             self.best_reward = genome_reward.reward
             self.best_path = self._get_path(genome_reward, config)
-            self.update_in_generation = True
 
         genome_novelty = max(genomes.values(), key=lambda z: z.fitness)
         self.novelty_path = self._get_path(genome_novelty, config)
@@ -85,9 +79,7 @@ class DrawReporter(BaseReporter):
         scatter_data = self.ax.scatter(current_data[:,0], current_data[:,1], s=2.0, color='y', alpha=0.5)
 
         line_best = self.ax.plot(self.best_path[:,0], self.best_path[:,1], linewidth=3, c='b', alpha=0.7)
-
         line_novelty = self.ax.plot(self.novelty_path[:,0], self.novelty_path[:,1], linewidth=3, c='orange', alpha=0.7)
-
 
         filename = os.path.join(self.save_dir,f'{self.generation}.jpg')
         plt.savefig(filename, bbox_inches='tight')
@@ -101,8 +93,6 @@ class DrawReporter(BaseReporter):
 
         self.ax.scatter(current_data[:,0], current_data[:,1], s=1.0, facecolor='gray', alpha=0.7)
 
-        self.update_in_generation = False
-
-    def close(self):
+    def found_solution(self, config, generation, best):
         plt.clf()
         plt.close('all')

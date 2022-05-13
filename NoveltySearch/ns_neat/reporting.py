@@ -1,6 +1,4 @@
-import copy
 import csv
-import time
 import os
 import shutil
 import pickle
@@ -46,7 +44,6 @@ class SaveResultReporter(BaseReporter):
     def post_evaluate(self, config, population, species, best_genome):
         with open(self.history_pop_file, 'a', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.history_pop_header)
-
             for key,genome in population.items():
                 items = {
                     'generation': self.generation,
@@ -56,7 +53,8 @@ class SaveResultReporter(BaseReporter):
                 }
                 writer.writerow(items)
 
-        current_novelty = reduce(lambda x,y: x if x.fitness>y.fitness else y, population.values())
+        # current_novelty = reduce(lambda x,y: x if x.fitness>y.fitness else y, population.values())
+        current_novelty = max(population.values(), key=lambda z: z.fitness)
         items = {
             'generation': self.generation,
             'id': current_novelty.key,
@@ -70,7 +68,8 @@ class SaveResultReporter(BaseReporter):
         with open(novelty_file, 'wb') as f:
             pickle.dump(current_novelty, f)
 
-        current_reward = reduce(lambda x,y: x if x.reward>y.reward else y, population.values())
+        # current_reward = reduce(lambda x,y: x if x.reward>y.reward else y, population.values())
+        current_reward = max(population.values(), key=lambda z: z.reward)
         items = {
             'generation': self.generation,
             'id': current_reward.key,

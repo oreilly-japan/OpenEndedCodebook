@@ -1,25 +1,11 @@
-import neat
-import distances
-
-from ns_config import NSConfig
-from reporting import SaveResultReporter, NoveltySearchReporter
+from neat import Population
+from . import distances
 
 
 class CompleteExtinctionException(Exception):
     pass
 
-
-def make_config(config_file, extra_info=None, custom_config=None):
-    config = NSConfig(neat.DefaultGenome,
-                      neat.DefaultReproduction,
-                      neat.DefaultSpeciesSet,
-                      neat.DefaultStagnation,
-                      config_file,
-                      extra_info=extra_info,
-                      custom_config=custom_config)
-    return config
-
-class Population(neat.Population):
+class Population(Population):
 
     def __init__(self, config, **kwargs):
         super().__init__(config, **kwargs)
@@ -31,20 +17,6 @@ class Population(neat.Population):
         assert self.metric_func is not None, f'metric {config.metric} is not impelemented in distances.py'
 
     def run(self, evaluate_function, n=None):
-        """
-        Runs NEAT's genetic algorithm for at most n generations.  If n
-        is None, run until solution is found or extinction occurs.
-        The user-provided fitness_function must take only two arguments:
-            1. The population as a list of (genome id, genome) tuples.
-            2. The current configuration object.
-        The return value of the fitness function is ignored, but it must assign
-        a Python float to the `fitness` member of each genome.
-        The fitness function is free to maintain external state, perform
-        evaluations in parallel, etc.
-        It is assumed that fitness_function does not modify the list of genomes,
-        the genomes themselves (apart from updating the fitness member),
-        or the configuration object.
-        """
 
         if self.config.no_fitness_termination and (n is None):
             raise RuntimeError("Cannot have no generational limit with no fitness termination")

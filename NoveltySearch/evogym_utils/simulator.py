@@ -1,23 +1,20 @@
 import os
 import csv
 import time
-import random
 import pickle
 import numpy as np
 
 import multiprocessing
 from multiprocessing import Process
 
-from stable_baselines3 import PPO
-
 from gym_utils import make_vec_envs
 
-from neat.nn import FeedForwardNetwork
+import ns_neat
 
 class Simulator:
-    def __init__(self, env_id, structure, save_dir, neat_config):
-        self.save_dir = save_dir
-        self.history_file = os.path.join(self.save_dir, 'history_novelty.csv')
+    def __init__(self, env_id, structure, load_path, history_file, neat_config):
+        self.load_path = load_path
+        self.history_file = os.path.join(self.load_path, history_file)
         self.neat_config = neat_config
         self.generation = -1
         self.controller = None
@@ -39,12 +36,12 @@ class Simulator:
         if len(lines)>1:
             latest = lines[-1]
             if self.generation<int(latest[0]):
-                genome_file = os.path.join(self.save_dir, 'genome', f'{latest[1]}.pickle')
+                genome_file = os.path.join(self.load_path, 'genome', f'{latest[1]}.pickle')
 
                 with open(genome_file, 'rb') as f:
                     genome = pickle.load(f)
 
-                self.controller = FeedForwardNetwork.create(genome, self.neat_config)
+                self.controller = ns_neat.nn.FeedForwardNetwork.create(genome, self.neat_config)
                 self.generation = int(latest[0])
                 print(f'simulator update controller: generation {latest[0]}  id {latest[1]}')
         else:
@@ -62,8 +59,8 @@ class Simulator:
             self.env.render()
 
 
-def run_process(env_id, structure, save_dir, neat_config, generations):
-    simulator = Simulator(env_id, structure, save_dir, neat_config)
+def run_process(env_id, structure, load_path, history_file, neat_config, generations):
+    simulator = Simulator(env_id, structure, load_path, history_file, neat_config)
     count = 0
     while simulator.generation < generations-1:
         try:
@@ -77,19 +74,23 @@ def run_process(env_id, structure, save_dir, neat_config, generations):
 
 
 class SimulateProcess:
-    def __init__(self, env_id, structure, save_dir, neat_config, generations):
+    def __init__(self, env_id, structure, load_path, history_file, neat_config, generations):
         self.env_id = env_id
         self.structure = structure
-        self.save_dir = save_dir
+        self.load_path = load_path
+        self.history_file = history_file
         self.neat_config = neat_config
         self.generations = generations
         self.process = None
+
+    def __del__(self):
+        self.process.terminate()
 
     def init_process(self):
         multiprocessing.set_start_method("spawn", force=True)
         self.process = Process(
             target=run_process,
-            args=(self.env_id, self.structure, self.save_dir, self.neat_config, self.generations))
+            args=(self.env_id, self.structure, self.load_path, self.history_file, self.neat_config, self.generations))
 
     def start(self):
         self.process.start()

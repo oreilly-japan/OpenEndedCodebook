@@ -2,13 +2,8 @@ import sys
 import os
 import shutil
 import json
-import random
 import numpy as np
-import warnings
-warnings.simplefilter('ignore')
 
-
-from neat.nn import FeedForwardNetwork
 
 import ns_neat
 from parallel import ParallelEvaluator
@@ -23,7 +18,7 @@ from maze_environment_numpy import MazeEnvironment
 
 
 def eval_genome(genome, config, env, timesteps, **kwargs):
-    controller = FeedForwardNetwork.create(genome, config)
+    controller = ns_neat.nn.FeedForwardNetwork.create(genome, config)
     env.reset()
 
     done = False
@@ -94,6 +89,7 @@ def main():
     config = ns_neat.make_config(config_path, custom_config=overwrite_config)
     config_out_path = os.path.join(save_path, 'ns_config.ini')
     config.save(config_out_path)
+
 
     pop = ns_neat.Population(config)
 
