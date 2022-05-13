@@ -1,7 +1,18 @@
 import os
 from configparser import ConfigParser
 
+import neat
 from neat.config import ConfigParameter, UnknownConfigItemError, write_pretty_params
+
+def make_config(config_file, extra_info=None, custom_config=None):
+    config = NSConfig(neat.DefaultGenome,
+                      neat.DefaultReproduction,
+                      neat.DefaultSpeciesSet,
+                      neat.DefaultStagnation,
+                      config_file,
+                      extra_info=extra_info,
+                      custom_config=custom_config)
+    return config
 
 
 class NSConfig():

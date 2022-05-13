@@ -3,22 +3,16 @@ import os
 import shutil
 import json
 import pickle
-import warnings
-warnings.simplefilter('ignore')
 
-from neat import DefaultGenome
-from neat.nn import FeedForwardNetwork
 
 import mcc
 import ns_neat
-import distances
 from parallel import ParallelEvaluator
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 UTIL_DIR = os.path.join(CURR_DIR, 'maze_utils')
 sys.path.append(UTIL_DIR)
 from arguments import get_bootstrap_args
-from utils import make_config
 from maze_genome import MazeGenome
 from maze_genome_decoder import MazeGenomeDecoder
 
@@ -26,9 +20,8 @@ from maze_environment import MazeEnvironment
 
 
 import time
-from neat import BaseReporter
 
-class RewardReporter(BaseReporter):
+class RewardReporter(ns_neat.BaseReporter):
 
     def __init__(self):
         self.generation = 0
@@ -49,7 +42,7 @@ class RewardReporter(BaseReporter):
 
 
 def eval_genome(genome, config, env, timesteps, **kwargs):
-    controller = FeedForwardNetwork.create(genome, config)
+    controller = ns_neat.nn.FeedForwardNetwork.create(genome, config)
 
     env.reset()
 
@@ -84,7 +77,6 @@ def make_random_maze(config, key, wall_gene_num, path_gene_num):
 
     c = 0
     while c < path_gene_num:
-    # for __ in range(path_gene_num):
         valid = genome.mutate_add_path(config.genome2_config)
         if valid:
             c += 1
@@ -119,16 +111,19 @@ def main():
 
 
     mcc_config_path = os.path.join(UTIL_DIR, 'mcc_config.ini')
-    mcc_config = mcc.make_config(DefaultGenome, MazeGenome, mcc_config_path, None, None)
+    mcc_config = mcc.make_config(mcc.DefaultGenome, MazeGenome, mcc_config_path)
+    mcc_config_out_path = os.path.join(save_path, 'mcc_config.ini')
+    mcc_config.save(mcc_config_out_path)
 
     ns_config_path = os.path.join(UTIL_DIR, 'ns_config.ini')
     ns_config = ns_neat.make_config(ns_config_path)
-
+    ns_config_out_path = os.path.join(save_path, 'ns_config.ini')
+    ns_config.save(ns_config_out_path)
 
     MazeDecoder = MazeGenomeDecoder(mcc_config.genome2_config)
 
-    perMaze = min(mcc_config.genome2_limit, args.agent_num//args.maze_num)
 
+    perMaze = min(mcc_config.genome2_limit, args.agent_num//args.maze_num)
     maze_genomes = {}
     agent_genomes = {}
     a_i = 0

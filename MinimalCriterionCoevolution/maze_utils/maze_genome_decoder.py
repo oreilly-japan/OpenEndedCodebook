@@ -343,20 +343,29 @@ class MazeGenomeDecoder:
         return walls
 
     def plot(self, save_path, maze_size, path_map, h_wall_map, v_wall_map):
-        plt.figure(figsize=(8,8))
+        fig, ax = plt.subplots(figsize=(maze_size[0]/2, maze_size[1]/2))
 
-        arrow_args = {'width':0.05/(maze_size[1]/15),'head_width':0.2/(maze_size[1]/15),'head_length':0.2,'fc':'k','length_includes_head':True}
+        arrow_args = {
+            'width':0.03,
+            'head_width':0.2,
+            'head_length':0.15,
+            'fc':'k',
+            'length_includes_head':True
+        }
         for j,i in zip(*np.where(path_map>0)):
-            # if (i,j)==(0,0) or (i,j)==(maze_size[0]-1,maze_size[1]-1):
-            #     continue
+            if (i,j)==(0,0) or (i,j)==(maze_size[0]-1,maze_size[1]-1):
+                continue
             if path_map[j,i]==1:
-                plt.arrow(x=i+0.5,y=j+0.25,dx=0,dy=0.5,**arrow_args)
+                ax.arrow(x=i+0.5,y=j+0.25,dx=0,dy=0.5,**arrow_args)
             elif path_map[j,i]==2:
-                plt.arrow(x=i+0.75,y=j+0.5,dx=-0.5,dy=0,**arrow_args)
+                ax.arrow(x=i+0.75,y=j+0.5,dx=-0.5,dy=0,**arrow_args)
             elif path_map[j,i]==3:
-                plt.arrow(x=i+0.5,y=j+0.75,dx=0,dy=-0.5,**arrow_args)
+                ax.arrow(x=i+0.5,y=j+0.75,dx=0,dy=-0.5,**arrow_args)
             elif path_map[j,i]==4:
-                plt.arrow(x=i+0.25,y=j+0.5,dx=0.5,dy=0,**arrow_args)
+                ax.arrow(x=i+0.25,y=j+0.5,dx=0.5,dy=0,**arrow_args)
+
+        ax.scatter(0.5, 0.5, color=[0.0,0.6,0.3], s=96, marker='s')
+        ax.scatter(maze_size[0]-0.5, maze_size[1]-0.5, color=[0.9,0.2,0.0], s=128, marker='*')
 
         for h_i in range(maze_size[1]+1):
             no_walls = list(np.where(h_wall_map[h_i,:]==False)[0])
@@ -364,7 +373,7 @@ class MazeGenomeDecoder:
             prev_i = 0
             for now_i in no_walls:
                 if prev_i<now_i:
-                    plt.plot([prev_i, now_i], [h_i, h_i], c='k', markersize=3/(maze_size[1]/15), linewidth=1.5/(maze_size[1]/15))
+                    ax.plot([prev_i, now_i], [h_i, h_i], c='k', linewidth=3)
                 prev_i = now_i+1
 
         for w_i in range(maze_size[0]+1):
@@ -373,10 +382,9 @@ class MazeGenomeDecoder:
             prev_i = 0
             for now_i in no_walls:
                 if prev_i<now_i:
-                    plt.plot([w_i, w_i], [prev_i, now_i], c='k', markersize=3/(maze_size[1]/15), linewidth=1.5/(maze_size[1]/15))
+                    ax.plot([w_i, w_i], [prev_i, now_i], c='k', linewidth=3)
                 prev_i = now_i+1
 
-        plt.xlim([0-maze_size[0]/100,maze_size[0]+maze_size[0]/100])
-        plt.ylim([0-maze_size[1]/100,maze_size[1]+maze_size[1]/100])
+        ax.axis('off')
         plt.savefig(save_path, bbox_inches='tight')
         plt.cla()

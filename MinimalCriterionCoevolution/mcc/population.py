@@ -3,19 +3,8 @@ import random
 import itertools
 from copy import deepcopy
 
-import neat
-
-from mcc_config import MCCConfig
-
-from reporting import ReporterSet, SaveReporter, MCCReporter
-
-def make_config(genome1, genome2, config_file, extra_info, custom_config):
-    config = MCCConfig(genome1,
-                       genome2,
-                       config_file,
-                       extra_info=extra_info,
-                       custom_config=custom_config)
-    return config
+from neat import Population
+from .reporting import ReporterSet
 
 class Reproduction():
     def __init__(self, population, config):
@@ -45,7 +34,7 @@ class Reproduction():
         return offsprings
 
 
-class Population(neat.Population):
+class Population(Population):
 
     def __init__(self, config, genome1_pop_file, genome2_pop_file):
 

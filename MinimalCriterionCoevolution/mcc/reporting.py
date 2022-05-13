@@ -27,7 +27,18 @@ class ReporterSet():
             r.post_evaluate(config, offsprings1, offsprings2)
 
 
-class SaveReporter():
+class BaseReporter():
+    def start_generation(self, generation):
+        pass
+
+    def post_evaluate(self, config, survivors1, survivors2):
+        pass
+
+    def end_generation(self, config, population1, population2):
+        pass
+
+
+class SaveResultReporter(BaseReporter):
 
     def __init__(self, save_path, genome1_name, genome2_name, init_pop1, init_pop2):
         self.generation = 0
@@ -90,11 +101,8 @@ class SaveReporter():
             with open(file_name, 'wb') as f:
                 pickle.dump(genome, f)
 
-    def end_generation(self, config, pop1, pop2):
-        pass
 
-
-class MCCReporter():
+class MCCReporter(BaseReporter):
 
     def __init__(self, genome1_name, genome2_name, print_genome1=False, print_genome2=False):
         max_str_size = max(len(genome1_name), len(genome2_name))

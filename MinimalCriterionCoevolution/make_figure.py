@@ -4,15 +4,12 @@ import csv
 import ast
 import json
 import pickle
-import warnings
-warnings.simplefilter('ignore')
+
 
 import mcc
 
 import multiprocessing as mp
 
-from neat import DefaultGenome
-from feed_forward import FeedForwardNetwork
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 UTIL_DIR = os.path.join(CURR_DIR, 'maze_utils')
@@ -24,7 +21,6 @@ import matplotlib.pyplot as plt
 
 
 import argparse
-
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -64,10 +60,10 @@ def get_args():
     return args
 
 
-def make_figure(exp_path, save_path, maze_key, agent_key, config, colorbar=False, overwrite=True):
+def make_figure(expt_path, save_path, maze_key, agent_key, config, colorbar=False, overwrite=True):
 
-    agent_file = os.path.join(exp_path, 'agent', f'{agent_key}.pickle')
-    maze_file = os.path.join(exp_path, 'maze', f'{maze_key}.pickle')
+    agent_file = os.path.join(expt_path, 'agent', f'{agent_key}.pickle')
+    maze_file = os.path.join(expt_path, 'maze', f'{maze_key}.pickle')
 
     save_file = os.path.join(save_path, f'{maze_key}.jpg')
 
@@ -80,13 +76,13 @@ def make_figure(exp_path, save_path, maze_key, agent_key, config, colorbar=False
     with open(maze_file, 'rb') as f:
         maze_genome = pickle.load(f)
 
-    controller = FeedForwardNetwork.create(agent_genome, config.genome1_config)
+    controller = mcc.FeedForwardNetwork.create(agent_genome, config.genome1_config)
     MazeDecoder = MazeGenomeDecoder(config.genome2_config)
     maze, timesteps = MazeDecoder.decode(maze_genome, config.genome2_config)
 
     done = False
     maze.reset()
-    data = [maze.agent.location]
+    data = [maze.get_agent_location()]
     for i in range(timesteps):
         obs = maze.get_observation()
         action = controller.activate(obs)
@@ -124,40 +120,40 @@ def make_figure(exp_path, save_path, maze_key, agent_key, config, colorbar=False
     return
 
 
-if __name__=='__main__':
+def main():
+
     args = get_args()
 
 
-    exp_path = os.path.join(CURR_DIR, 'maze_out', 'main', args.name)
+    expt_path = os.path.join(CURR_DIR, 'maze_out', 'main', args.name)
 
     config_path = os.path.join(UTIL_DIR, 'mcc_config.ini')
-    config = mcc.make_config(DefaultGenome, MazeGenome, config_path, None, None)
+    config = mcc.make_config(mcc.DefaultGenome, MazeGenome, config_path)
 
 
-    save_path = os.path.join(exp_path, 'figure')
+    save_path = os.path.join(expt_path, 'figure')
     os.makedirs(save_path, exist_ok=True)
 
-    # make_figure(exp_path, save_path, 1036, 3891, config, colorbar=True)
 
-    maze_history_file = os.path.join(exp_path, 'history_maze.csv')
+    maze_history_file = os.path.join(expt_path, 'history_maze.csv')
     with open(maze_history_file, 'r') as f:
         reader = csv.reader(f)
         histories = list(reader)[1:]
         pairs = [(int(hist[1]),ast.literal_eval(hist[3])[0]) for hist in histories]
 
 
-    if not args.no_multi and args.specific is None:
+    if not args.no_multi:
 
         pool = mp.Pool(args.num_cores)
         jobs = []
 
         for maze_key, agent_key in pairs:
-            func_args = (exp_path, save_path, maze_key, agent_key, config)
+            func_args = (expt_path, save_path, maze_key, agent_key, config)
             func_kwargs = {
                 'colorbar': args.colorbar,
                 'overwrite': not args.not_overwrite
             }
-            jobs.append(pool.apply_async(make_figure, args=func_args, kwargs=func_kwargs))
+            jobs.append(pool.apply_async(make_figure, args=func_args, kwds=func_kwargs))
 
         for job in jobs:
             job.get(timeout=None)
@@ -166,10 +162,13 @@ if __name__=='__main__':
     else:
 
         for maze_key, agent_key in pairs:
-            func_args = (exp_path, save_path, maze_key, agent_key, config)
+            func_args = (expt_path, save_path, maze_key, agent_key, config)
             func_kwargs = {
                 'colorbar': args.colorbar,
                 'overwrite': not args.not_overwrite
             }
 
             make_figure(*func_args, **func_kwargs)
+
+if __name__=='__main__':
+    main()

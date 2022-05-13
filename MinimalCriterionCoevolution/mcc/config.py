@@ -1,7 +1,16 @@
 import os
 from configparser import ConfigParser
 
-from neat.config import ConfigParameter, UnknownConfigItemError
+from neat.config import ConfigParameter, UnknownConfigItemError, write_pretty_params
+
+def make_config(genome1, genome2, config_file, extra_info=None, custom_config=None):
+    config = MCCConfig(genome1,
+                       genome2,
+                       config_file,
+                       extra_info=extra_info,
+                       custom_config=custom_config)
+    return config
+
 
 class MCCConfig(object):
     """A simple container for user-configurable parameters of MCC."""

@@ -3,11 +3,7 @@ import os
 import shutil
 import json
 import numpy as np
-import warnings
-warnings.simplefilter('ignore')
 
-from neat import DefaultGenome
-from feed_forward import FeedForwardNetwork
 
 import mcc
 from parallel import MCCParallelEvaluator
@@ -20,16 +16,7 @@ from maze_genome import MazeGenome
 from maze_genome_decoder import MazeGenomeDecoder
 
 
-
-class MazeReporter():
-    def __init__(self):
-        pass
-
-    def start_generation(self, generation):
-        pass
-
-    def post_evaluate(self, config, agent_survivors, maze_survivors):
-        pass
+class MazeReporter(mcc.BaseReporter):
 
     def end_generation(self, config, agent_genomes, maze_genomes):
         maze_areas = [maze_genome.get_maze_area() for maze_genome in maze_genomes.values()]
@@ -93,7 +80,9 @@ def main():
         ('MCC', 'genome1_limit', args.agent_limit),
         ('MCC', 'genome2_limit', args.maze_limit)
     ]
-    config = mcc.make_config(DefaultGenome, MazeGenome, config_path, None, overwrite_config)
+    config = mcc.make_config(mcc.DefaultGenome, MazeGenome, config_path, custom_config=overwrite_config)
+    config_out_path = os.path.join(save_path, 'mcc_config.ini')
+    config.save(config_out_path)
 
 
     MazeDecoder = MazeGenomeDecoder(config.genome2_config)
@@ -102,8 +91,9 @@ def main():
         kwargs={},
         num_workers=args.num_cores,
         evaluate_function=simulate_maze,
-        decode_function1=FeedForwardNetwork.create,
+        decode_function1=mcc.FeedForwardNetwork.create,
         decode_function2=MazeDecoder.decode)
+
 
     bootstrap_path = os.path.join(CURR_DIR, 'maze_out', 'bootstrap', args.bootstrap)
     agent_bootstrap_file = os.path.join(bootstrap_path, 'agent_genomes.pickle')
@@ -114,7 +104,7 @@ def main():
     pop = mcc.Population(config, agent_bootstrap_file, maze_bootstrap_file)
 
     reporters = [
-        mcc.SaveReporter(save_path, 'agent', 'maze', pop.genome1_pop, pop.genome2_pop),
+        mcc.SaveResultReporter(save_path, 'agent', 'maze', pop.genome1_pop, pop.genome2_pop),
         mcc.MCCReporter('agent', 'maze', print_genome2=args.print_maze),
         MazeReporter(),
     ]
