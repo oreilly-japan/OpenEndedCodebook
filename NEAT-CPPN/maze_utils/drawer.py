@@ -3,10 +3,9 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-from neat import BaseReporter
-from neat.nn import FeedForwardNetwork
+import neat_cppn
 
-class DrawReporter(BaseReporter):
+class DrawReporter(neat_cppn.BaseReporter):
     def __init__(self, env, timesteps, save_dir, no_plot=False):
 
         self.env = env
@@ -52,7 +51,7 @@ class DrawReporter(BaseReporter):
             self.best_path = self._get_path(genome_reward, config)
 
     def _get_path(self, genome, config):
-        controller = FeedForwardNetwork.create(genome, config)
+        controller = neat_cppn.nn.FeedForwardNetwork.create(genome, config)
         self.env.reset()
 
         path = []

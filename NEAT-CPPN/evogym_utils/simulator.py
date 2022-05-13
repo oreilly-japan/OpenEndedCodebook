@@ -9,7 +9,7 @@ from multiprocessing import Process
 
 from gym_utils import make_vec_envs
 
-from neat_cppn.nn import FeedForwardNetwork
+import neat_cppn
 
 class Simulator:
     def __init__(self, env_id, structure, load_path, history_file, neat_config):
@@ -41,7 +41,7 @@ class Simulator:
                 with open(genome_file, 'rb') as f:
                     genome = pickle.load(f)
 
-                self.controller = FeedForwardNetwork.create(genome, self.neat_config)
+                self.controller = neat_cppn.nn.FeedForwardNetwork.create(genome, self.neat_config)
                 self.generation = int(latest[0])
                 print(f'simulator update controller: generation {latest[0]}  id {latest[1]}')
         else:
