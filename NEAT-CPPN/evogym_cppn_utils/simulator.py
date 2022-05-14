@@ -2,7 +2,6 @@ import os
 import csv
 import time
 import random
-import pickle
 import numpy as np
 
 import multiprocessing

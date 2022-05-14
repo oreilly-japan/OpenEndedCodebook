@@ -23,6 +23,10 @@ class DrawReporter(neat_cppn.BaseReporter):
 
         os.makedirs(save_dir, exist_ok=True)
 
+    def __del__(self):
+        plt.clf()
+        plt.close('all')
+
     def _init_figure(self):
         walls = self.env.walls
 

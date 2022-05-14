@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 
-import neat_cppn
+import me_neat
 from parallel import ParallelEvaluator
 
 import evogym.envs
@@ -17,8 +17,10 @@ UTIL_DIR = os.path.join(CURR_DIR, 'evogym_cppn_utils')
 sys.path.append(UTIL_DIR)
 from arguments import get_args
 from simulator import SimulateProcess
+import behavioral_descriptor as BD
 
 from ppo import run_ppo
+
 
 
 class EvogymStructureDecoder():
@@ -33,7 +35,7 @@ class EvogymStructureDecoder():
         self.input_d = ((self.input_x - center[0]) ** 2 + (self.input_y - center[1]) ** 2).sqrt()
 
     def decode(self, genome, config):
-        nodes = neat_cppn.create_cppn(
+        nodes = me_neat.create_cppn(
             genome, config,
             leaf_names=['x', 'y', 'd'],
             node_names=['empty', 'rigid', 'soft', 'hori', 'vert'])
@@ -49,12 +51,13 @@ class EvogymStructureDecoder():
 
 
 class EvogymStructureEvaluator():
-    def __init__(self, env_id, save_path, ppo_iters, deterministic=False):
+    def __init__(self, env_id, save_path, ppo_iters, bd_dictionary, deterministic=False):
         self.env_id = env_id
         self.save_path = save_path
         self.structure_save_path = os.path.join(save_path, 'structure')
         self.controller_save_path = os.path.join(save_path, 'controller')
         self.ppo_iters = ppo_iters
+        self.bd_dictionary = bd_dictionary
         self.deterministic = deterministic
 
         os.makedirs(self.structure_save_path, exist_ok=True)
@@ -73,9 +76,11 @@ class EvogymStructureEvaluator():
             save_file=file_controller,
             deterministic=self.deterministic
         )
+        bd = {bd_name: bd_func.evaluate(*structure) for bd_name,bd_func in self.bd_dictionary.items()}
 
         results = {
             'fitness': fitness,
+            'bd': bd
         }
         return results
 
@@ -122,9 +127,20 @@ def main():
         json.dump(args.__dict__, f, indent=4)
 
 
+    area_size = args.shape[0]*args.shape[1]
+
+    bd_dictionary = {
+        'block density': BD.BlockDensity(name='block density', value_range=[0,1], resolution=area_size),
+        'rigid density': BD.RigidDensity(name='rigid density', value_range=[0,1], resolution=area_size),
+        # 'soft density': BD.SoftDensity(name='soft density', value_range=[0,1], resolution=area_size),
+        # 'actuator density': BD.ActuatorDensity(name='actuator density', value_range=[0,1], resolution=area_size),
+    }
+    bd_axis = ['block density','rigid density']
+
+
     decoder = EvogymStructureDecoder(args.shape)
     constraint = Constraint(decoder.decode)
-    evaluator = EvogymStructureEvaluator(args.task, save_path, args.ppo_iters, deterministic=args.deterministic)
+    evaluator = EvogymStructureEvaluator(args.task, save_path, args.ppo_iters, bd_dictionary, deterministic=args.deterministic)
 
     parallel = ParallelEvaluator(
         num_workers=args.num_cores,
@@ -134,20 +150,21 @@ def main():
     )
 
 
-    config_path = os.path.join(UTIL_DIR, 'neat_config.ini')
+    config_path = os.path.join(UTIL_DIR, 'me_config.ini')
     overwrite_config = [
-        ('NEAT', 'pop_size', args.pop_size),
+        ('ME-NEAT', 'offspring_size', args.batch_size),
     ]
-    config = neat_cppn.make_config(config_path, custom_config=overwrite_config)
-    config_out_path = os.path.join(save_path, 'neat_config.ini')
+    config = me_neat.make_config(config_path, custom_config=overwrite_config)
+    config_out_path = os.path.join(save_path, 'me_config.ini')
     config.save(config_out_path)
 
 
-    pop = neat_cppn.Population(config, constraint_function=constraint.eval_genome_constraint)
+    pop = me_neat.Population(config)
 
     reporters = [
-        neat_cppn.SaveResultReporter(save_path),
-        neat_cppn.StdOutReporter(True),
+        me_neat.SaveResultReporter(save_path, list(bd_dictionary.keys())),
+        me_neat.MapElitesReporter(),
+        me_neat.BDDrawer(save_path, bd_dictionary[bd_axis[0]], bd_dictionary[bd_axis[1]], no_plot=args.no_plot)
     ]
     for reporter in reporters:
         pop.add_reporter(reporter)
@@ -166,11 +183,18 @@ def main():
         simulator.start()
 
 
-    pop.run(
+    best_genome = pop.run(
         fitness_function=parallel.evaluate,
         constraint_function=constraint.eval_genome_constraint,
         n=args.generation
     )
+
+    best_robot = get_structure_from_genome(best_genome, config, args.shape)
+    best_fitness = best_genome.fitness
+
+    print('best robot: \n', best_robot)
+    print(f'fitness: {best_fitness: =.5f}')
+
 
 if __name__=='__main__':
     main()

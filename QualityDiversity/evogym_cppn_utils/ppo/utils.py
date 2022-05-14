@@ -1,5 +1,6 @@
 import gym
 import numpy as np
+import multiprocessing.pool
 
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv

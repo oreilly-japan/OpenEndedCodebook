@@ -12,15 +12,15 @@ import imageio
 from pygifsicle import gifsicle
 
 
-CURR_DIR = os.path.dirname(os.path.abspath(__file__))
-UTIL_DIR = os.path.join(CURR_DIR, 'evogym_cppn_utils')
-sys.path.append(UTIL_DIR)
-from ppo.utils import make_vec_envs
-
 import evogym.envs
 
 import neat_cppn
 from stable_baselines3 import PPO
+
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+UTIL_DIR = os.path.join(CURR_DIR, 'evogym_cppn_utils')
+sys.path.append(UTIL_DIR)
+from ppo.utils import make_vec_envs
 
 
 def get_args():
@@ -39,7 +39,7 @@ def get_args():
         help='image resolution ratio (default: 0.2 -> 256:144)'
     )
     parser.add_argument(
-        '-s', '--specific',
+        '-s', '--specified',
         type=int,
         help='make gif for only specified robot (usage: "-s {id}")'
     )
@@ -140,9 +140,9 @@ def main():
 
     robot_ids = {}
 
-    if args.specific is not None:
+    if args.specified is not None:
         robot_ids = {
-            'specified': [args.specific]
+            'specified': [args.specified]
         }
     else:
         files = {
@@ -158,7 +158,7 @@ def main():
                 robot_ids[metric] = ids
 
 
-    if not args.no_multi and args.specific is None:
+    if not args.no_multi and args.specified is None:
 
         lock = mp.Lock()
         pool = mp.Pool(args.num_cores, initializer=pool_init_func, initargs=(lock,))

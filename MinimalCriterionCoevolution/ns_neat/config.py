@@ -3,10 +3,11 @@ from configparser import ConfigParser
 
 import neat
 from neat.config import ConfigParameter, UnknownConfigItemError, write_pretty_params
+from .reproduction import DefaultReproduction
 
 def make_config(config_file, extra_info=None, custom_config=None):
     config = NSConfig(neat.DefaultGenome,
-                      neat.DefaultReproduction,
+                      DefaultReproduction,
                       neat.DefaultSpeciesSet,
                       neat.DefaultStagnation,
                       config_file,
@@ -61,30 +62,30 @@ class NSConfig():
                 section, key, value = cfg
                 parameters[section][key] = str(value)
 
-        # NEAT configuration
-        if not parameters.has_section('NEAT'):
-            raise RuntimeError("'NEAT' section not found in NEAT configuration file.")
+        # NS-NEAT configuration
+        if not parameters.has_section('NS-NEAT'):
+            raise RuntimeError("'NS-NEAT' section not found in NS-NEAT configuration file.")
 
         param_list_names = []
         for p in self.__params:
             if p.default is None:
-                setattr(self, p.name, p.parse('NEAT', parameters))
+                setattr(self, p.name, p.parse('NS-NEAT', parameters))
             else:
                 try:
-                    setattr(self, p.name, p.parse('NEAT', parameters))
+                    setattr(self, p.name, p.parse('NS-NEAT', parameters))
                 except Exception:
                     setattr(self, p.name, p.default)
                     warnings.warn("Using default {!r} for '{!s}'".format(p.default, p.name),
                                   DeprecationWarning)
             param_list_names.append(p.name)
-        param_dict = dict(parameters.items('NEAT'))
+        param_dict = dict(parameters.items('NS-NEAT'))
         unknown_list = [x for x in param_dict if x not in param_list_names]
         if unknown_list:
             if len(unknown_list) > 1:
-                raise UnknownConfigItemError("Unknown (section 'NEAT') configuration items:\n" +
+                raise UnknownConfigItemError("Unknown (section 'NS-NEAT') configuration items:\n" +
                                              "\n\t".join(unknown_list))
             raise UnknownConfigItemError(
-                "Unknown (section 'NEAT') configuration item {!s}".format(unknown_list[0]))
+                "Unknown (section 'NS-NEAT') configuration item {!s}".format(unknown_list[0]))
 
         # Parse type sections.
         genome_dict = dict(parameters.items(genome_type.__name__))
@@ -101,9 +102,9 @@ class NSConfig():
 
     def save(self, filename):
         with open(filename, 'w') as f:
-            f.write('# The `NEAT` section specifies parameters particular to the NEAT algorithm\n')
+            f.write('# The `NS-NEAT` section specifies parameters particular to the NS-NEAT algorithm\n')
             f.write('# or the experiment itself.  This is the only required section.\n')
-            f.write('[NEAT]\n')
+            f.write('[NS-NEAT]\n')
             write_pretty_params(f, self, self.__params)
 
             f.write('\n[{0}]\n'.format(self.genome_type.__name__))

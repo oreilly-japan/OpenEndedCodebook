@@ -5,11 +5,10 @@ import ast
 import json
 import pickle
 
-
-import mcc
-
 import multiprocessing as mp
 
+
+import mcc
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 UTIL_DIR = os.path.join(CURR_DIR, 'maze_utils')

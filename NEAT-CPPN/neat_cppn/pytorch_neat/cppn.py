@@ -165,9 +165,8 @@ class Leaf:
         self._reset()
 
 
-def create_cppn(genome, config, leaf_names, node_names, output_activation=None):
+def create_cppn(genome, genome_config, leaf_names, node_names, output_activation=None):
 
-    genome_config = config.genome_config
     required = required_for_output(
         genome_config.input_keys, genome_config.output_keys, genome.connections
     )

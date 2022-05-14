@@ -20,25 +20,29 @@ from gym_utils import make_vec_envs
 from simulator import SimulateProcess
 
 
-def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
-    controller = neat_cppn.nn.FeedForwardNetwork.create(genome, config)
+class EvogymEvaluator():
+    def __init__(self, env_id, structure, num_eval=1):
+        self.env_id = env_id
+        self.structure = structure
+        self.num_eval = num_eval
 
-    env = make_vec_envs(env_id, structure, random.randint(0,10000), 1)
+    def evaluate_controller(self, key, controller, generation):
+        env = make_vec_envs(self.env_id, self.structure, random.randint(0,10000), 1)
 
-    obs = env.reset()
-    episode_rewards = []
-    while len(episode_rewards) < num_eval:
-        action = np.array(controller.activate(obs[0]))*2 - 1
-        obs, _, done, infos = env.step([np.array(action)])
+        obs = env.reset()
+        episode_rewards = []
+        while len(episode_rewards) < self.num_eval:
+            action = np.array(controller.activate(obs[0]))*2 - 1
+            obs, _, done, infos = env.step([np.array(action)])
 
-        if 'episode' in infos[0]:
-            reward = infos[0]['episode']['r']
-            episode_rewards.append(reward)
+            if 'episode' in infos[0]:
+                reward = infos[0]['episode']['r']
+                episode_rewards.append(reward)
 
-    results = {
-        'fitness': np.mean(episode_rewards),
-    }
-    return results
+        results = {
+            'fitness': np.mean(episode_rewards),
+        }
+        return results
 
 
 def main():
@@ -78,12 +82,12 @@ def main():
     np.savez(robot_file, robot=robot, connectivity=connectivity)
 
 
-    evaluator_kwargs = {
-        'env_id': args.task,
-        'structure': structure,
-        'eval_num': args.eval_num
-    }
-    evaluator = ParallelEvaluator(evaluator_kwargs, args.num_cores, eval_genome)
+    evaluator = EvogymEvaluator(args.task, structure, args.eval_num)
+    parallel = ParallelEvaluator(
+        num_workers=args.num_cores,
+        evaluate_function=evaluator.evaluate_controller,
+        decode_function=neat_cppn.FeedForwardNetwork.create
+    )
 
 
     env = make_vec_envs(args.task, structure, 0, 1)
@@ -124,7 +128,7 @@ def main():
         simulator.start()
 
 
-    pop.run(evaluator.evaluate, n=args.generation)
+    pop.run(fitness_function=parallel.evaluate, n=args.generation)
 
 if __name__=='__main__':
     main()

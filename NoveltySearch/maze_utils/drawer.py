@@ -3,15 +3,14 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
-from neat import BaseReporter
-from neat.nn import FeedForwardNetwork
+from ns_neat import BaseReporter, FeedForwardNetwork
 
 class DrawReporter(BaseReporter):
-    def __init__(self, env, timesteps, save_dir, no_plot=False):
+    def __init__(self, env, timesteps, save_path, no_plot=False):
 
         self.env = env
         self.timesteps = timesteps
-        self.save_dir = save_dir
+        self.save_path = save_path
         self.no_plot = no_plot
 
         self.fig = None
@@ -23,7 +22,11 @@ class DrawReporter(BaseReporter):
         self.novelty_path = None
         self.generation = -1
 
-        os.makedirs(save_dir, exist_ok=True)
+        os.makedirs(save_path, exist_ok=True)
+
+    def __del__(self):
+        plt.clf()
+        plt.close('all')
 
     def _init_figure(self):
         walls = self.env.walls
@@ -56,7 +59,7 @@ class DrawReporter(BaseReporter):
         self.novelty_path = self._get_path(genome_novelty, config)
 
     def _get_path(self, genome, config):
-        controller = FeedForwardNetwork.create(genome, config)
+        controller = FeedForwardNetwork.create(genome, config.genome_config)
         self.env.reset()
 
         path = []
@@ -81,7 +84,7 @@ class DrawReporter(BaseReporter):
         line_best = self.ax.plot(self.best_path[:,0], self.best_path[:,1], linewidth=3, c='b', alpha=0.7)
         line_novelty = self.ax.plot(self.novelty_path[:,0], self.novelty_path[:,1], linewidth=3, c='orange', alpha=0.7)
 
-        filename = os.path.join(self.save_dir,f'{self.generation}.jpg')
+        filename = os.path.join(self.save_path, f'{self.generation}.jpg')
         plt.savefig(filename, bbox_inches='tight')
 
         if not self.no_plot:

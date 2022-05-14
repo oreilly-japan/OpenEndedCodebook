@@ -17,30 +17,34 @@ from drawer import DrawReporter
 from maze_environment_numpy import MazeEnvironment
 
 
-def eval_genome(genome, config, env, timesteps, **kwargs):
-    controller = ns_neat.nn.FeedForwardNetwork.create(genome, config)
-    env.reset()
+class MazeEvaluator():
+    def __init__(self, maze, timesteps):
+        self.maze = maze
+        self.timesteps = timesteps
 
-    done = False
-    for i in range(timesteps):
-        obs = env.get_observation()
-        action = controller.activate(obs)
-        done = env.update(action)
+    def evaluate_agent(self, key, controller, generation):
+        self.maze.reset()
+
+        done = False
+        for i in range(self.timesteps):
+            obs = self.maze.get_observation()
+            action = controller.activate(obs)
+            done = self.maze.update(action)
+            if done:
+                break
+
         if done:
-            break
+            reward = 1.0
+        else:
+            distance = self.maze.get_distance_to_exit()
+            reward = (self.maze.initial_distance - distance) / self.maze.initial_distance
 
-    if done:
-        reward = 1.0
-    else:
-        distance = env.get_distance_to_exit()
-        reward = (env.initial_distance - distance) / env.initial_distance
-
-    last_loc = env.get_agent_location()
-    results = {
-        'reward': reward,
-        'data': [last_loc[0], last_loc[1]]
-    }
-    return results
+        last_loc = self.maze.get_agent_location()
+        results = {
+            'reward': reward,
+            'data': [last_loc[0], last_loc[1]]
+        }
+        return results
 
 
 def main():
@@ -70,21 +74,21 @@ def main():
     maze_env = MazeEnvironment.read_environment(maze_env_config)
 
 
-    evaluator_kwargs = {
-        'env': maze_env,
-        'timesteps': args.timesteps,
-    }
-    evaluator = ParallelEvaluator(evaluator_kwargs, args.num_cores, eval_genome)
-
+    evaluator = MazeEvaluator(maze_env, args.timesteps)
+    parallel = ParallelEvaluator(
+        num_workers=args.num_cores,
+        evaluate_function=evaluator.evaluate_agent,
+        decode_function=ns_neat.FeedForwardNetwork.create
+    )
 
     config_path = os.path.join(UTIL_DIR, 'ns_config.ini')
     overwrite_config = [
-        ('NEAT', 'pop_size', args.pop_size),
-        ('NEAT', 'metric', 'manhattan'),
-        ('NEAT', 'threshold_init', args.ns_threshold),
-        ('NEAT', 'threshold_floor', 0.25),
-        ('NEAT', 'neighbors', args.num_knn),
-        ('NEAT', 'mcns', args.mcns),
+        ('NS-NEAT', 'pop_size', args.pop_size),
+        ('NS-NEAT', 'metric', 'manhattan'),
+        ('NS-NEAT', 'threshold_init', args.ns_threshold),
+        ('NS-NEAT', 'threshold_floor', 0.25),
+        ('NS-NEAT', 'neighbors', args.num_knn),
+        ('NS-NEAT', 'mcns', args.mcns),
     ]
     config = ns_neat.make_config(config_path, custom_config=overwrite_config)
     config_out_path = os.path.join(save_path, 'ns_config.ini')
@@ -103,7 +107,7 @@ def main():
         pop.add_reporter(reporter)
 
 
-    pop.run(evaluator.evaluate, n=args.generation)
+    pop.run(evaluate_function=parallel.evaluate, n=args.generation)
 
 if __name__=='__main__':
     main()

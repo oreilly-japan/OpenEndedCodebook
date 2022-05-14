@@ -13,14 +13,14 @@ import imageio
 from pygifsicle import gifsicle
 
 
+import evogym.envs
+
+import ns_neat
+
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 UTIL_DIR = os.path.join(CURR_DIR, 'evogym_utils')
 sys.path.append(UTIL_DIR)
 from gym_utils import make_vec_envs
-
-import evogym.envs
-
-import ns_neat
 
 
 def get_args():
@@ -38,9 +38,9 @@ def get_args():
         help='image resolution ratio (default: 0.2 -> 256:144)'
     )
     parser.add_argument(
-        '-s', '--specific',
+        '-s', '--specified',
         type=int,
-        help='make gif for only specified robot (how to: "-s {id}")'
+        help='make gif for only specified robot (usage: "-s {id}")'
     )
     parser.add_argument(
         '--num-cores',
@@ -65,7 +65,7 @@ def get_args():
     return args
 
 
-def save_robot_gif(expt_path, save_path, env_id, structure, key, resolution, neat_config, overwrite=True):
+def save_robot_gif(expt_path, save_path, env_id, structure, key, resolution, config, overwrite=True):
 
     genome_file = os.path.join(expt_path, 'genome', f'{key}.pickle')
 
@@ -81,7 +81,7 @@ def save_robot_gif(expt_path, save_path, env_id, structure, key, resolution, nea
     env = make_vec_envs(env_id, structure, 1000, 1, allow_early_resets=False)
     env.get_attr("default_viewer", indices=None)[0].set_resolution(resolution)
 
-    controller = ns_neat.nn.FeedForwardNetwork.create(genome, neat_config)
+    controller = ns_neat.FeedForwardNetwork.create(genome, config.genome_config)
 
     done = False
     obs = env.reset()
@@ -138,9 +138,9 @@ def main():
 
     robot_ids = {}
 
-    if args.specific is not None:
+    if args.specified is not None:
         robot_ids = {
-            'specified': [args.specific]
+            'specified': [args.specified]
         }
 
     else:
@@ -158,7 +158,7 @@ def main():
                 robot_ids[metric] = ids
 
 
-    if not args.no_multi and args.specific is None:
+    if not args.no_multi and args.specified is None:
 
         lock = mp.Lock()
         pool = mp.Pool(args.num_cores, initializer=pool_init_func, initargs=(lock,))

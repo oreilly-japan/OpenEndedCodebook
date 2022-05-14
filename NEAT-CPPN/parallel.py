@@ -27,9 +27,9 @@ class NonDaemonPool(mp.pool.Pool):
 
 
 class ParallelEvaluator(object):
-    def __init__(self, kwargs, num_workers, evaluate_function, timeout=None, parallel=True):
-        self.kwargs = kwargs
+    def __init__(self, num_workers, decode_function, evaluate_function, timeout=None, parallel=True):
         self.num_workers = num_workers
+        self.decode_function = decode_function
         self.evaluate_function = evaluate_function
         self.timeout = timeout
         self.parallel = parallel
@@ -41,21 +41,26 @@ class ParallelEvaluator(object):
             self.pool.join()
 
     def evaluate(self, genomes, config, generation):
-        kwargs = dict(**self.kwargs, config=config, generation=generation)
 
         if self.parallel:
-            jobs = []
-            for key, genome in genomes:
-                jobs.append(self.pool.apply_async(self.evaluate_function, args=(genome,), kwds=kwargs))
+            phenomes = {key: self.decode_function(genome, config.genome_config) for key,genome in genomes.items()}
+
+            jobs = {}
+            for key,phenome in phenomes.items():
+                args = (key, phenome, generation)
+                jobs[key] = self.pool.apply_async(self.evaluate_function, args=args)
 
             # assign the fitness back to each genome
-            for job, (_, genome) in zip(jobs, genomes):
-                results = job.get(timeout=self.timeout)
+            for key,genome in genomes.items():
+                results = jobs[key].get(timeout=self.timeout)
                 for attr, data in results.items():
                     setattr(genome, attr, data)
 
         else:
-            for i, (_, genome) in enumerate(genomes):
-                results = self.evaluate_function(genome, **kwargs)
+            for key,genome in genomes.items():
+                phenome = self.decode_function(genome, config.genome_config)
+
+                args = (key, phenome, generation)
+                results = self.evaluate_function(*args)
                 for attr, data in results.items():
                     setattr(genome, attr, data)

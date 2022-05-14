@@ -1,40 +1,10 @@
 import pickle
-import random
-import itertools
-from copy import deepcopy
 
-from neat import Population
+from .reproduction import Reproduction
 from .reporting import ReporterSet
 
-class Reproduction():
-    def __init__(self, population, config):
-        self.config = config
-        self.indexer = itertools.count(max(population.keys())+1)
 
-        for _,genome in population.items():
-            setattr(genome, 'generation', 0)
-            setattr(genome, 'parent', -1)
-            if getattr(genome, 'success_keys', None) is None:
-                setattr(genome, 'success_keys', [])
-
-    def create_offsprings(self, population, offspring_size, generation):
-        offsprings = {}
-        while len(offsprings) < offspring_size:
-            key = next(self.indexer)
-            parent_key = random.choice(list(population.keys()))
-            offspring = deepcopy(population[parent_key])
-            offspring.mutate(self.config)
-            offspring.key = key
-
-            setattr(offspring, 'generation', generation)
-            setattr(offspring, 'success_keys', [])
-            setattr(offspring, 'parent', parent_key)
-
-            offsprings[key] = offspring
-        return offsprings
-
-
-class Population(Population):
+class Population():
 
     def __init__(self, config, genome1_pop_file, genome2_pop_file):
 
@@ -48,12 +18,18 @@ class Population(Population):
         self.genome1_reproduction = Reproduction(self.genome1_pop, config.genome1_config)
         self.genome2_reproduction = Reproduction(self.genome2_pop, config.genome2_config)
 
+    def add_reporter(self, reporter):
+        self.reporters.add(reporter)
+
+    def remove_reporter(self, reporter):
+        self.reporters.remove(reporter)
+
     def run(self, evaluate_function, n=None):
         if n is None:
             n = self.config.generation - self.generation
 
         k = 0
-        while n is None or k < n:
+        while k < n:
             k += 1
 
             self.reporters.start_generation(self.generation)
@@ -62,8 +38,8 @@ class Population(Population):
             genome2_offsprings = self.genome2_reproduction.create_offsprings(self.genome2_pop, self.config.genome2_offspring_size, self.generation)
 
             # Evaluate all genomes using the user-provided function.
-            evaluate_function(list(genome1_offsprings.items()), list(genome2_offsprings.items()),
-                              list(self.genome1_pop.items()), list(self.genome2_pop.items()), self.config, self.generation)
+            evaluate_function(genome1_offsprings, genome2_offsprings,
+                              self.genome1_pop, self.genome2_pop, self.config, self.generation)
 
             genome1_survivors = {key: genome for key,genome in genome1_offsprings.items() if genome.fitness>=1}
             genome2_survivors = {key: genome for key,genome in genome2_offsprings.items() if genome.fitness>=1}

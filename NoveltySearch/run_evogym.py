@@ -10,7 +10,6 @@ import numpy as np
 import evogym.envs
 from evogym import is_connected, has_actuator, get_full_connectivity
 
-
 import ns_neat
 from parallel import ParallelEvaluator
 
@@ -22,69 +21,73 @@ from gym_utils import make_vec_envs
 from simulator import SimulateProcess
 
 
-def calc_covar(vec, align=True):
-    ave = np.mean(vec,axis=0)
-    if align:
-        vec_align = (vec-ave).T
-    else:
-        vec_align = vec.T
-    comb_indices = np.tril_indices(vec.shape[1],k=0)
-    covar = np.mean(vec_align[comb_indices[0]]*vec_align[comb_indices[1]],axis=1)
-    return covar
+class EvogymEvaluator():
+    def __init__(self, env_id, structure, num_eval=1):
+        self.env_id = env_id
+        self.structure = structure
+        self.num_eval = num_eval
 
-def eval_genome(genome, env_id, structure, config, num_eval=1, **kwargs):
-    controller = ns_neat.nn.FeedForwardNetwork.create(genome, config)
+    def evaluate_controller(self, key, controller, generation):
+        env = make_vec_envs(self.env_id, self.structure, random.randint(0,10000), 1)
 
-    env = make_vec_envs(env_id, structure, random.randint(0,10000), 1)
+        obs = env.reset()
+        # pos = env.env_method('get_pos_com_obs', object_name='robot')[0]
+        # pos_data = [0,0]
 
-    obs = env.reset()
+        obs_data = []
+        act_data = []
 
-    # pos = env.env_method('get_pos_com_obs', object_name='robot')[0]
-    # pos_data = [0,0]
+        episode_rewards = []
+        episode_data = []
+        while len(episode_rewards) < self.num_eval:
+            action = np.array(controller.activate(obs[0]))*2 - 1
+            obs_data.append(obs)
+            act_data.append(action)
+            obs, _, done, infos = env.step([np.array(action)])
 
-    obs_data = []
-    act_data = []
+            # pos_ = env.env_method('get_pos_com_obs', object_name='robot')[0]
 
-    episode_rewards = []
-    episode_data = []
-    while len(episode_rewards) < num_eval:
-        action = np.array(controller.activate(obs[0]))*2 - 1
-        obs_data.append(obs)
-        act_data.append(action)
-        obs, _, done, infos = env.step([np.array(action)])
+            if 'episode' in infos[0]:
+                obs_data = np.vstack(obs_data)
+                obs_cov = self.calc_covar(obs_data)
 
-        # pos_ = env.env_method('get_pos_com_obs', object_name='robot')[0]
+                act_data = np.clip(np.vstack(act_data),-1,1)
+                act_cov = self.calc_covar(act_data, align=False)
 
-        if 'episode' in infos[0]:
-            obs_data = np.vstack(obs_data)
-            obs_cov = calc_covar(obs_data)
+                data = np.hstack([obs_cov,act_cov])
+                episode_data.append(data)
 
-            act_data = np.clip(np.vstack(act_data),-1,1)
-            act_cov = calc_covar(act_data, align=False)
+                obs_data = []
+                act_data = []
+                # pos_data = [0,0]
+                # rad_data = [0,0]
+                reward = infos[0]['episode']['r']
+                # if np.mean(pos_data)<0.3:
+                    # reward = -3.
+                episode_rewards.append(reward)
+            # else:
+                # pos_diff = pos_-pos
+                # pos_data[0] += np.maximum(pos_diff, 0)
+                # pos_data[1] += np.maximum(-pos_diff, 0)
 
-            data = np.hstack([obs_cov,act_cov])
-            episode_data.append(data)
+            # pos = pos_
 
-            obs_data = []
-            act_data = []
-            # pos_data = [0,0]
-            # rad_data = [0,0]
-            reward = infos[0]['episode']['r']
-            # if np.mean(pos_data)<0.3:
-                # reward = -3.
-            episode_rewards.append(reward)
-        # else:
-            # pos_diff = pos_-pos
-            # pos_data[0] += np.maximum(pos_diff, 0)
-            # pos_data[1] += np.maximum(-pos_diff, 0)
+        results = {
+            'reward': np.mean(episode_rewards),
+            'data': list(np.mean(np.vstack(episode_data),axis=0))
+        }
+        return results
 
-        # pos = pos_
-
-    results = {
-        'reward': np.mean(episode_rewards),
-        'data': list(np.mean(np.vstack(episode_data),axis=0))
-    }
-    return results
+    @staticmethod
+    def calc_covar(vec, align=True):
+        ave = np.mean(vec,axis=0)
+        if align:
+            vec_align = (vec-ave).T
+        else:
+            vec_align = vec.T
+        comb_indices = np.tril_indices(vec.shape[1],k=0)
+        covar = np.mean(vec_align[comb_indices[0]]*vec_align[comb_indices[1]],axis=1)
+        return covar
 
 
 def main():
@@ -124,12 +127,12 @@ def main():
     np.savez(robot_file, robot=robot, connectivity=connectivity)
 
 
-    evaluator_kwargs = {
-        'env_id': args.task,
-        'structure': structure,
-        'eval_num': args.eval_num
-    }
-    evaluator = ParallelEvaluator(evaluator_kwargs, args.num_cores, eval_genome)
+    evaluator = EvogymEvaluator(args.task, structure, args.eval_num)
+    parallel = ParallelEvaluator(
+        num_workers=args.num_cores,
+        evaluate_function=evaluator.evaluate_controller,
+        decode_function=ns_neat.FeedForwardNetwork.create
+    )
 
 
     env = make_vec_envs(args.task, structure, 0, 1)
@@ -138,12 +141,12 @@ def main():
 
     config_path = os.path.join(UTIL_DIR, 'ns_config.ini')
     overwrite_config = [
-        ('NEAT', 'pop_size', args.pop_size),
-        ('NEAT', 'metric', 'manhattan'),
-        ('NEAT', 'threshold_init', args.ns_threshold),
-        ('NEAT', 'threshold_floor', 0.001),
-        ('NEAT', 'neighbors', args.num_knn),
-        ('NEAT', 'mcns', args.mcns),
+        ('NS-NEAT', 'pop_size', args.pop_size),
+        ('NS-NEAT', 'metric', 'manhattan'),
+        ('NS-NEAT', 'threshold_init', args.ns_threshold),
+        ('NS-NEAT', 'threshold_floor', 0.001),
+        ('NS-NEAT', 'neighbors', args.num_knn),
+        ('NS-NEAT', 'mcns', args.mcns),
         ('DefaultGenome', 'num_inputs', num_inputs),
         ('DefaultGenome', 'num_outputs', num_outputs)
     ]
@@ -169,12 +172,13 @@ def main():
             load_path=save_path,
             history_file='history_novelty.csv',
             neat_config=pop.config,
-            generations=args.generation)
+            generations=args.generation
+        )
 
         simulator.init_process()
         simulator.start()
 
-    pop.run(evaluator.evaluate, n=args.generation)
+    pop.run(evaluate_function=parallel.evaluate, n=args.generation)
 
 if __name__=='__main__':
     main()

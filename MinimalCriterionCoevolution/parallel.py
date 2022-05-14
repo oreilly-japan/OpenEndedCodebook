@@ -27,22 +27,13 @@ class NonDaemonPool(mp.pool.Pool):
 
 
 class ParallelEvaluator(object):
-    def __init__(self, kwargs, num_workers, evaluate_function, timeout=None, parallel=True):
-        """
-        fitness_function should take one argument, a tuple of
-        (genome object, config object), and return
-        a single float (the genome's fitness).
-        constraint_function should take one argument, a tuple of
-        (genome object, config object), and return
-        a single bool (the genome's validity).
-        """
-        self.kwargs = kwargs
+    def __init__(self, num_workers, decode_function, evaluate_function, timeout=None, parallel=True):
         self.num_workers = num_workers
+        self.decode_function = decode_function
         self.evaluate_function = evaluate_function
         self.timeout = timeout
         self.parallel = parallel
         self.pool = NonDaemonPool(num_workers) if parallel and num_workers>0 else None
-
 
     def __del__(self):
         if self.parallel:
@@ -50,98 +41,92 @@ class ParallelEvaluator(object):
             self.pool.join()
 
     def evaluate(self, genomes, config, generation):
-        kwargs = dict(**self.kwargs, config=config, generation=generation)
 
         if self.parallel:
-            jobs = []
-            for key, genome in genomes:
-                jobs.append(self.pool.apply_async(self.evaluate_function, args=(genome,), kwds=kwargs))
+            phenomes = {key: self.decode_function(genome, config.genome_config) for key,genome in genomes.items()}
+
+            jobs = {}
+            for key,phenome in phenomes.items():
+                args = (key, phenome, generation)
+                jobs[key] = self.pool.apply_async(self.evaluate_function, args=args)
 
             # assign the fitness back to each genome
-            for job, (_, genome) in zip(jobs, genomes):
-                results = job.get(timeout=self.timeout)
+            for key,genome in genomes.items():
+                results = jobs[key].get(timeout=self.timeout)
                 for attr, data in results.items():
                     setattr(genome, attr, data)
 
         else:
-            for i, (_, genome) in enumerate(genomes):
-                results = self.evaluate_function(genome, **kwargs)
+            for key,genome in genomes.items():
+                phenome = self.decode_function(genome, config.genome_config)
+
+                args = (key, phenome, generation)
+                results = self.evaluate_function(*args)
                 for attr, data in results.items():
                     setattr(genome, attr, data)
 
 
 class MCCParallelEvaluator(object):
-    def __init__(self, kwargs, num_workers, evaluate_function, decode_function1, decode_function2, timeout=None):
-        """
-        fitness_function should take one argument, a tuple of
-        (genome object, config object), and return
-        a single float (the genome's fitness).
-        constraint_function should take one argument, a tuple of
-        (genome object, config object), and return
-        a single bool (the genome's validity).
-        """
-        self.kwargs = kwargs
+    def __init__(self, num_workers, evaluate_function, decode_function1, decode_function2, timeout=None):
         self.num_workers = num_workers
         self.evaluate_function = evaluate_function
         self.decode_function1 = decode_function1
         self.decode_function2 = decode_function2
         self.timeout = timeout
 
-        lock = mp.Lock()
-        self.pool = NonDaemonPool(num_workers, initargs=(lock,))
+        self.pool = NonDaemonPool(num_workers)
         self.manager = mp.Manager()
-
 
     def __del__(self):
         self.pool.close() # should this be terminate?
         self.pool.join()
 
-    def evaluate(self, offsprings1, offsprings2, population1, population2, config, generation):
-        kwargs = dict(**self.kwargs, config=config, generation=generation, evaluate_function=self.evaluate_function)
+    def evaluate(self, offsprings1_genome, offsprings2_genome, population1_genome, population2_genome, config, generation):
 
-        offsprings1_decoded = [self.decode_function1(genome1, config.genome1_config) for (_,genome1) in offsprings1]
-        offsprings2_decoded = [self.decode_function2(genome2, config.genome2_config) for (_,genome2) in offsprings2]
+        offsprings1_phenome = {key1: self.decode_function1(genome1, config.genome1_config) for key1,genome1 in offsprings1_genome.items()}
+        offsprings2_phenome = {key2: self.decode_function2(genome2, config.genome2_config) for key2,genome2 in offsprings2_genome.items()}
 
-        population1_decoded = [self.decode_function1(genome1, config.genome1_config) for (_,genome1) in population1]
-        population2_decoded = [self.decode_function2(genome2, config.genome2_config) for (_,genome2) in population2]
+        population1_phenome = {key1: self.decode_function1(genome1, config.genome1_config) for key1,genome1 in population1_genome.items()}
+        population2_phenome = {key2: self.decode_function2(genome2, config.genome2_config) for key2,genome2 in population2_genome.items()}
 
-        offsprings1_success_num = [self.manager.Value('i', 0) for _ in range(len(offsprings1))]
-        offsprings2_success_num = [self.manager.Value('i', 0) for _ in range(len(offsprings2))]
+        offsprings1_count = {key1: self.manager.Value('i', 0) for key1 in offsprings1_genome.keys()}
+        offsprings2_count = {key2: self.manager.Value('i', 0) for key2 in offsprings2_genome.keys()}
 
-        population1_success_num = [self.manager.Value('i', len(genome1.success_keys)) for (_,genome1) in population1]
-        population2_success_num = [self.manager.Value('i', len(genome2.success_keys)) for (_,genome2) in population2]
+        population1_count = {key1: self.manager.Value('i', len(genome1.success_keys)) for key1,genome1 in population1_genome.items()}
+        population2_count = {key2: self.manager.Value('i', len(genome2.success_keys)) for key2,genome2 in population2_genome.items()}
 
 
         # evaluate genome1
-        self.evalute_one_side(offsprings1, offsprings1_decoded, offsprings1_success_num,
-                              population2, population2_decoded, population2_success_num, kwargs)
+        self.evalute_one_side(offsprings1_genome, offsprings1_phenome, offsprings1_count,
+                              population2_genome, population2_phenome, population2_count, config, generation)
         # evaluate genome2
-        self.evalute_one_side(population1, population1_decoded, population1_success_num,
-                              offsprings2, offsprings2_decoded, offsprings2_success_num, kwargs)
+        self.evalute_one_side(population1_genome, population1_phenome, population1_count,
+                              offsprings2_genome, offsprings2_phenome, offsprings2_count, config, generation)
 
-        for (_,genome1), num in zip(offsprings1, offsprings1_success_num):
-            genome1.fitness = num.value
-        for (_,genome2), num in zip(offsprings2, offsprings2_success_num):
-            genome2.fitness = num.value
+        for key1 in offsprings1_genome.keys():
+            offsprings1_genome[key1].fitness = offsprings1_count[key1].value
+        for key2 in offsprings2_genome.keys():
+            offsprings2_genome[key2].fitness = offsprings2_count[key2].value
 
-    def evalute_one_side(self, genomes1, phenos1, nums1, genomes2, phenos2, nums2, kwargs):
-        jobs = []
-        for g1_i in range(len(phenos1)):
-            for g2_i in range(len(phenos2)):
-                args = (phenos1[g1_i], nums1[g1_i],
-                        phenos2[g2_i], nums2[g2_i])
-                jobs.append(self.pool.apply_async(self.conditioned_evaluation, args=args, kwds=kwargs))
+    def evalute_one_side(self, genomes1, phenomes1, counts1, genomes2, phenomes2, counts2, config, generation):
+        jobs = {}
+        for key1 in genomes1.keys():
+            for key2 in genomes2.keys():
+                args = (phenomes1[key1], counts1[key1],
+                        phenomes2[key2], counts2[key2],
+                        config, generation, self.evaluate_function)
+                jobs[(key1, key2)] = self.pool.apply_async(self.conditioned_evaluation, args=args)
 
-        for g1_key, genome1 in genomes1:
-            for g2_key, genome2 in genomes2:
-                success = jobs.pop(0).get(timeout=self.timeout)
+        for key1, genome1 in genomes1.items():
+            for key2, genome2 in genomes2.items():
+                success = jobs[(key1, key2)].get(timeout=self.timeout)
 
                 if success:
-                    genome1.success_keys.append(g2_key)
-                    genome2.success_keys.append(g1_key)
+                    genome1.success_keys.append(key1)
+                    genome2.success_keys.append(key2)
 
     @staticmethod
-    def conditioned_evaluation(pheno1, achieve1, pheno2, achieve2, config, evaluate_function, **kwargs):
+    def conditioned_evaluation(phenome1, achieve1, phenome2, achieve2, config, generation, evaluate_function):
         count_up = False
 
         if (config.genome1_limit > 0 and achieve1.value >= config.genome1_limit) or\
@@ -150,7 +135,7 @@ class MCCParallelEvaluator(object):
         if achieve1.value >= config.genome1_criteria and achieve2.value >= config.genome2_criteria:
             return count_up
 
-        success = evaluate_function(pheno1, pheno2)
+        success = evaluate_function(phenome1, phenome2, generation)
 
         if success:
             if (achieve1.value < config.genome1_criteria and (config.genome2_limit == 0 or achieve2.value < config.genome2_limit)) or \

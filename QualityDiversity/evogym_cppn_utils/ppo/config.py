@@ -11,7 +11,7 @@ gamma           = 0.99
 clip_range      = 0.3
 ent_coef        = 0.01
 
-learning_steps  = 50
+learning_steps  = 5
 
 policy_kwargs   = {
     'log_std_init'  : 0.0,

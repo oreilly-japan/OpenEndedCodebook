@@ -1,10 +1,9 @@
-import copy
 import csv
 import time
 import os
 import shutil
 import csv
-from functools import reduce
+import pickle
 
 from neat.math_util import mean, stdev, median2
 from neat.reporting import BaseReporter
@@ -28,27 +27,41 @@ class ReporterSet(object):
         for r in self.reporters:
             r.end_generation(config, population)
 
-    def post_evaluate(self, config, population, best_genome):
+    def post_evaluate(self, config, offsprings, best_genome):
         for r in self.reporters:
-            r.post_evaluate(config, population, best_genome)
+            r.post_evaluate(config, offsprings, best_genome)
 
-    def found_solution(self, config, generation, best):
+    def found_solution(self, config, population, best_genome):
         for r in self.reporters:
-            r.found_solution(config, generation, best)
+            r.found_solution(config, population, best_genome)
 
-    def info(self, msg):
-        for r in self.reporters:
-            r.info(msg)
 
-class SaveResultReporter(object):
+class BaseReporter():
+    def start_generation(self, generation):
+        pass
+
+    def post_evaluate(self, config, offsprings, best):
+        pass
+
+    def end_generation(self, config, population):
+        pass
+
+    def found_solution(self, config, population, best_genome):
+        pass
+
+
+class SaveResultReporter(BaseReporter):
 
     def __init__(self, save_path, bd_names):
         self.save_path = save_path
         self.history_pop_file = os.path.join(self.save_path, 'history_pop.csv')
-        self.history_pop_header = ['birth', 'no.'] + bd_names + ['fitness']
+        self.history_pop_header = ['generation', 'key'] + bd_names + ['fitness']
         self.history_best_file = os.path.join(self.save_path, 'history_best.csv')
-        self.history_best_header = ['generation', 'birth', 'no.'] + bd_names + ['fitness']
+        self.history_best_header = ['generation', 'key'] + bd_names + ['fitness']
         self.generation = None
+
+        self.genome_path = os.path.join(self.save_path, 'genome')
+        os.makedirs(self.genome_path, exist_ok=True)
 
         with open(self.history_pop_file, 'w') as f:
             writer = csv.DictWriter(f, fieldnames=self.history_pop_header)
@@ -60,48 +73,35 @@ class SaveResultReporter(object):
 
     def start_generation(self, generation):
         self.generation = generation
-        save_path_structure = os.path.join(self.save_path, f"generation_{generation}", 'structure')
-        save_path_controller = os.path.join(self.save_path, f"generation_{generation}", 'controller')
-        os.makedirs(save_path_structure, exist_ok=True)
-        os.makedirs(save_path_controller, exist_ok=True)
 
-    def end_generation(self, config, population_pool):
+    def post_evaluate(self, config, offsprings, best_genome):
         with open(self.history_pop_file, 'a', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.history_pop_header)
-
-            for key,genome in population_pool.items():
+            for key,genome in offsprings.items():
                 items = {
-                    'birth': key[0],
-                    'no.': key[1],
+                    'generation': self.generation,
+                    'key': key,
                     'fitness': genome.fitness
                 }
                 items.update(**genome.bd)
 
                 writer.writerow(items)
 
-        current_best = reduce(lambda x,y: x if x.fitness>y.fitness else y, population_pool.values())
         items = {
             'generation': self.generation,
-            'birth': current_best.key[0],
-            'no.': current_best.key[1],
-            'fitness': current_best.fitness
+            'key': best_genome.key,
+            'fitness': best_genome.fitness
         }
-        items.update(**current_best.bd)
+        items.update(**best_genome.bd)
         with open(self.history_best_file, 'a', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.history_best_header)
             writer.writerow(items)
-
-    def post_evaluate(self, config, population, best_genome):
-        pass
-
-    def found_solution(self, config, generation, best):
-        pass
-
-    def info(self, msg):
-        pass
+        best_file = os.path.join(self.genome_path, f'{best_genome.key}.pickle')
+        with open(best_file, 'wb') as f:
+            pickle.dump(best_genome, f)
 
 
-class MapElitesReporter(object):
+class MapElitesReporter(BaseReporter):
 
     def __init__(self):
         self.generation = None
@@ -110,10 +110,25 @@ class MapElitesReporter(object):
 
     def start_generation(self, generation):
         self.generation = generation
-        print('\n ****** Running generation {0} ****** \n'.format(generation))
+        print('\n ****** Running generation {} ****** \n'.format(generation))
         self.generation_start_time = time.time()
 
-    def end_generation(self, config, population_pool):
+    # def post_evaluate(self, config, offsprings, best_genome):
+        #
+
+    def end_generation(self, config, population):
+
+        print('Population size {}'.format(len(population)))
+
+        fitnesses = [c.fitness for c in population.values()]
+        fit_mean = mean(fitnesses)
+        fit_std = stdev(fitnesses)
+        print("Population's average fitness: {0:3.5f} stdev: {1:3.5f}".format(fit_mean, fit_std))
+
+        best = max(population.values(), key=lambda z: z.fitness)
+        best_bd_str = '(' + ', '.join(map(str, list(best.bd.values()))) + ')'
+        print('Best fitness: {0:3.5f} - id {1} - bd {2}'.format(best.fitness, best.key, best_bd_str))
+
         elapsed = time.time() - self.generation_start_time
         self.generation_times.append(elapsed)
         self.generation_times = self.generation_times[-10:]
@@ -122,18 +137,3 @@ class MapElitesReporter(object):
             print('Generation time: {0:.3f} sec ({1:.3f} average)'.format(elapsed, average))
         else:
             print('Generation time: {0:.3f} sec'.format(elapsed))
-
-    def post_evaluate(self, config, population, best_genome):
-        fitnesses = [c.fitness for c in population.values()]
-        fit_mean = mean(fitnesses)
-        fit_std = stdev(fitnesses)
-        best_bd_str = '(' + ', '.join(map(str, list(best_genome.bd.values()))) + ')'
-        print('Population size {}'.format(len(population)))
-        print("Population's average fitness: {0:3.5f} stdev: {1:3.5f}".format(fit_mean, fit_std))
-        print('Best fitness: {0:3.5f} - complexity: {1!r} - bd {2} - id {3}'.format(best_genome.fitness, best_genome.size(), best_bd_str, best_genome.key))
-
-    def found_solution(self, config, generation, best):
-        print('\nBest individual in generation {0} meets fitness threshold - complexity: {1!r}'.format(self.generation, best.size()))
-
-    def info(self, msg):
-        print(msg)

@@ -2,6 +2,7 @@
 Runs evaluation functions in parallel subprocesses
 in order to evaluate multiple genomes at once.
 """
+import multiprocessing.pool
 import multiprocessing as mp
 
 class NoDaemonProcess(mp.Process):
@@ -26,37 +27,40 @@ class NonDaemonPool(mp.pool.Pool):
 
 
 class ParallelEvaluator(object):
-    def __init__(self, num_workers, fitness_function, drawer, timeout=None):
-        """
-        fitness_function should take one argument, a tuple of
-        (genome object, config object), and return
-        a single float (the genome's fitness).
-        constraint_function should take one argument, a tuple of
-        (genome object, config object), and return
-        a single bool (the genome's validity).
-        """
+    def __init__(self, num_workers, decode_function, evaluate_function, timeout=None, parallel=True):
         self.num_workers = num_workers
-        self.fitness_function = fitness_function
-        self.drawer = drawer
+        self.decode_function = decode_function
+        self.evaluate_function = evaluate_function
         self.timeout = timeout
-        self.pool = NonDaemonPool(num_workers)
+        self.parallel = parallel
+        self.pool = NonDaemonPool(num_workers) if parallel and num_workers>0 else None
 
     def __del__(self):
-        self.pool.close() # should this be terminate?
-        self.pool.join()
+        if self.parallel:
+            self.pool.close() # should this be terminate?
+            self.pool.join()
 
-    def evaluate_fitness(self, genomes, config, generation):
-        jobs = []
-        for key, genome in genomes:
-            jobs.append(self.pool.apply_async(self.fitness_function, (genome, config, key[1], key[0])))
+    def evaluate(self, genomes, config, generation):
 
-        # assign the fitness back to each genome
-        for job, (_, genome) in zip(jobs, genomes):
-            fitness,bd = job.get(timeout=self.timeout)
-            genome.fitness = fitness
-            setattr(genome,'bd',bd)
-        # for i, (_, genome) in enumerate(genomes):
-            # genome.fitness,genome.bd = self.fitness_function(genome, config, i, generation)
+        if self.parallel:
+            phenomes = {key: self.decode_function(genome, config.genome_config) for key,genome in genomes.items()}
 
-        self.drawer.update_bd_map(genomes)
-        self.drawer.draw(generation)
+            jobs = {}
+            for key,phenome in phenomes.items():
+                args = (key, phenome, generation)
+                jobs[key] = self.pool.apply_async(self.evaluate_function, args=args)
+
+            # assign the fitness back to each genome
+            for key,genome in genomes.items():
+                results = jobs[key].get(timeout=self.timeout)
+                for attr, data in results.items():
+                    setattr(genome, attr, data)
+
+        else:
+            for key,genome in genomes.items():
+                phenome = self.decode_function(genome, config.genome_config)
+
+                args = (key, phenome, generation)
+                results = self.evaluate_function(*args)
+                for attr, data in results.items():
+                    setattr(genome, attr, data)

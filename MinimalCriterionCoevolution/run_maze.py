@@ -32,14 +32,14 @@ class MazeReporter(mcc.BaseReporter):
         print(f'nn connections   :  {np.min(nn_conns): =7.1f}  {np.mean(nn_conns): =7.1f}  {np.max(nn_conns): =7.1f}')
 
 
-def simulate_maze(controller, maze):
-    env, timesteps = maze
-    env.reset()
+def simulate_maze(controller, maze_phenome, generation):
+    maze, timesteps = maze_phenome
+    maze.reset()
     done = False
     for i in range(timesteps):
-        obs = env.get_observation()
+        obs = maze.get_observation()
         action = controller.activate(obs)
-        done = env.update(action)
+        done = maze.update(action)
         if done:
             break
     return done
@@ -88,11 +88,11 @@ def main():
     MazeDecoder = MazeGenomeDecoder(config.genome2_config)
 
     evaluator = MCCParallelEvaluator(
-        kwargs={},
         num_workers=args.num_cores,
         evaluate_function=simulate_maze,
         decode_function1=mcc.FeedForwardNetwork.create,
-        decode_function2=MazeDecoder.decode)
+        decode_function2=MazeDecoder.decode
+    )
 
 
     bootstrap_path = os.path.join(CURR_DIR, 'maze_out', 'bootstrap', args.bootstrap)
@@ -112,7 +112,7 @@ def main():
         pop.add_reporter(reporter)
 
 
-    pop.run(evaluator.evaluate)
+    pop.run(evaluate_function=evaluator.evaluate)
 
 if __name__=='__main__':
     main()

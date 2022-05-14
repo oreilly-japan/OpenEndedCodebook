@@ -1,14 +1,44 @@
-from neat import Population
+
+from neat.math_util import mean
+from neat.reporting import ReporterSet
 from . import distances
 
 
 class CompleteExtinctionException(Exception):
     pass
 
-class Population(Population):
+class Population():
 
-    def __init__(self, config, **kwargs):
-        super().__init__(config, **kwargs)
+    def __init__(self, config, initial_state=None, constraint_function=None):
+        self.reporters = ReporterSet()
+        self.config = config
+        stagnation = config.stagnation_type(config.stagnation_config, self.reporters)
+        self.reproduction = config.reproduction_type(config.reproduction_config,
+                                                     self.reporters,
+                                                     stagnation)
+        if config.fitness_criterion == 'max':
+            self.fitness_criterion = max
+        elif config.fitness_criterion == 'min':
+            self.fitness_criterion = min
+        elif config.fitness_criterion == 'mean':
+            self.fitness_criterion = mean
+        elif not config.no_fitness_termination:
+            raise RuntimeError(
+                "Unexpected fitness_criterion: {0!r}".format(config.fitness_criterion))
+
+        if initial_state is None:
+            # Create a population from scratch, then partition into species.
+            self.population = self.reproduction.create_new(config.genome_type,
+                                                           config.genome_config,
+                                                           config.pop_size,
+                                                           constraint_function=constraint_function)
+            self.species = config.species_set_type(config.species_set_config, self.reporters)
+            self.generation = 0
+            self.species.speciate(config, self.population, self.generation)
+        else:
+            self.population, self.species, self.generation = initial_state
+
+        self.best_genome = None
 
         self.archive = {}
         self.novelty_threshold = config.threshold_init
@@ -16,7 +46,13 @@ class Population(Population):
         self.metric_func = getattr(distances, config.metric, None)
         assert self.metric_func is not None, f'metric {config.metric} is not impelemented in distances.py'
 
-    def run(self, evaluate_function, n=None):
+    def add_reporter(self, reporter):
+        self.reporters.add(reporter)
+
+    def remove_reporter(self, reporter):
+        self.reporters.remove(reporter)
+
+    def run(self, evaluate_function, constraint_function=None, n=None):
 
         if self.config.no_fitness_termination and (n is None):
             raise RuntimeError("Cannot have no generational limit with no fitness termination")
@@ -28,7 +64,7 @@ class Population(Population):
             self.reporters.start_generation(self.generation)
 
             # Evaluate all genomes using the user-provided function.
-            evaluate_function(list(self.population.items()), self.config, self.generation)
+            evaluate_function(self.population, self.config, self.generation)
 
             self.evaluate_novelty_fitness()
 
@@ -55,8 +91,9 @@ class Population(Population):
                     break
 
             # Create the next generation from the current generation.
-            self.population = self.reproduction.reproduce(self.config, self.species,
-                                                          self.config.pop_size, self.generation)
+            self.population = self.reproduction.reproduce(
+                self.config, self.species, self.config.pop_size, self.generation,
+                constraint_function=constraint_function)
 
             # Check for complete extinction.
             if not self.species.species:
@@ -65,9 +102,9 @@ class Population(Population):
                 # If requested by the user, create a completely new population,
                 # otherwise raise an exception.
                 if self.config.reset_on_extinction:
-                    self.population = self.reproduction.create_new(self.config.genome_type,
-                                                                   self.config.genome_config,
-                                                                   self.config.pop_size)
+                    self.population = self.reproduction.create_new(
+                        self.config.genome_type, self.config.genome_config, self.config.pop_size,
+                        constraint_function=constraint_function)
                 else:
                     raise CompleteExtinctionException()
 

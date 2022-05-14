@@ -44,7 +44,7 @@ $python make_gifs.py -n {target experiment name}
 #### options:
 - -n --name             : target experiment name
 - -r --resolution-ratio : image resolution ratio (default: 0.2 -> (256,144))
-- -s --specific         : make gif for only specified robot (how to: "-s {id}")
+- -s --specified        : make gif for only specified robot (usage: "-s {id}")
 - --num-cores           : number of parallel processes (default: 1)
 - --not-overwrite       : skip process if already gif exists (default: overwrite)
 - --no-multi            : do without using multiprocess. if error occur, try this option.

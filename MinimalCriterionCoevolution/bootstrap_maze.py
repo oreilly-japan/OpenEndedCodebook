@@ -40,32 +40,34 @@ class RewardReporter(ns_neat.BaseReporter):
         print(f'\rgeneration: {self.generation :3}  best: {self.best: =.3f}  elapsed: {hours:0=2}:{minutes:0=2}:{seconds:0=4.1f}',end='')
 
 
+class MazeEvaluator():
+    def __init__(self, maze, timesteps):
+        self.maze = maze
+        self.timesteps = timesteps
 
-def eval_genome(genome, config, env, timesteps, **kwargs):
-    controller = ns_neat.nn.FeedForwardNetwork.create(genome, config)
+    def evaluate_agent(self, key, controller, generation):
+        self.maze.reset()
 
-    env.reset()
+        done = False
+        for i in range(self.timesteps):
+            obs = self.maze.get_observation()
+            action = controller.activate(obs)
+            done = self.maze.update(action)
+            if done:
+                break
 
-    done = False
-    for i in range(timesteps):
-        obs = env.get_observation()
-        action = controller.activate(obs)
-        done = env.update(action)
         if done:
-            break
+            reward = 1.0
+        else:
+            distance = self.maze.get_distance_to_exit()
+            reward = (self.maze.initial_distance - distance) / self.maze.initial_distance
 
-    if done:
-        reward = 1.0
-    else:
-        distance = env.get_distance_to_exit()
-        reward = (env.initial_distance - distance) / env.initial_distance
-
-    last_loc = env.get_agent_location()
-    results = {
-        'reward': reward,
-        'data': [last_loc[0], last_loc[1]]
-    }
-    return results
+        last_loc = self.maze.get_agent_location()
+        results = {
+            'reward': reward,
+            'data': [last_loc[0], last_loc[1]]
+        }
+        return results
 
 
 def make_random_maze(config, key, wall_gene_num, path_gene_num):
@@ -136,10 +138,12 @@ def main():
 
         maze_env, timesteps = MazeDecoder.decode(maze_genome, mcc_config, save=os.path.join(save_path, f'maze{maze_genome.key+1}.jpg'))
 
-        evaluator_kwargs = {
-            'env': maze_env,
-            'timesteps': timesteps}
-        evaluator = ParallelEvaluator(evaluator_kwargs, args.num_cores, eval_genome)
+        evaluator = MazeEvaluator(maze_env, timesteps)
+        parallel = ParallelEvaluator(
+            num_workers=args.num_cores,
+            evaluate_function=evaluator.evaluate_agent,
+            decode_function=ns_neat.FeedForwardNetwork.create
+        )
 
         agent_genomes_tmp = {}
         not_found_count = 0
@@ -148,7 +152,7 @@ def main():
 
             pop = ns_neat.Population(ns_config)
             pop.add_reporter(RewardReporter())
-            agent_genome = pop.run(evaluator.evaluate, n=400)
+            agent_genome = pop.run(evaluate_function=parallel.evaluate, n=400)
 
             if agent_genome.reward>=1.0:
                 print('  found')

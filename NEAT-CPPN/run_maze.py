@@ -14,30 +14,34 @@ from drawer import DrawReporter
 from maze_environment_numpy import MazeEnvironment
 
 
-def eval_genome(genome, config, env, timesteps, **kwargs):
-    controller = neat_cppn.nn.FeedForwardNetwork.create(genome, config)
-    env.reset()
+class MazeEvaluator():
+    def __init__(self, maze, timesteps):
+        self.maze = maze
+        self.timesteps = timesteps
 
-    done = False
-    for i in range(timesteps):
-        obs = env.get_observation()
-        action = controller.activate(obs)
-        done = env.update(action)
+    def evaluate_agent(self, key, controller, generation):
+        self.maze.reset()
+
+        done = False
+        for i in range(self.timesteps):
+            obs = self.maze.get_observation()
+            action = controller.activate(obs)
+            done = self.maze.update(action)
+            if done:
+                break
+
         if done:
-            break
+            reward = 1.0
+        else:
+            distance = self.maze.get_distance_to_exit()
+            reward = (self.maze.initial_distance - distance) / self.maze.initial_distance
 
-    if done:
-        reward = 1.0
-    else:
-        distance = env.get_distance_to_exit()
-        reward = (env.initial_distance - distance) / env.initial_distance
-
-    last_loc = env.get_agent_location()
-    results = {
-        'fitness': reward,
-        'data': [last_loc[0], last_loc[1]]
-    }
-    return results
+        last_loc = self.maze.get_agent_location()
+        results = {
+            'fitness': reward,
+            'data': [last_loc[0], last_loc[1]]
+        }
+        return results
 
 
 
@@ -67,11 +71,13 @@ def main():
     maze_env_config = os.path.join(UTIL_DIR, f'{args.task}_maze.txt')
     maze_env = MazeEnvironment.read_environment(maze_env_config)
 
-    evaluator_kwargs = {
-        'env': maze_env,
-        'timesteps': args.timesteps,
-    }
-    evaluator = ParallelEvaluator(evaluator_kwargs, args.num_cores, eval_genome)
+
+    evaluator = MazeEvaluator(maze_env, args.timesteps)
+    parallel = ParallelEvaluator(
+        num_workers=args.num_cores,
+        evaluate_function=evaluator.evaluate_agent,
+        decode_function=neat_cppn.FeedForwardNetwork.create
+    )
 
 
     config_path = os.path.join(UTIL_DIR, 'neat_config.ini')
@@ -95,7 +101,7 @@ def main():
         pop.add_reporter(reporter)
 
 
-    pop.run(evaluator.evaluate, n=args.generation)
+    pop.run(fitness_function=parallel.evaluate, n=args.generation)
 
 if __name__=='__main__':
     main()

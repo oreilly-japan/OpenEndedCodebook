@@ -3,9 +3,7 @@ import sys
 import csv
 import argparse
 import json
-import pickle
 import numpy as np
-
 
 import multiprocessing as mp
 
@@ -16,12 +14,13 @@ from pygifsicle import gifsicle
 
 import evogym.envs
 
-import neat_cppn
+import me_neat
+from stable_baselines3 import PPO
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
-UTIL_DIR = os.path.join(CURR_DIR, 'evogym_utils')
+UTIL_DIR = os.path.join(CURR_DIR, 'evogym_cppn_utils')
 sys.path.append(UTIL_DIR)
-from gym_utils import make_vec_envs
+from ppo.utils import make_vec_envs
 
 
 def get_args():
@@ -41,13 +40,18 @@ def get_args():
     )
     parser.add_argument(
         '-s', '--specified',
-        type=int,
+        nargs='+', type=int,
         help='make gif for only specified robot (usage: "-s {id}")'
     )
     parser.add_argument(
         '--num-cores',
         default=1, type=int,
         help='num of multiprocesses'
+    )
+    parser.add_argument(
+        '--deterministic',
+        action='store_true', default=False,
+        help='robot act deterministic'
     )
     parser.add_argument(
         '--not-overwrite',
@@ -67,31 +71,32 @@ def get_args():
     return args
 
 
-def save_robot_gif(expt_path, save_path, env_id, structure, key, resolution, config, overwrite=True):
+def save_robot_gif(expt_path, save_path, env_id, key, resolution, deterministic=False, overwrite=True):
 
-    genome_file = os.path.join(expt_path, 'genome', f'{key}.pickle')
+    structure_file = os.path.join(expt_path, 'structure', f'{key}.npz')
+    controller_file = os.path.join(expt_path, 'controller', f'{key}.zip')
 
     gif_file = os.path.join(save_path, f'{key}.gif')
 
     if os.path.exists(gif_file) and not overwrite:
         return
 
-    with open(genome_file, 'rb') as f:
-        genome = pickle.load(f)
 
+    structure_data = np.load(structure_file)
+    structure = (structure_data['robot'], structure_data['connectivity'])
 
     env = make_vec_envs(env_id, structure, 1000, 1, allow_early_resets=False)
     env.get_attr("default_viewer", indices=None)[0].set_resolution(resolution)
 
-    controller = neat_cppn.FeedForwardNetwork.create(genome, config.genome_config)
+    controller = PPO.load(controller_file)
 
     done = False
     obs = env.reset()
     img = env.render(mode='img')
     imgs = [img]
     while not done:
-        action = np.array(controller.activate(obs[0]))*2 - 1
-        obs, _, done, infos = env.step([action])
+        action, _ = controller.predict(obs, deterministic=deterministic)
+        obs, _, done, infos = env.step(action)
         img = env.render(mode='img')
         imgs.append(img)
 
@@ -106,7 +111,7 @@ def save_robot_gif(expt_path, save_path, env_id, structure, key, resolution, con
                  colors=64,
                  options=["--optimize=3","--no-warnings"])
 
-    print(f'genome {key} ... done')
+    print(f'robot {key} ... done')
     return
 
 
@@ -115,23 +120,18 @@ def pool_init_func(lock_):
     lock = lock_
 
 def main():
-
     args = get_args()
 
     resolution = (1280*args.resolution_ratio, 720*args.resolution_ratio)
 
-    expt_path = os.path.join(CURR_DIR, 'evogym_out', args.name)
+    expt_path = os.path.join(CURR_DIR, 'evogym_cppn_out', args.name)
 
     with open(os.path.join(expt_path, 'arguments.json'), 'r') as f:
         expt_args = json.load(f)
 
 
-    neat_config_file = os.path.join(expt_path, 'neat_config.ini')
-    config = neat_cppn.make_config(neat_config_file)
-
-    structure_file = os.path.join(expt_path, 'structure.npz')
-    structure_data = np.load(structure_file)
-    structure = (structure_data['robot'], structure_data['connectivity'])
+    me_config_file = os.path.join(expt_path, 'me_config.ini')
+    config = me_neat.make_config(me_config_file)
 
 
     gif_path = os.path.join(expt_path, 'gif')
@@ -146,7 +146,7 @@ def main():
         }
     else:
         files = {
-            'reward': 'history_reward.csv',
+            'population': 'history_pop.csv',
         }
         for metric,file in files.items():
 
@@ -168,8 +168,9 @@ def main():
             save_path = os.path.join(gif_path, metric)
             os.makedirs(save_path, exist_ok=True)
             for key in ids:
-                func_args = (expt_path, save_path, expt_args['task'], structure, key, resolution, config)
+                func_args = (expt_path, save_path, expt_args['task'], key, resolution)
                 func_kwargs = {
+                    'deterministic': args.deterministic,
                     'overwrite': not args.not_overwrite
                 }
                 jobs.append(pool.apply_async(save_robot_gif, args=func_args, kwds=func_kwargs))
@@ -184,8 +185,9 @@ def main():
             save_path = os.path.join(gif_path, metric)
             os.makedirs(save_path, exist_ok=True)
             for key in ids:
-                func_args = (expt_path, save_path, expt_args['task'], structure, key, resolution, config)
+                func_args = (expt_path, save_path, expt_args['task'], key, resolution)
                 func_kwargs = {
+                    'deterministic': args.deterministic,
                     'overwrite': not args.not_overwrite
                 }
 

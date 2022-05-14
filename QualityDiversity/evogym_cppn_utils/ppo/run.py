@@ -1,4 +1,3 @@
-import os
 import numpy as np
 
 from stable_baselines3 import PPO
@@ -22,14 +21,7 @@ def evaluate(model, envs, num_eval=1, deterministic=False):
     return np.mean(episode_rewards)
 
 
-def run_ppo(
-    env_id,
-    structure,
-    train_iter,
-    saving_convention,
-    deterministic=False):
-
-    controller_save_path = os.path.join(saving_convention[0], f'{saving_convention[1]}.zip')
+def run_ppo(env_id, structure, train_iter, save_file, deterministic=False):
 
     train_envs = make_vec_envs(env_id, structure, config.seed, config.num_processes)
     train_envs.reset()
@@ -59,6 +51,6 @@ def run_ppo(
         reward = evaluate(model, eval_envs, num_eval=config.eval_processes, deterministic=deterministic)
         if reward > max_reward:
             max_reward = reward
-            model.save(controller_save_path)
+            model.save(save_file)
 
     return reward
