@@ -1,5 +1,7 @@
 from neat.graphs import feed_forward_layers
 from neat.nn import FeedForwardNetwork
+from neat.activations import sigmoid_activation
+from neat.aggregations import sum_aggregation
 
 class FeedForwardNetwork(FeedForwardNetwork):
 
@@ -30,3 +32,27 @@ class FeedForwardNetwork(FeedForwardNetwork):
                 node_evals.append((node, activation_function, aggregation_function, ng.bias, ng.response, inputs))
 
         return FeedForwardNetwork(config.input_keys, config.output_keys, node_evals)
+
+
+    @staticmethod
+    def create_from_weights(input_keys, output_keys, weights, weight_thr=0.05):
+        connections = [key for key,weight in weights.items() if abs(weight)>weight_thr]
+
+        layers = feed_forward_layers(input_keys, output_keys, connections)
+        node_evals = []
+        for layer in layers:
+            for node in layer:
+                inputs = []
+                node_expr = [] # currently unused
+                for conn_key in connections:
+                    inode, onode = conn_key
+                    if onode == node:
+                        weight = weights[conn_key]
+                        inputs.append((inode, weight))
+                        node_expr.append("v[{}] * {:.7e}".format(inode, weight))
+
+                aggregation_function = sum_aggregation
+                activation_function = sigmoid_activation
+                node_evals.append((node, activation_function, aggregation_function, 0, 1, inputs))
+
+        return FeedForwardNetwork(input_keys, output_keys, node_evals)
