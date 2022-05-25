@@ -185,8 +185,8 @@ def main():
 
     else:
 
-        global lock
         lock = mp.Lock()
+        lock = pool_init_func(lock)
 
         for metric,ids in robot_ids.items():
             save_path = os.path.join(gif_path, metric)
