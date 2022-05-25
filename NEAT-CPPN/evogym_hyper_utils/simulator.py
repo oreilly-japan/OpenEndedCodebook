@@ -12,7 +12,8 @@ from gym_utils import make_vec_envs
 import neat_cppn
 
 class Simulator:
-    def __init__(self, env_id, structure, load_path, history_file, neat_config):
+    def __init__(self, env_id, structure, decode_function, load_path, history_file, neat_config):
+        self.decode_function = decode_function
         self.load_path = load_path
         self.history_file = os.path.join(self.load_path, history_file)
         self.neat_config = neat_config
@@ -41,7 +42,7 @@ class Simulator:
                 with open(genome_file, 'rb') as f:
                     genome = pickle.load(f)
 
-                self.controller = neat_cppn.FeedForwardNetwork.create(genome, self.neat_config.genome_config)
+                self.controller = self.decode_function(genome, self.neat_config.genome_config)
                 self.generation = int(latest[0])
                 print(f'simulator update controller: generation {latest[0]}  id {latest[1]}')
         else:
@@ -59,8 +60,8 @@ class Simulator:
             self.env.render()
 
 
-def run_process(env_id, structure, load_path, history_file, neat_config, generations):
-    simulator = Simulator(env_id, structure, load_path, history_file, neat_config)
+def run_process(env_id, structure, decode_function, load_path, history_file, neat_config, generations):
+    simulator = Simulator(env_id, structure, decode_function, load_path, history_file, neat_config)
     count = 0
     while simulator.generation < generations-1:
         try:
@@ -74,9 +75,10 @@ def run_process(env_id, structure, load_path, history_file, neat_config, generat
 
 
 class SimulateProcess:
-    def __init__(self, env_id, structure, load_path, history_file, neat_config, generations):
+    def __init__(self, env_id, structure, decode_function, load_path, history_file, neat_config, generations):
         self.env_id = env_id
         self.structure = structure
+        self.decode_function = decode_function
         self.load_path = load_path
         self.history_file = history_file
         self.neat_config = neat_config
@@ -90,7 +92,7 @@ class SimulateProcess:
         multiprocessing.set_start_method("spawn", force=True)
         self.process = Process(
             target=run_process,
-            args=(self.env_id, self.structure, self.load_path, self.history_file, self.neat_config, self.generations))
+            args=(self.env_id, self.structure, self.decode_function, self.load_path, self.history_file, self.neat_config, self.generations))
 
     def start(self):
         self.process.start()

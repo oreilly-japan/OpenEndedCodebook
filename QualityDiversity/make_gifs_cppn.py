@@ -181,6 +181,9 @@ def main():
 
     else:
 
+        global lock
+        lock = mp.Lock()
+
         for metric,ids in robot_ids.items():
             save_path = os.path.join(gif_path, metric)
             os.makedirs(save_path, exist_ok=True)

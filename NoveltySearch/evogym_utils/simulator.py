@@ -41,7 +41,7 @@ class Simulator:
                 with open(genome_file, 'rb') as f:
                     genome = pickle.load(f)
 
-                self.controller = ns_neat.nn.FeedForwardNetwork.create(genome, self.neat_config)
+                self.controller = ns_neat.FeedForwardNetwork.create(genome, self.neat_config.genome_config)
                 self.generation = int(latest[0])
                 print(f'simulator update controller: generation {latest[0]}  id {latest[1]}')
         else:
