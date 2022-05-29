@@ -88,7 +88,7 @@ class DrawReporter(BaseReporter):
         line_best = self.ax.plot(self.best_path[:,0], self.best_path[:,1], linewidth=3, c='b', alpha=0.7, label='reward')
         line_novelty = self.ax.plot(self.novelty_path[:,0], self.novelty_path[:,1], linewidth=3, c='orange', alpha=0.7, label='novelty')
 
-        legend = plt.legend(bbox_to_anchor=(0.95, 1.05), loc='upper right', borderaxespad=0, fontsize=10)
+        legend = plt.legend(bbox_to_anchor=(0.95, 0.97), loc='lower right', borderaxespad=0, fontsize=10)
 
         filename = os.path.join(self.save_path,f'{self.generation}.jpg')
         plt.savefig(filename, bbox_inches='tight')
