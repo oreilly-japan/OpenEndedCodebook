@@ -7,13 +7,15 @@
 $python run_maze.py
 ```
 #### options:
-- -n --name         : experiment name (default: "{task}")
-- -t --task         : task id (default: medium)
-- -p --pop-size     : population size of neat (default: 500)
-- -g --generation   : generations of neat (default: 500)
-- --timesteps       : maze solving simulator steps (default: 400)
-- --num-cores       : number of parallel processes (default: 4)
-- --no-plot         : not plot progress figure
+| option          | default   | detail  |
+| :---            | :---      | :---    |
+| -n --name       | "{task}"  | experiment name |
+| -t --task       | medium    | maze name (built on "envs/maze/maze_files/{name}.txt")) |
+| -p --po-size    | 500       | population size of NEAT |
+| --timestep      | 400       | timestep limit of solving maze |
+| --num-cores     | 4         | number of parallel processes |
+| --no-plot       | to plot   | not plot progress figure |
+
 
 ## Maze Hyper-NEAT
 ### execution
