@@ -78,6 +78,7 @@ $python make_gifs.py {experiment name}
 $python run_evogym_hyper.py
 ```
 #### options:
+| option      | abbrev  | default         | detail  |
 | :---        | :---:   | :---:           | :---    |
 | --name      | -n      | "{task}_{robot}"| experiment name |
 | --task      | -t      | Walker-v0       | evogym environment id |
@@ -113,6 +114,7 @@ $python make_gifs_hyper.py {experiment name}
 $python run_evogym_cppn.py
 ```
 #### options:
+| option          | abbrev  | default         | detail  |
 | :---            | :---:   | :---:           | :---    |
 | --name          | -n      | "{task}_{robot}"| experiment name |
 | --task          | -t      | Walker-v0       | evogym environment id |
