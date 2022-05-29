@@ -1,32 +1,37 @@
 # Quality Diversity
 
+
 ### execution
 ```
 $python run_evogym_cppn.py
 ```
 #### options:
-- -n --name       : experiment name (default: task id)
-- -t --task       : task id (default: Walker-v0)
-- --shape         : robot shape (usage: "--shape {height} {width}", default: (5,5))
-- -b --batch-size : genome num to evaluate in one generation (default: 4)
-- -g --generation : generations of neat (default: 100)
-- --ppo-iters     : learning iterations of PPO algo (default: 5). on the more complex task, need more.
-- --deterministic : evaluate robot deterministically (default: probabilistic)
-- --num-cores     : number of parallel processes (default: 1)
-- --no-plot       : not plot progress figure
-- --no-view       : not view simulation of best robot
+| option          | abbrev  | default         | detail  |
+| :---            | :---:   | :---:           | :---    |
+| --name          | -n      | "{task}_{robot}"| experiment name |
+| --task          | -t      | Walker-v0       | evogym environment id |
+| --shape         | -s      | (5,5)           | robot shape <br> usage: "-s {height} {width}" |
+| --batch-size    | -b      | 4               | genome number to evaluate in one generation |
+| --generation    | -g      | 500             | iterations of NEAT |
+| --ppo-iters     | -l      | 5               | learning iterations of PPO algo <br> on the more complex task, need more. |
+| --deterministic |         | *false*         | evaluate robot on deterministic action |
+| --num-cores     | -c      | 1               | number of parallel evaluation processes |
+| --no-plot       |         | *false*         | not open window of progress figure |
+| --no-view       |         | *false*         | not open simulation window of best robot |
 
 ### make gif
 after run_evogym_cppn, make gif file for each of all robots written in population history file.
 output to "./out/evogym_me_cppn/{expt name}/gif/"
 ```
-$python make_gifs_cppn.py -n {experiment name}
+$python make_gifs_cppn.py {experiment name}
 ```
 #### options:
-- -n --name             : experiment name
-- -r --resolution-ratio : image resolution ratio (default: 0.2 -> (256,144))
-- -s --specified        : make gif for only specified robot (usage: "-s {id}")
-- --deterministic       : robot act deterministically (default: probabilistically)
-- --num-cores           : number of parallel processes (default: 1)
-- --not-overwrite       : skip process if already gif exists (default: overwrite)
-- --no-multi            : do without using multiprocess. if error occur, try this option.
+| option          | abbrev  | default | detail  |
+| :---            | :---:   | :---:   | :---    |
+|                 |         |         | name of experiment for making gifs |
+| --resolution    | -r      | 0.2     | image resolution ratio (0.2 -> (256,144)) |
+| --specified     | -s      |         | input id, make gif for the only specified robot |
+| --deterministic |         | *false* | robot act deterministically |
+| --num-cores     | -c      | 1       | number of parallel making processes |
+| --not-overwrite |         | *false* | skip process if already gif exists |
+| --no-multi      |         | *false* | do without using multiprocessing. if error occur, try this option. |

@@ -1,5 +1,6 @@
 # Minimal Criterion Coevolution
 
+
 ## Maze
 ### bootstrap
 To execute before main mcc process. It prepare initial population.
@@ -7,46 +8,52 @@ To execute before main mcc process. It prepare initial population.
 $python bootstrap_maze.py
 ```
 #### options:
-- -n --name           : bootstrap name (default: default)
-- --agent-num         : number of agent to prepare (default: 20)
-- --maze-num          : number of maze to prepare (default: 10)
-- --wall-gene-num     : initial number of wall gene (default: 2)
-- --path-gene-num     : initial number of path gene (default: 2)
-- --exit-range      : range of judgment that reached the goal (default: 5.0)
-- --radius          : agent radius (default: 5.0)
-- --range-finder    : range of agent's range finder (default: 100)
-- --max-speed       : agent max speed (default: 5.0)
-- --max-angular-vel : agent max angular velocity (default: 8.0)
-- --speed-scale     : nn output scaler for speed (default: 2.0)
-- --sngular_scale   : nn output scaler for angular velocity (default: 3.0)
-- --num-cores         : number of parallel process (default: 4)
+| option            | abbrev  | default   | detail  |
+| :---              | :---:   | :---:     | :---    |
+| --name            | -n      | default   | boostrap name |
+| --agent-num       |         | 20        | number of agent to prepare |
+| --maze-num        |         | 10        | number of maze to prepare |
+| --wall-gene-num   |         | 2         | initial number of wall gene |
+| --path-gene-num   |         | 2         | initial number of path gene |
+| --exit-range      |         | 5.0       | range of judgment that reached the goal |
+| --radius          |         | 5.0       | radius of agent |
+| --range-finder    |         | 100.0     | range of agent's range finder |
+| --max-speed       |         | 5.0       | agent max speed |
+| --max-angular-vel |         | 8.0       | agent max angular velocity |
+| --speed-scale     |         | 2.0       | nn output scaler for speed |
+| --angular-scale   |         | 3.0       | nn output scaler for angular velocity |
+| --num-cores       | -c      | 4         | number of parallel evaluation processes |
 
 ### mcc
 ```
 $python run_maze.py
 ```
 #### options:
-- -n --name         : experiment name (default: "{bootstrap}")
-- -b --bootstrap    : to use bootstrap maze (default: default)
-- -g --generation   : number of iteration (default: 1000)
-- --agent-criteria  : minimal number to solve maze for each agent to survive (default: 1)
-- --maze-criteria   : minimal number of agent to solve for each maze to survive (default: 1)
-- --agent-pop       : maximum size of agent population (default: 160)
-- --maze-pop        : maximum size of maze population (default: 40)
-- --agent-limit     : resource limit of agent (default: 0, it means no limit)
-- --maze-limit      : resource limit of maze (default: 4)
-- --agent-batch     : batch size of agent (default: 40)
-- --maze-batch      : batch size of maze (default: 10)
-- --num-cores       : number of parallel process (default: 4)
-- --print-maze      : print detail of survived maze genome every generation (default: not)
+| option          | abbrev  | default       | detail  |
+| :---            | :---:   | :---:         | :---    |
+| --name          | -n      | "{bootstrap}" | experiment name |
+| --bootstrap     | -b      | default       | name of bootstrap to use as initial state |
+| --generation    | -g      | 1000          | iterations |
+| --agent-criteria|         | 1             | minimal number to solve maze for each agent to survive |
+| --maze-criteria |         | 1             | minimal number of agent to solve for each maze to survive |
+| --agent-pop     |         | 160           | maximum size of agent population |
+| --maze-pop      |         | 40            | maximum size of maze population |
+| --agent-limit   |         | 0             | resource limit of agent <br> 0 means no limit |
+| --maze-limit    |         | 4             | resource limit of maze |
+| --agent-bacth   |         | 40            | agent number to evaluate in one iteration |
+| --maze-batch    |         | 10            | maze number to evaluate in one iteration |
+| --num-cores     | -c      | 4             | number of parallel evaluation processes |
+| --print-maze    |         | *false*       | print detail of survived maze genome every iteration |
 
 ### make figure
 ```
-$python make_figures.py -n {experiment name}
+$python make_figures.py {experiment name}
 ```
 #### options:
-- -n --name         : experiment name
-- -cb --colorbar    : plot colorbar of timestep (default: no plot)
-- --num-cores       : number of parallel process (default: 1)
-- --not-overwrite   : skip process if already gif exists (default: overwrite)
-- --no-multi        : do without using multiprocess. if error occur, try this option.
+| option          | abbrev  | default | detail  |
+| :---            | :---:   | :---:   | :---    |
+|                 |         |         | name of experiment for making figures |
+| --colorbar      | -cb     | *false* | plot colorbar of timestep |
+| --num-cores     | -c      | 1       | number of parallel making processes |
+| --not-overwrite |         | *false* | skip process if already gif exists |
+| --no-multi      |         | *false* | do without using multiprocessing. if error occur, try this option. |

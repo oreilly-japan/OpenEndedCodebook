@@ -15,45 +15,45 @@ def get_args():
     parser.add_argument(
         '-t', '--task',
         default='Walker-v0', type=str,
-        help='target task id'
+        help='evogym environment id (default: Walker-v0)'
     )
     parser.add_argument(
-        '--shape',
+        '-s', '--shape',
         default=[5,5], nargs='+', type=int,
-        help='robot shape (useage: "--shape {height} {width}", default: (5,5))'
+        help='robot shape (default: (5,5), useage: "--shape {height} {width}")'
     )
 
     parser.add_argument(
         '-p', '--pop-size',
         default=4, type=int,
-        help='population size of neat'
+        help='population size of NEAT (default: 4)'
     )
     parser.add_argument(
         '-g', '--generation',
         default=500, type=int,
-        help='neat iterations'
+        help='iterations of NEAT (default: 500)'
     )
 
     parser.add_argument(
-        '--ppo-iters',
+        '-l', '--ppo-iters',
         default=5, type=int,
-        help='ppo learning iterations'
+        help='learning iterations of PPO algo. on the more complex task, need more. (default: 5)'
     )
     parser.add_argument(
         '--deterministic',
         action='store_true', default=False,
-        help='evaluate robot on deterministic simulation'
+        help='evaluate robot on deterministic action (default: False)'
     )
 
     parser.add_argument(
-        '--num-cores',
+        '-c', '--num-cores',
         default=1, type=int,
-        help='num of multiprocesses'
+        help='number of parallel evaluation processes (default: 1)'
     )
     parser.add_argument(
         '--no-view',
         action='store_true', default=False,
-        help='not view simulation of best robot'
+        help='not open simulation window of best robot (default: False)'
     )
     args = parser.parse_args()
 
@@ -63,7 +63,7 @@ def get_args():
     assert args.task in BASELINE_ENV_NAMES,\
         f'argumented task id "{args.task}" is not prepared, so pick from ['+', '.join(BASELINE_ENV_NAMES)+'].'
 
-    assert len(args.shape)==2, 'argument error: use "--shape" option as "--shape {height} {width}"'
+    assert len(args.shape)==2, 'argument error: use "-s --shape" option as "-s {height} {width}"'
 
     return args
 
@@ -74,44 +74,44 @@ def get_gif_args():
     )
 
     parser.add_argument(
-        '-n', '--name',
+        'name',
         type=str,
-        help='experiment name'
+        help='name of experiment for making gifs'
     )
     parser.add_argument(
-        '-r', '--resolution-ratio',
+        '-r', '--resolution',
         default=0.2, type=float,
         help='image resolution ratio (default: 0.2 -> 256:144)'
     )
     parser.add_argument(
         '-s', '--specified',
         type=int,
-        help='make gif for only specified robot (usage: "-s {id}")'
+        help='input id, make gif for the only specified robot (usage: "-s {id}")'
     )
     parser.add_argument(
         '--deterministic',
         action='store_true', default=False,
-        help='robot act deterministic'
+        help='robot act deterministic (default: False)'
     )
 
     parser.add_argument(
-        '--num-cores',
+        '-c', '--num-cores',
         default=1, type=int,
-        help='num of multiprocesses'
+        help='number of parallel making processes (default: 1)'
     )
     parser.add_argument(
         '--not-overwrite',
         action='store_true', default=False,
-        help='skip process if already gif exists (default: overwrite)'
+        help='skip process if already gif exists (default: False)'
     )
     parser.add_argument(
         '--no-multi',
         action='store_true', default=False,
-        help='do without using multiprocess. if error occur, try this option.'
+        help='do without using multiprocessing. if error occur, try this option. (default: False)'
     )
 
     args = parser.parse_args()
 
-    assert args.name is not None, 'argumented error: input "--name {experiment name}"'
+    assert args.name is not None, 'argumented error: input "{experiment name}"'
 
     return args

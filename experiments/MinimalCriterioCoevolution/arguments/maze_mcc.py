@@ -14,41 +14,41 @@ def get_args():
     parser.add_argument(
         '-b', '--bootstrap',
         default='default', type=str,
-        help='bootstrap name to use'
+        help='name of bootstrap to use as initial state (default: default)'
     )
 
     parser.add_argument(
         '-g', '--generation',
         default=1000, type=int,
-        help='generation num'
+        help='iterations (default: 1000)'
     )
 
     parser.add_argument(
         '--agent-criteria',
         default=1, type=int,
-        help='minimum criteria of agent'
+        help='minimal number to solve maze for each agent to survive (default: 1)'
     )
     parser.add_argument(
         '--maze-criteria',
         default=1, type=int,
-        help='minimum criteria of maze'
+        help='minimal number of agent to solve for each maze to survive (default: 1)'
     )
 
     parser.add_argument(
         '--agent-pop',
         default=160, type=int,
-        help='max agent population size'
+        help='maximum size of agent population (default: 160)'
     )
     parser.add_argument(
         '--maze-pop',
         default=40, type=int,
-        help='max maze population size'
+        help='maximum size of maze population (default: 40)'
     )
 
     parser.add_argument(
         '--agent-limit',
         default=0, type=int,
-        help='resource limit of agent'
+        help='resource limit of agent (default: 0, it means no limit)'
     )
     parser.add_argument(
         '--maze-limit',
@@ -59,23 +59,23 @@ def get_args():
     parser.add_argument(
         '--agent-batch',
         default=40, type=int,
-        help='batch size of agent'
+        help='agent number to evaluate in one iteration (default: 40)'
     )
     parser.add_argument(
         '--maze-batch',
         default=10, type=int,
-        help='batch size of maze'
+        help='maze number to evaluate in one iteration (default: 10)'
     )
 
     parser.add_argument(
-        '--num-cores',
+        '-c', '--num-cores',
         default=4, type=int,
-        help='num of multiprocesses'
+        help='number of parallel evaluation processes (default: 4)'
     )
     parser.add_argument(
         '--print-maze',
         action='store_true', default=False,
-        help='print detail of survived maze genome every generation'
+        help='print detail of survived maze genome every generation (default: False)'
     )
 
     args = parser.parse_args()
@@ -94,71 +94,71 @@ def get_bootstrap_args():
     parser.add_argument(
         '-n', '--name',
         default='default', type=str,
-        help='bootstrap name'
+        help='bootstrap name (default: default)'
     )
 
     parser.add_argument(
         '--agent-num',
         default=20, type=int,
-        help='number to prepare agent'
+        help='number of agent to prepare (default: 20)'
     )
     parser.add_argument(
         '--maze-num',
         default=10, type=int,
-        help='number to prepare maze'
+        help='number of maze to prepare (default: 10)'
     )
 
     parser.add_argument(
         '--wall-gene-num',
         default=2, type=int,
-        help='number of wall gene'
+        help='initial number of wall gene (default: 2)'
     )
     parser.add_argument(
         '--path-gene-num',
         default=2, type=int,
-        help='number of path gene'
+        help='initial number of path gene (default: 2)'
     )
 
     parser.add_argument(
         '--exit-range',
         default=5.0, type=float,
-        help='range of judgment that reached the goal'
+        help='range of judgment that reached the goal (default: 5.0)'
     )
     parser.add_argument(
         '--radius',
         default=5.0, type=float,
-        help='agent radius'
+        help='radius of agent (default: 5.0)'
     )
     parser.add_argument(
         '--range-finder',
         default=100.0, type=float,
-        help='agent range finder range'
+        help='range of agent\'s range finder (default: 100.0)'
     )
     parser.add_argument(
         '--max-speed',
         default=5.0, type=float,
-        help='agent max speed'
+        help='agent max speed (default: 5.0)'
     )
     parser.add_argument(
         '--max-angular-vel',
         default=8.0, type=float,
-        help='agent max angular velocity'
+        help='agent max angular velocity (default: 5.0)'
     )
     parser.add_argument(
         '--speed-scale',
         default=2.0, type=float,
-        help='nn output scaler for speed'
+        help='nn output scaler for speed (default: 2.0)'
     )
     parser.add_argument(
         '--angular-scale',
         default=3.0, type=float,
-        help='nn output scaler for angular velocity'
+        help='nn output scaler for angular velocity (default: 3.0)'
     )
 
     parser.add_argument(
-        '--num-cores',
+        '-c', '--num-cores',
         default=4, type=int,
-        help='num of multiprocesses'
+        help='number of parallel evaluation processes (default: 4)'
     )
 
     args = parser.parse_args()
@@ -172,35 +172,35 @@ def get_figure_args():
     )
 
     parser.add_argument(
-        '-n', '--name',
+        'name',
         type=str,
-        help='experiment name'
+        help='name of experiment for making figures'
     )
 
     parser.add_argument(
         '-cb', '--colorbar',
         action='store_true', default=False,
-        help='plot colorbar of timestep'
+        help='plot colorbar of timestep (default: False)'
     )
 
     parser.add_argument(
-        '--num-cores',
+        '-c', '--num-cores',
         default=1, type=int,
-        help='num of multiprocesses'
+        help='number of parallel making processes (default: 1)'
     )
     parser.add_argument(
         '--not-overwrite',
         action='store_true', default=False,
-        help='skip process if already gif exists (default: overwrite)'
+        help='skip process if already gif exists (default: False)'
     )
     parser.add_argument(
         '--no-multi',
         action='store_true', default=False,
-        help='do without using multiprocess. if error occur, try this option.'
+        help='do without using multiprocess. if error occur, try this option. (default: False)'
     )
 
     args = parser.parse_args()
 
-    assert args.name is not None, 'argumented error: input "--name {experiment name}"'
+    assert args.name is not None, 'argumented error: input "{experiment name}"'
 
     return args

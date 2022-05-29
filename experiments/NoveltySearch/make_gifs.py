@@ -28,7 +28,7 @@ def main():
 
     args = get_gif_args()
 
-    resolution = (1280*args.resolution_ratio, 720*args.resolution_ratio)
+    resolution = (1280*args.resolution, 720*args.resolution)
 
     expt_path = os.path.join(CURR_DIR, 'out', 'evogym_ns_neat', args.name)
     expt_args = load_experiment(expt_path)

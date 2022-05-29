@@ -20,35 +20,12 @@ ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'evogym')
 sys.path.append(ENV_DIR)
 from evaluator import EvogymStructureEvaluator
 from simulator import EvogymStructureSimulator, SimulateProcess
+from cppn_decoder import EvogymStructureDecoder
 from substrate import Substrate
 from constraint import EvogymStructureConstraint
 
 
 from arguments.evogym_cppn import get_args
-
-
-class EvogymStructureDecoder(neat_cppn.BaseCPPNDecoder):
-    def __init__(self, size):
-        self.size = size
-
-        x, y = torch.meshgrid(torch.arange(size[0]), torch.arange(size[1]), indexing='ij')
-        x = x.flatten()
-        y = y.flatten()
-
-        center = (np.array(size) - 1) / 2
-        d = np.sqrt(np.square(x - center[0]) + np.square(y - center[1]))
-
-        self.inputs = {'x': x, 'y': y, 'd': d}
-        self.output_keys = ['empty', 'rigid', 'soft', 'hori', 'vert']
-
-    def decode(self, genome, config):
-        output = super().decode(genome, config)
-        output = np.vstack([output[key] for key in self.output_keys])
-        material = np.argmax(output, axis=0)
-
-        robot = np.reshape(material, self.size)
-        connectivity = get_full_connectivity(robot)
-        return (robot, connectivity)
 
 
 def main():

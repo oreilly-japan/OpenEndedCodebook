@@ -18,7 +18,7 @@ ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'evogym')
 sys.path.append(ENV_DIR)
 from evaluator import EvogymControllerEvaluatorNS
 from simulator import EvogymControllerSimulator, SimulateProcess
-from hyper_decoder import EvogymHyperDecoder
+from cppn_decoder import EvogymHyperDecoder
 from substrate import Substrate
 from gym_utils import load_robot
 

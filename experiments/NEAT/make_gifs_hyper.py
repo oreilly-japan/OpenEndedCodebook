@@ -17,7 +17,7 @@ from experiment_utils import load_experiment
 
 ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'evogym')
 sys.path.append(ENV_DIR)
-from hyper_decoder import EvogymHyperDecoder
+from cppn_decoder import EvogymHyperDecoder
 from substrate import Substrate
 from gym_utils import load_robot
 from make_gif_funcs import save_controller_gif, pool_init_func
@@ -30,7 +30,7 @@ def main():
 
     args = get_gif_args()
 
-    resolution = (1280*args.resolution_ratio, 720*args.resolution_ratio)
+    resolution = (1280*args.resolution, 720*args.resolution)
 
     expt_path = os.path.join(CURR_DIR, 'out', 'evogym_hyper', args.name)
     expt_args = load_experiment(expt_path)

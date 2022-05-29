@@ -15,7 +15,7 @@ ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'maze')
 sys.path.append(ENV_DIR)
 from maze_environment_numpy import MazeEnvironment
 from evaluator import MazeControllerEvaluator
-from hyper_decoder import MazeHyperDecoder
+from cppn_decoder import MazeHyperDecoder
 from substrate import Substrate
 
 
