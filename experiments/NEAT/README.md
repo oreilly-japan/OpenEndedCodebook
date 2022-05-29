@@ -7,14 +7,14 @@
 $python run_maze.py
 ```
 #### options:
-| option          | default   | detail  |
-| :---            | :---      | :---    |
-| -n --name       | "{task}"  | experiment name |
-| -t --task       | medium    | maze name (built on "envs/maze/maze_files/{name}.txt")) |
-| -p --po-size    | 500       | population size of NEAT |
-| --timestep      | 400       | timestep limit of solving maze |
-| --num-cores     | 4         | number of parallel processes |
-| --no-plot       | to plot   | not plot progress figure |
+| option      | abbrev  | default   | detail  |
+| :---        | :---:   | :---:     | :--     |
+| --name      | -n      | "{task}"  | experiment name |
+| --task      | -t      | medium    | maze name (built on "envs/maze/maze_files/{name}.txt")) |
+| --po-size   | -p      | 500       | population size of NEAT |
+| --timestep  |         | 400       | timestep limit of solving maze |
+| --num-cores |         | 4         | number of parallel processes |
+| --no-plot   |         | false     | not plot progress figure |
 
 
 ## Maze Hyper-NEAT
