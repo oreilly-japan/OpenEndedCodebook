@@ -1,10 +1,7 @@
 import sys
 import os
-import numpy as np
-import torch
 
 import evogym.envs
-from evogym import get_full_connectivity
 
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))

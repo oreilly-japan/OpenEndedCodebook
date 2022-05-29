@@ -66,7 +66,7 @@ def main():
     reporters = [
         neat_cppn.SaveResultReporter(save_path),
         neat_cppn.StdOutReporter(True),
-        DrawReporter(maze_env, args.timesteps, figure_path, decode_function, no_plot=args.no_plot)
+        DrawReporter(maze_env, args.timesteps, figure_path, decode_function, args.generation, no_plot=args.no_plot)
     ]
     for reporter in reporters:
         pop.add_reporter(reporter)

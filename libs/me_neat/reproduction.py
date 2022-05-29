@@ -51,6 +51,7 @@ class Reproduction():
                     parent_key, parent = random.choice(list(population.items()))
                     offspring = self.mutate(key, parent)
 
+            setattr(offspring, 'fitness', None)
             setattr(offspring, 'generation', generation)
             setattr(offspring, 'parent', parent_key)
             offsprings[key] = offspring

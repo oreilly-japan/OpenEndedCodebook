@@ -1,6 +1,8 @@
 import numpy as np
 import torch
 
+from evogym import get_full_connectivity
+
 from neat_cppn import BaseCPPNDecoder, BaseHyperDecoder
 
 
