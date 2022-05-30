@@ -1,9 +1,10 @@
 import neat
 from neat.config import *
+from .genome import DefaultGenome
 from .reproduction import DefaultReproduction
 
 def make_config(config_file, extra_info=None, custom_config=None):
-    config = neat.Config(neat.DefaultGenome,
+    config = neat.Config(DefaultGenome,
                          DefaultReproduction,
                          neat.DefaultSpeciesSet,
                          neat.DefaultStagnation,

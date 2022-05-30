@@ -1,4 +1,5 @@
 from neat import *
+from .genome import DefaultGenome
 from .population import Population
 from .reproduction import DefaultReproduction
 from .reporting import BaseReporter, SaveResultReporter

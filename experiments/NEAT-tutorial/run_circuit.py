@@ -1,0 +1,89 @@
+import sys
+import os
+
+
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(os.path.dirname(CURR_DIR))
+
+LIB_DIR = os.path.join(ROOT_DIR, 'libs')
+sys.path.append(LIB_DIR)
+import neat_cppn
+from parallel import ParallelEvaluator
+from experiment_utils import initialize_experiment
+
+ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'circuit')
+sys.path.append(ENV_DIR)
+from evaluator import CircuitEvaluator, load_circuit
+
+
+from arguments.circuit_neat import get_args
+
+
+def print_result(genome, config, decode_function, input_data, output_data):
+    print()
+    print('best circuit result:')
+    circuit = decode_function(genome, config)
+
+    error = []
+    for inp, out in zip(input_data, output_data):
+        pred = circuit.activate(inp)
+
+        print('input: ', inp, end='  ')
+        print('label: ', out, end='  ')
+        print('predict: ', '[' + ' '.join( map(lambda z: f'{z: =.2f}', pred) ) + ']')
+
+        error.append(sum([(o - p)**2 for o,p in zip(out, pred)])/len(out))
+
+    error = sum(error)/len(error)
+    print(f'mean squared error: {error: =.5f}')
+
+
+def main():
+    args = get_args()
+
+    save_path = os.path.join(CURR_DIR, 'out', 'circuit_neat', args.name)
+
+    initialize_experiment(args.name, save_path, args)
+
+
+    decode_function = neat_cppn.FeedForwardNetwork.create
+
+    circuit_file = os.path.join(ENV_DIR, 'circuit_files', f'{args.task}.txt')
+    input_data, output_data = load_circuit(circuit_file)
+    evaluator = CircuitEvaluator(input_data, output_data)
+    evaluate_function = evaluator.evaluate_circuit
+
+    parallel = ParallelEvaluator(
+        num_workers=args.num_cores,
+        evaluate_function=evaluate_function,
+        decode_function=decode_function
+    )
+
+
+    config_file = os.path.join(CURR_DIR, 'config', 'circuit_neat.cfg')
+    custom_config = [
+        ('NEAT', 'pop_size', args.pop_size),
+        ('DefaultGenome', 'num_inputs', input_data.shape[1]),
+        ('DefaultGenome', 'num_outputs', output_data.shape[1]),
+    ]
+    config = neat_cppn.make_config(config_file, custom_config=custom_config)
+    config_out_file = os.path.join(save_path, 'circuit_neat.cfg')
+    config.save(config_out_file)
+
+
+    pop = neat_cppn.Population(config)
+
+    reporters = [
+        neat_cppn.SaveResultReporter(save_path),
+        neat_cppn.StdOutReporter(True),
+    ]
+    for reporter in reporters:
+        pop.add_reporter(reporter)
+
+
+    best_genome = pop.run(fitness_function=parallel.evaluate, n=args.generation)
+
+    print_result(best_genome, config.genome_config, decode_function, input_data, output_data)
+
+if __name__=='__main__':
+    main()
