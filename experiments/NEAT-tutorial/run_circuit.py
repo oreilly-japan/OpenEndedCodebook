@@ -19,25 +19,6 @@ from evaluator import CircuitEvaluator, load_circuit
 from arguments.circuit_neat import get_args
 
 
-def print_result(genome, config, decode_function, input_data, output_data):
-    print()
-    print('best circuit result:')
-    circuit = decode_function(genome, config)
-
-    error = []
-    for inp, out in zip(input_data, output_data):
-        pred = circuit.activate(inp)
-
-        print('input: ', inp, end='  ')
-        print('label: ', out, end='  ')
-        print('predict: ', '[' + ' '.join( map(lambda z: f'{z: =.2f}', pred) ) + ']')
-
-        error.append(sum([(o - p)**2 for o,p in zip(out, pred)])/len(out))
-
-    error = sum(error)/len(error)
-    print(f'mean squared error: {error: =.5f}')
-
-
 def main():
     args = get_args()
 
@@ -50,7 +31,7 @@ def main():
 
     circuit_file = os.path.join(ENV_DIR, 'circuit_files', f'{args.task}.txt')
     input_data, output_data = load_circuit(circuit_file)
-    evaluator = CircuitEvaluator(input_data, output_data)
+    evaluator = CircuitEvaluator(input_data, output_data, error_type=args.error)
     evaluate_function = evaluator.evaluate_circuit
 
     parallel = ParallelEvaluator(
@@ -83,7 +64,9 @@ def main():
 
     best_genome = pop.run(fitness_function=parallel.evaluate, n=args.generation)
 
-    print_result(best_genome, config.genome_config, decode_function, input_data, output_data)
+    print()
+    print('best circuit result:')
+    evaluator.print_result(decode_function(best_genome, config.genome_config))
 
 if __name__=='__main__':
     main()

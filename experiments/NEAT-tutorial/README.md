@@ -13,6 +13,7 @@ $python run_circuit.py
 | --task      | -t      | xor       | circuit name <br> built on "envs/circuit/circuit_files/" |
 | --pop-size  | -p      | 150       | population size of NEAT |
 | --generation| -g      | 300       | iterations of NEAT |
+| --error     | -e      | mse       | error type (default: mse, options: [mse, mae]) |
 | --num-cores | -c      | 4         | number of parallel evaluation processes |
 
 ### make gif

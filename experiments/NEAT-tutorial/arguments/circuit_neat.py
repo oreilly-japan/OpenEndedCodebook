@@ -27,6 +27,12 @@ def get_args():
         default=300, type=int,
         help='iterations of NEAT (default: 300)'
     )
+    
+    parser.add_argument(
+        '-e', '--error',
+        default='mse', type=str,
+        help='error function (default: mse, options: [mse, mae])'
+    )
 
     parser.add_argument(
         '-c', '--num-cores',

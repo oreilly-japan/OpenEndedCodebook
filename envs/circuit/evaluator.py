@@ -34,10 +34,13 @@ def load_circuit(data_file):
 
 
 class CircuitEvaluator():
-    def __init__(self, input_data, output_data):
+    def __init__(self, input_data, output_data, error_type='mse'):
+
+        assert error_type in ['mse', 'mae'], 'choise error_type from [mse, mae].'
 
         self.input_data = input_data
         self.output_data = output_data
+        self.error_type = error_type
 
     def evaluate_circuit(self, key, circuit, generation):
 
@@ -47,9 +50,31 @@ class CircuitEvaluator():
             output_pred.append(pred)
 
         output_pred = np.vstack(output_pred)
-        error = np.mean(np.square(self.output_data - output_pred))
+        if self.error_type=='mae':
+            error = np.mean(np.abs(self.output_data - output_pred))
+        else:
+            error = np.mean(np.square(self.output_data - output_pred))
 
         results = {
             'fitness': 1.0 - error
         }
         return results
+
+    def print_result(self, circuit):
+
+        output_pred = []
+        for inp, out in zip(self.input_data, self.output_data):
+            pred = circuit.activate(inp)
+            output_pred.append(pred)
+
+            print('input: ', inp, end='  ')
+            print('label: ', out, end='  ')
+            print('predict: ', '[' + ' '.join( map(lambda z: f'{z: =.2f}', pred) ) + ']')
+
+        output_pred = np.vstack(output_pred)
+        if self.error_type=='mae':
+            error = np.mean(np.abs(self.output_data - output_pred))
+        else:
+            error = np.mean(np.square(self.output_data - output_pred))
+
+        print(f'error: {error: =.5f}')
