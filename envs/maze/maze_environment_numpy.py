@@ -179,7 +179,7 @@ class MazeEnvironment:
         Returns:
             The initialized maze environment.
         """
-        num_lines, index = -1, 0
+        index = 0
         walls = []
         maze_agent, maze_exit = None, None
         with open(file_path, 'r') as file:
