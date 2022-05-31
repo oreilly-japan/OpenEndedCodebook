@@ -51,6 +51,38 @@ def save_controller_gif(env_id, structure, genome_key, genome_file, genome_confi
     return
 
 
+def save_controller_ppo_gif(env_id, structure, iter, ppo_file, gif_file, resolution, deterministic=False):
+
+    env = make_vec_envs(env_id, structure, 0, 1, allow_early_resets=False)
+    env.get_attr("default_viewer", indices=None)[0].set_resolution(resolution)
+
+    controller = PPO.load(ppo_file)
+
+    done = False
+    obs = env.reset()
+    img = env.render(mode='img')
+    imgs = [img]
+    while not done:
+        action, _ = controller.predict(obs, deterministic=deterministic)
+        obs, _, done, infos = env.step(action)
+        img = env.render(mode='img')
+        imgs.append(img)
+
+    env.close()
+
+    imageio.mimsave(gif_file, imgs, duration=(1/50.0))
+
+    with lock:
+        gifsicle(sources=gif_file,
+                 destination=gif_file,
+                 optimize=False,
+                 colors=64,
+                 options=["--optimize=3","--no-warnings"])
+
+    print(f'iter {iter} ... done')
+    return
+
+
 def save_structure_gif(env_id, genome_key, ppo_file, structure_file, gif_file, resolution, deterministic=False):
 
     controller = PPO.load(ppo_file)

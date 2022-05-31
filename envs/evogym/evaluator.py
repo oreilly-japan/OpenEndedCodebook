@@ -108,7 +108,7 @@ class EvogymStructureEvaluator():
         fitness = run_ppo(
             env_id=self.env_id,
             structure=structure,
-            train_iter=self.ppo_iters,
+            train_iters=self.ppo_iters,
             save_file=file_controller,
             deterministic=self.deterministic
         )
@@ -140,7 +140,7 @@ class EvogymStructureEvaluatorME():
         fitness = run_ppo(
             env_id=self.env_id,
             structure=structure,
-            train_iter=self.ppo_iters,
+            train_iters=self.ppo_iters,
             save_file=file_controller,
             deterministic=self.deterministic
         )

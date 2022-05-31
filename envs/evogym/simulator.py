@@ -30,6 +30,7 @@ class EvogymControllerSimulator():
 
     def update(self):
         if not os.path.exists(self.history_file):
+            time.sleep(0.1)
             return
 
         lines = []
@@ -53,7 +54,7 @@ class EvogymControllerSimulator():
                 self.generation = int(latest[0])
                 print(f'simulator update controller: generation {latest[0]}  id {latest[1]}')
         else:
-            time.sleep(1)
+            time.sleep(0.1)
 
     def simulate(self):
         if self.controller is None:
@@ -65,6 +66,59 @@ class EvogymControllerSimulator():
             action = np.array(self.controller.activate(obs[0]))*2 - 1
             obs, _, done, infos = self.env.step([np.array(action)])
             self.env.render()
+
+class EvogymControllerSimulatorPPO():
+    def __init__(self, env_id, structure, load_path, deterministic=False):
+        self.env_id = env_id
+        self.structure = structure
+        self.load_path = load_path
+        self.deterministic = deterministic
+        self.iter = -1
+        self.generation = self.iter
+        self.env = None
+        self.controller = None
+
+    def initialize(self):
+        self.generation = -1
+        self.env = make_vec_envs(self.env_id, self.structure, 0, 1, vecnormalize=True)
+
+    def update(self):
+
+        iter = self.iter + 1
+        controller_file = os.path.join(self.load_path, f'{iter}.zip')
+        while os.path.exists(controller_file):
+            iter += 1
+            controller_file = os.path.join(self.load_path, f'{iter}.zip')
+
+        if self.iter==iter-1:
+            time.sleep(0.1)
+            return
+
+        if self.iter < iter-1:
+            self.iter = iter - 1
+            self.generation = self.iter
+            controller_file = os.path.join(self.load_path, f'{self.iter}.zip')
+
+            self.controller = PPO.load(controller_file)
+            self.env.obs_rms = self.controller.env.obs_rms
+            print(f'simulator update controller: iter {self.iter}')
+
+
+    def simulate(self):
+        if self.controller is None or self.env is None:
+            return
+
+        done = False
+        obs = self.env.reset()
+        while not done:
+            action, _ = self.controller.predict(obs, deterministic=self.deterministic)
+            obs, _, done, infos = self.env.step(action)
+            self.env.render()
+
+            for info in infos:
+                if 'episode' in info:
+                    reward = info['episode']['r']
+                    print(f'simulator reward: {reward: =.5f}')
 
 
 class EvogymStructureSimulator():
@@ -82,6 +136,7 @@ class EvogymStructureSimulator():
 
     def update(self):
         if not os.path.exists(self.history_file):
+            time.sleep(0.1)
             return
 
         lines = []
@@ -109,7 +164,7 @@ class EvogymStructureSimulator():
                 self.generation = int(latest[0])
                 print(f'simulator update controller: generation {latest[0]}  id {latest[1]}')
         else:
-            time.sleep(1)
+            time.sleep(0.1)
 
     def simulate(self):
         if self.controller is None or self.env is None:
@@ -121,7 +176,6 @@ class EvogymStructureSimulator():
             action, _ = self.controller.predict(obs, deterministic=self.deterministic)
             obs, _, done, infos = self.env.step(action)
             self.env.render()
-
 
 
 def run_process(simulator, generations):
