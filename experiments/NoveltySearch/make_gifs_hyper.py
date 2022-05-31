@@ -36,8 +36,7 @@ def main():
     expt_args = load_experiment(expt_path)
 
 
-    robot_file = os.path.join(ENV_DIR, 'robot_files', f'{expt_args["robot"]}.txt')
-    structure = load_robot(robot_file)
+    structure = load_robot(ROOT_DIR, args.robot, task=args.task)
 
 
     substrate = Substrate(expt_args['task'], structure[0])

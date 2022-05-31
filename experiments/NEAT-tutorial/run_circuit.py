@@ -29,8 +29,7 @@ def main():
 
     decode_function = neat_cppn.FeedForwardNetwork.create
 
-    circuit_file = os.path.join(ENV_DIR, 'circuit_files', f'{args.task}.txt')
-    input_data, output_data = load_circuit(circuit_file)
+    input_data, output_data = load_circuit(ROOT_DIR, args.task)
     evaluator = CircuitEvaluator(input_data, output_data, error_type=args.error)
     evaluate_function = evaluator.evaluate_circuit
 

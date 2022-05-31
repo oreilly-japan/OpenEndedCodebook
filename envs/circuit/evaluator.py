@@ -1,7 +1,10 @@
+import os
 import numpy as np
 
 
-def load_circuit(data_file):
+def load_circuit(ROOT_DIR, data_name):
+    data_file = os.path.join(ROOT_DIR, 'envs', 'circuit', 'circuit_files', f'{data_name}.txt')
+    
     index = 0
     input_size = None
     output_size = None

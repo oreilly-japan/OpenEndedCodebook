@@ -19,7 +19,7 @@ def get_args():
     parser.add_argument(
         '-r', '--robot',
         default='cat', type=str,
-        help='robot structure name (default: cat, built on "envs/evogym/robot_files/")'
+        help='robot structure name (default: cat, built on "envs/evogym/robot_files/", if "default", load default robot of task)'
     )
 
     parser.add_argument(

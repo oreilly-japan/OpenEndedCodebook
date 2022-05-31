@@ -31,8 +31,7 @@ def main():
     initialize_experiment(args.name, save_path, args)
 
 
-    maze_env_file = os.path.join(ENV_DIR, 'maze_files', f'{args.task}.txt')
-    maze_env = MazeEnvironment.read_environment(maze_env_file)
+    maze_env = MazeEnvironment.read_environment(ROOT_DIR, args.task)
 
 
     substrate = Substrate()

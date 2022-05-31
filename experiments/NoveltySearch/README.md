@@ -52,7 +52,7 @@ $python run_evogym.py
 | :---          | :---:   | :---:           | :---    |
 | --name        | -n      | "{task}_{robot}"| experiment name |
 | --task        | -t      | Walker-v0       | evogym environment id |
-| --robot       | -r      | cat             | robot structure name <br> built on "envs/evogym/robot_files/" |
+| --robot       | -r      | cat             | robot structure name <br> built on "envs/evogym/robot_files/" <br> if "default", load default robot of task |
 | --pop-size    | -p      | 200             | population size of NEAT |
 | --generation  | -g      | 500             | iterations of NEAT |
 | --ns-threshold|         | 0.1             | initial threshold to add to novelty archive |
@@ -89,7 +89,7 @@ $python run_evogym_hyper.py
 | :---          | :---:   | :---:           | :---    |
 | --name        | -n      | "{task}_{robot}"| experiment name |
 | --task        | -t      | Walker-v0       | evogym environment id |
-| --robot       | -r      | cat             | robot structure name <br> built on "envs/evogym/robot_files/" |
+| --robot       | -r      | cat             | robot structure name <br> built on "envs/evogym/robot_files/" <br> if "default", load default robot of task |
 | --pop-size    | -p      | 200             | population size of NEAT |
 | --generation  | -g      | 500             | iterations of NEAT |
 | --ns-threshold|         | 0.1             | initial threshold to add to novelty archive |

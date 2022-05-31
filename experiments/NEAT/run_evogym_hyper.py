@@ -33,8 +33,7 @@ def main():
     initialize_experiment(args.name, save_path, args)
 
 
-    robot_file = os.path.join(ENV_DIR, 'robot_files', f'{args.robot}.txt')
-    structure = load_robot(robot_file)
+    structure = load_robot(ROOT_DIR, args.robot, task=args.task)
 
 
     substrate = Substrate(args.task, structure[0])

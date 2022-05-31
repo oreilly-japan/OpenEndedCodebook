@@ -1,3 +1,4 @@
+import os
 import gym
 import numpy as np
 import multiprocessing.pool
@@ -30,12 +31,20 @@ def make_vec_envs(env_id, robot, seed, num_processes, allow_early_resets=True, v
 
 from evogym import is_connected, has_actuator, get_full_connectivity
 
-def load_robot(robot_file):
+def load_robot(ROOT_DIR, robot, task=None):
+
+    if robot=='default':
+        robot = task
+        robot_file = os.path.join(ROOT_DIR, 'envs', 'evogym', 'robot_files', f'{robot}.txt')
+        assert os.path.exists(robot_file), f'defalt robot is not set on the task {task}'
+    else:
+        robot_file = os.path.join(ROOT_DIR, 'envs', 'evogym', 'robot_files', f'{robot}.txt')
+
     robot = np.loadtxt(robot_file)
     assert is_connected(robot), f'robot {args.robot} is not fully connected'
     assert has_actuator(robot), f'robot {args.robot} have not actuator block'
 
     connectivity = get_full_connectivity(robot)
     structure = (robot, connectivity)
-    
+
     return structure
