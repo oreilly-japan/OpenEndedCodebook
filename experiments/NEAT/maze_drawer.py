@@ -83,7 +83,7 @@ class DrawReporter(BaseReporter):
 
         line_best = self.ax.plot(self.best_path[:,0], self.best_path[:,1], linewidth=3, c='b', alpha=0.7)
 
-        filename = os.path.join(self.save_path,f'{self.generation}.jpg')
+        filename = os.path.join(self.save_path, f'{self.generation}.jpg')
         plt.savefig(filename, bbox_inches='tight')
 
         if not self.no_plot:

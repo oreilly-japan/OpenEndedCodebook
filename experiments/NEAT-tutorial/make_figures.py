@@ -91,8 +91,8 @@ def draw_network(genome_key, genome_file, config, figure_file):
     fig,ax = plt.subplots(figsize=(network_width*1.5, network_height))
     ax.set_xlim([-(network_width-1)/2*1.5, (network_width-1)/2*1.5])
     ax.set_ylim([-(network_height-1)-0.2, 0.2])
-    try:
-        nx.draw_networkx(G, position, ax=ax,
+
+    nx.draw_networkx(G, position, ax=ax,
         node_color=[node['color'] for node in G.nodes.values()],
         node_size=[node['node_size'] for node in G.nodes.values()],
         node_shape='o',
@@ -102,9 +102,6 @@ def draw_network(genome_key, genome_file, config, figure_file):
         labels={node[0]: node[1]['label'] for node in nodes.values()},
         font_size=8,
         font_color=[1.0,1.0,1.0])
-    except:
-        print(genome_orig)
-        print(genome)
 
     ax.axis("off")
     plt.savefig(figure_file, bbox_inches='tight')
