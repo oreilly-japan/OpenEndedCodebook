@@ -20,6 +20,8 @@ class DefaultReproduction(DefaultReproduction):
                     g = genome_type(key)
                     g.configure_new(genome_config)
 
+            setattr(g, 'parent1', -1)
+            setattr(g, 'parent2', -1)
             new_genomes[key] = g
             self.ancestors[key] = tuple()
 
@@ -135,6 +137,8 @@ class DefaultReproduction(DefaultReproduction):
                         child.configure_crossover(parent1, parent2, config.genome_config)
                         child.mutate(config.genome_config)
 
+                setattr(child, 'parent1', parent1_id)
+                setattr(child, 'parent2', parent2_id)
                 new_population[gid] = child
                 self.ancestors[gid] = (parent1_id, parent2_id)
 

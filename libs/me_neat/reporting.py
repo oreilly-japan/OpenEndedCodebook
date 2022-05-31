@@ -52,9 +52,9 @@ class SaveResultReporter(BaseReporter):
     def __init__(self, save_path, bd_names):
         self.save_path = save_path
         self.history_pop_file = os.path.join(self.save_path, 'history_pop.csv')
-        self.history_pop_header = ['generation', 'id'] + bd_names + ['fitness']
+        self.history_pop_header = ['generation', 'id'] + bd_names + ['fitness', 'parent']
         self.history_reward_file = os.path.join(self.save_path, 'history_reward.csv')
-        self.history_reward_header = ['generation', 'id'] + bd_names + ['fitness']
+        self.history_reward_header = ['generation', 'id'] + bd_names + ['fitness', 'parent']
         self.generation = None
 
         self.genome_path = os.path.join(self.save_path, 'genome')
@@ -78,7 +78,8 @@ class SaveResultReporter(BaseReporter):
                 items = {
                     'generation': self.generation,
                     'id': key,
-                    'fitness': genome.fitness
+                    'fitness': genome.fitness,
+                    'parent': genome.parent
                 }
                 items.update(**genome.bd)
 
@@ -87,7 +88,8 @@ class SaveResultReporter(BaseReporter):
         items = {
             'generation': self.generation,
             'id': best_genome.key,
-            'fitness': best_genome.fitness
+            'fitness': best_genome.fitness,
+            'parent': best_genome.parent
         }
         items.update(**best_genome.bd)
         with open(self.history_reward_file, 'a', newline='') as f:

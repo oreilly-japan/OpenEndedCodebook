@@ -12,9 +12,9 @@ class SaveResultReporter(BaseReporter):
 
         self.save_path = save_path
         self.history_pop_file = os.path.join(self.save_path, 'history_pop.csv')
-        self.history_pop_header = ['generation', 'id', 'reward']
+        self.history_pop_header = ['generation', 'id', 'reward', 'species', 'parent1', 'parent2']
         self.history_reward_file = os.path.join(self.save_path, 'history_reward.csv')
-        self.history_reward_header = ['generation', 'id', 'reward']
+        self.history_reward_header = ['generation', 'id', 'reward', 'species', 'parent1', 'parent2']
 
         self.genome_path = os.path.join(self.save_path, 'genome')
         os.makedirs(self.genome_path, exist_ok=True)
@@ -39,6 +39,9 @@ class SaveResultReporter(BaseReporter):
                     'generation': self.generation,
                     'id': genome.key,
                     'reward': genome.fitness,
+                    'species': species.get_species_id(genome.key),
+                    'parent1': genome.parent1,
+                    'parent2': genome.parent2
                 }
                 writer.writerow(items)
 
@@ -46,7 +49,10 @@ class SaveResultReporter(BaseReporter):
         items = {
             'generation': self.generation,
             'id': current_reward.key,
-            'reward': current_reward.fitness
+            'reward': current_reward.fitness,
+            'species': species.get_species_id(current_reward.key),
+            'parent1': current_reward.parent1,
+            'parent2': current_reward.parent2
         }
         with open(self.history_reward_file, 'a', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.history_reward_header)
