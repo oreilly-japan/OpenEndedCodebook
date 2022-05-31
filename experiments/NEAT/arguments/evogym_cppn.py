@@ -46,11 +46,6 @@ def get_args():
     )
 
     parser.add_argument(
-        '-c', '--num-cores',
-        default=1, type=int,
-        help='number of parallel evaluation processes (default: 1)'
-    )
-    parser.add_argument(
         '--no-view',
         action='store_true', default=False,
         help='not open simulation window of best robot (default: False)'

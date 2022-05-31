@@ -34,7 +34,7 @@ def main():
     expt_args = load_experiment(expt_path)
 
 
-    structure = load_robot(ROOT_DIR, args.robot, task=args.task)
+    structure = load_robot(ROOT_DIR, expt_args['robot'], task=expt_args['task'])
 
 
     decode_function = neat_cppn.FeedForwardNetwork.create

@@ -170,7 +170,7 @@ class MazeEnvironment:
         return self.exit_found
 
     @staticmethod
-    def read_environment(file_path, maze_kwargs={}, agent_kwargs={}):
+    def read_environment(ROOT_DIR, maze_name, maze_kwargs={}, agent_kwargs={}):
         """
         The function to read maze environment configuration from provided
         file.
@@ -179,10 +179,12 @@ class MazeEnvironment:
         Returns:
             The initialized maze environment.
         """
+        maze_file = os.path.join(ROOT_DIR, 'envs', 'maze', 'maze_files', f'{maze_name}.txt')
+
         index = 0
         walls = []
         maze_agent, maze_exit = None, None
-        with open(file_path, 'r') as file:
+        with open(maze_file, 'r') as file:
             for line in file.readlines():
                 line = line.strip()
                 if len(line) == 0:
