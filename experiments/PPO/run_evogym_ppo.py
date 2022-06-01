@@ -62,7 +62,8 @@ def main():
         simulator = EvogymControllerSimulatorPPO(
             env_id=args.task,
             structure=structure,
-            load_path=controller_path)
+            load_path=controller_path,
+            deterministic=args.deterministic)
 
         simulate_process = SimulateProcess(
             simulator=simulator,

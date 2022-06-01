@@ -35,12 +35,12 @@ def get_args():
     )
 
     parser.add_argument(
-        '-l', '--ppo-iters',
+        '-i', '--ppo-iters',
         default=5, type=int,
         help='learning iterations of PPO algo. on the more complex task, need more. (default: 5)'
     )
     parser.add_argument(
-        '--deterministic',
+        '-d', '--deterministic',
         action='store_true', default=False,
         help='evaluate robot on deterministic action (default: False)'
     )
@@ -84,7 +84,7 @@ def get_gif_args():
         help='input id, make gif for the only specified robot (usage: "-s {id}")'
     )
     parser.add_argument(
-        '--deterministic',
+        '-d', '--deterministic',
         action='store_true', default=False,
         help='robot act deterministic (default: False)'
     )

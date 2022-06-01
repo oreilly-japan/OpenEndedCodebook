@@ -11,7 +11,7 @@ $python run_evogym.py
 | :---            | :---:   | :---:           | :---    |
 | --name          | -n      | "{task}_{robot}"| experiment name |
 | --task          | -t      | Walker-v0       | evogym environment id |
-| --robot         | -r      | default         | robot structure name <br> built on "envs/evogym/robot_files/" <br> if "default", load default robot of task |
+| --robot         | -r      | default         | robot structure name <br> built on "envs/evogym/robot_files/" <br> if "default", load default robot for the task |
 | --num-processes | -p      | 4               | how many training CPU processes to use |
 | --steps         | -s      | 128             | num steps to use in PPO |
 | --num-mini-batch| -b      | 4               | number of batches for ppo |
