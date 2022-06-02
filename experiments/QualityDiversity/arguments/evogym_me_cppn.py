@@ -73,26 +73,55 @@ def get_args():
     return args
 
 
-def get_gif_args():
+def get_figure_args():
     parser = argparse.ArgumentParser(
-        description='make robot gifs'
+        description='make robot figures'
     )
 
     parser.add_argument(
         'name',
         type=str,
-        help='name of experiment for making gifs'
-    )
-    parser.add_argument(
-        '-r', '--resolution',
-        default=0.2, type=float,
-        help='image resolution ratio (default: 0.2 -> 256:144)'
+        help='name of experiment for making figures'
     )
     parser.add_argument(
         '-s', '--specified',
         type=int,
-        help='input id, make gif for the only specified robot (usage: "-s {id}")'
+        help='input id, make figure for the only specified robot (usage: "-s {id}")'
     )
+
+    parser.add_argument(
+        '-st', '--save-type',
+        type=str, default='gif',
+        help='file type (default: gif, choose from [gif, jpg])'
+    )
+
+    parser.add_argument(
+        '-r', '--resolution-ratio',
+        default=0.2, type=float,
+        help='gif resolution ratio (default: 0.2 -> 256:144)'
+    )
+
+    parser.add_argument(
+        '-i', '--interval',
+        type=str, default='timestep',
+        help='in case of save type is jpg, type of interval for robot drawing (default: timestep, choose from [timestep, distance, hybrid])'
+    )
+    parser.add_argument(
+        '-ti', '--timestep-interval',
+        type=int, default=80,
+        help='timestep interval for robot drawing (default: 80, if interval is hybrid, it should be about 40)'
+    )
+    parser.add_argument(
+        '-di', '--distance-interval',
+        type=float, default=0.8,
+        help='distance interval for robot drawing'
+    )
+    parser.add_argument(
+        '--display-timestep',
+        action='store_true', default=False,
+        help='display timestep above robot'
+    )
+
     parser.add_argument(
         '-d', '--deterministic',
         action='store_true', default=False,
@@ -107,7 +136,7 @@ def get_gif_args():
     parser.add_argument(
         '--not-overwrite',
         action='store_true', default=False,
-        help='skip process if already gif exists (default: False)'
+        help='skip process if already figure exists (default: False)'
     )
     parser.add_argument(
         '--no-multi',
