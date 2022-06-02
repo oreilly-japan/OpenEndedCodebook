@@ -115,8 +115,8 @@ def get_figure_args():
     )
     parser.add_argument(
         '-rs', '--resolution-scale',
-        type=float, default=30.0,
-        help='jpg resolution scale. <br> when output monochrome image, try this argument change. (default: 30.0)'
+        type=float, default=32.0,
+        help='jpg resolution scale. <br> when output monochrome image, try this argument change. (default: 32.0)'
     )
     parser.add_argument(
         '-ti', '--timestep-interval',

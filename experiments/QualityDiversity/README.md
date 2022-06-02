@@ -33,7 +33,7 @@ $python make_figures_cppn.py {experiment name}
 | --save-type         | -st     | gif     | file type (choose from [gif, jpg])
 | --resolution-ratio  | -r      | 0.2     | gif resolution ratio (0.2 -> (256,144)) |
 | --interval          | -i      | timestep| in case of save type is jpg, type of interval for robot drawing <br>(choose from [timestep, distance, hybrid]) |
-| --resolution-scale  | -rs     | 30.0    | jpg resolution scale <br> when output monochrome image, try this argument change. |
+| --resolution-scale  | -rs     | 32.0    | jpg resolution scale <br> when output monochrome image, try this argument change. |
 | --timestep-interval | -ti     | 80      | timestep interval for robot drawing <br>(if interval is hybrid, it should be about 40) |
 | --distance-interval | -di     | 0.8     | distance interval for robot drawing |
 | --display-timestep  |         | *false* | display timestep above robot |
