@@ -55,21 +55,26 @@ $python run_evogym.py
 | --no-view   |         | *false*         | not open simulation window of best robot |
 
 
-### make gif
-after run_evogym, make gif file for each of all robots written in reward history file.
-output to "./out/evogym_neat/{expt name}/gif/"
+### make figure
+after run_evogym, make {gif, jpg} file for each of all genomes written in reward history file.
+output to "./out/evogym_neat/{expt name}/{gif, jpg}/"
 ```
-$python make_gifs.py {experiment name}
+$python make_figures.py {experiment name}
 ```
 #### options:
-| option          | abbrev  | default | detail  |
-| :---            | :---:   | :---:   | :---    |
-|                 |         |         | name of experiment for making gifs |
-| --resolution    | -r      | 0.2     | image resolution ratio (0.2 -> (256,144)) |
-| --specified     | -s      |         | input id, make gif for the only specified robot |
-| --num-cores     | -c      | 1       | number of parallel making processes |
-| --not-overwrite |         | *false* | skip process if already gif exists |
-| --no-multi      |         | *false* | do without using multiprocessing. if error occur, try this option. |
+| option              | abbrev  | default | detail  |
+| :---                | :---:   | :---:   | :---    |
+|                     |         |         | name of experiment for making figures |
+| --specified         | -s      |         | input id, make figure for the only specified genome |
+| --save-type         | -st     | gif     | file type (choose from [gif, jpg])
+| --resolution-ratio  | -r      | 0.2     | gif resolution ratio (0.2 -> (256,144)) |
+| --interval          | -i      | timestep| in case of save type is jpg, type of interval for robot drawing <br>(choose from [timestep, distance, hybrid]) |
+| --timestep-interval | -ti     | 80      | timestep interval for robot drawing <br>(if interval is hybrid, it should be about 40) |
+| --distance-interval | -di     | 0.8     | distance interval for robot drawing |
+| --display-timestep  |         | *false* | display timestep above robot |
+| --num-cores         | -c      | 1       | number of parallel making processes |
+| --not-overwrite     |         | *false* | skip process if already figure exists |
+| --no-multi          |         | *false* | do without using multiprocessing. if error occur, try this option. |
 
 
 ## Evogym Hyper-NEAT
@@ -91,21 +96,26 @@ $python run_evogym_hyper.py
 | --no-view   |         | *false*         | not open simulation window of best robot |
 
 
-### make gif
-after run_evogym_hyper, make gif file for each of all robots written in reward history file.
-output to "./out/evogym_hyper/{expt name}/gif/"
+### make figure
+after run_evogym_hyper, make {gif, jpg} file for each of all genomes written in reward history file.
+output to "./out/evogym_hyper/{expt name}/{gif, jpg}/"
 ```
-$python make_gifs_hyper.py {experiment name}
+$python make_figure_hyper.py {experiment name}
 ```
 #### options:
-| option          | abbrev  | default | detail  |
-| :---            | :---:   | :---:   | :---    |
-|                 |         |         | name of experiment for making gifs |
-| --resolution    | -r      | 0.2     | image resolution ratio (0.2 -> (256,144)) |
-| --specified     | -s      |         | input id, make gif for the only specified robot |
-| --num-cores     | -c      | 1       | number of parallel making processes |
-| --not-overwrite |         | *false* | skip process if already gif exists |
-| --no-multi      |         | *false* | do without using multiprocessing. if error occur, try this option. |
+| option              | abbrev  | default | detail  |
+| :---                | :---:   | :---:   | :---    |
+|                     |         |         | name of experiment for making figures |
+| --specified         | -s      |         | input id, make figure for the only specified genome |
+| --save-type         | -st     | gif     | file type (choose from [gif, jpg])
+| --resolution-ratio  | -r      | 0.2     | gif resolution ratio (0.2 -> (256,144)) |
+| --interval          | -i      | timestep| in case of save type is jpg, type of interval for robot drawing <br>(choose from [timestep, distance, hybrid]) |
+| --timestep-interval | -ti     | 80      | timestep interval for robot drawing <br>(if interval is hybrid, it should be about 40) |
+| --distance-interval | -di     | 0.8     | distance interval for robot drawing |
+| --display-timestep  |         | *false* | display timestep above robot |
+| --num-cores         | -c      | 1       | number of parallel making processes |
+| --not-overwrite     |         | *false* | skip process if already figure exists |
+| --no-multi          |         | *false* | do without using multiprocessing. if error occur, try this option. |
 
 
 ## Evogym Structure Evolution
@@ -126,19 +136,24 @@ $python run_evogym_cppn.py
 | --num-cores     | -c      | 1               | number of parallel evaluation processes |
 | --no-view       |         | *false*         | not open simulation window of best robot |
 
-### make gif
-after run_evogym_cppn, make gif file for each of all robots written in reward history file.
-output to "./out/evogym_cppn/{expt name}/gif/"
+### make figure
+after run_evogym_cppn, make {gif, jpg} file for each of all robots written in reward history file.
+output to "./out/evogym_cppn/{expt name}/{gif, jpg}/"
 ```
-$python make_gifs_cppn.py {experiment name}
+$python make_figures_cppn.py {experiment name}
 ```
 #### options:
-| option          | abbrev  | default | detail  |
-| :---            | :---:   | :---:   | :---    |
-|                 |         |         | name of experiment for making gifs |
-| --resolution    | -r      | 0.2     | image resolution ratio (0.2 -> (256,144)) |
-| --specified     | -s      |         | input id, make gif for the only specified robot |
-| --deterministic | -d      | *false* | robot act deterministically |
-| --num-cores     | -c      | 1       | number of parallel making processes |
-| --not-overwrite |         | *false* | skip process if already gif exists |
-| --no-multi      |         | *false* | do without using multiprocessing. if error occur, try this option. |
+| option              | abbrev  | default | detail  |
+| :---                | :---:   | :---:   | :---    |
+|                     |         |         | name of experiment for making figures |
+| --specified         | -s      |         | input id, make figure for the only specified robot |
+| --save-type         | -st     | gif     | file type (choose from [gif, jpg])
+| --resolution-ratio  | -r      | 0.2     | gif resolution ratio (0.2 -> (256,144)) |
+| --interval          | -i      | timestep| in case of save type is jpg, type of interval for robot drawing <br>(choose from [timestep, distance, hybrid]) |
+| --timestep-interval | -ti     | 80      | timestep interval for robot drawing <br>(if interval is hybrid, it should be about 40) |
+| --distance-interval | -di     | 0.8     | distance interval for robot drawing |
+| --display-timestep  |         | *false* | display timestep above robot |
+| --deterministic     | -d      | *false* | robot act deterministically |
+| --num-cores         | -c      | 1       | number of parallel making processes |
+| --not-overwrite     |         | *false* | skip process if already figure exists |
+| --no-multi          |         | *false* | do without using multiprocessing. if error occur, try this option. |

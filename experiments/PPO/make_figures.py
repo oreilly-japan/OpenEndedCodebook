@@ -17,17 +17,15 @@ from experiment_utils import load_experiment
 ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'evogym')
 sys.path.append(ENV_DIR)
 from gym_utils import load_robot
-from make_gif_funcs import save_controller_ppo_gif, pool_init_func
+from figure_drawer import EvogymControllerDrawerPPO, pool_init_func
 
 
-from arguments.evogym_ppo import get_gif_args
+from arguments.evogym_ppo import get_figure_args
 
 
 def main():
 
-    args = get_gif_args()
-
-    resolution = (1280*args.resolution, 720*args.resolution)
+    args = get_figure_args()
 
     expt_path = os.path.join(CURR_DIR, 'out', 'evogym_ppo', args.name)
     expt_args = load_experiment(expt_path)
@@ -36,15 +34,37 @@ def main():
     structure = load_robot(ROOT_DIR, expt_args['robot'], task=expt_args['task'])
 
 
-    gif_path = os.path.join(expt_path, 'gif')
-    os.makedirs(gif_path, exist_ok=True)
-
     controller_path = os.path.join(expt_path, 'controller')
-
     if args.specified is not None:
         controller_files = [os.path.join(controller_path, f'{args.specified}.zip')]
     else:
         controller_files = glob(os.path.join(controller_path, '*.zip'))
+
+
+    figure_path = os.path.join(expt_path, 'figure')
+    draw_kwargs = {}
+    if args.save_type=='gif':
+        draw_kwargs = {
+            'resolution': (1280*args.resolution_ratio, 720*args.resolution_ratio),
+            'deterministic': expt_args['deterministic']
+        }
+    elif args.save_type=='jpg':
+        draw_kwargs = {
+            'interval': args.interval,
+            'resolution_scale': 30,
+            'timestep_interval': args.timestep_interval,
+            'distance_interval': args.distance_interval,
+            'display_timestep': args.display_timestep,
+            'deterministic': expt_args['deterministic']
+        }
+    drawer = EvogymControllerDrawerPPO(
+        save_path=figure_path,
+        env_id=expt_args['task'],
+        structure=structure,
+        overwrite=not args.not_overwrite,
+        save_type=args.save_type, **draw_kwargs)
+
+    draw_function = drawer.draw
 
 
     if not args.no_multi and args.specified is None:
@@ -54,18 +74,8 @@ def main():
         jobs = []
 
         for controller_file in controller_files:
-
             iter = int(os.path.splitext(os.path.basename(controller_file))[0])
-            gif_file = os.path.join(gif_path, f'{iter}.gif')
-
-            if os.path.exists(gif_file) and args.not_overwrite:
-                continue
-
-            func_args = (expt_args['task'], structure, iter, controller_file, gif_file, resolution)
-            func_kwargs = {
-                'deterministic': expt_args['deterministic'],
-            }
-            jobs.append(pool.apply_async(save_controller_ppo_gif, args=func_args, kwds=func_kwargs))
+            jobs.append(pool.apply_async(draw_function, args=(iter, controller_file)))
 
         for job in jobs:
             job.get(timeout=None)
@@ -77,18 +87,8 @@ def main():
         lock = pool_init_func(lock)
 
         for controller_file in controller_files:
-
             iter = int(os.path.splitext(os.path.basename(controller_file))[0])
-            gif_file = os.path.join(gif_path, f'{iter}.gif')
-
-            if os.path.exists(gif_file) and args.not_overwrite:
-                continue
-
-            func_args = (expt_args['task'], structure, iter, controller_file, gif_file, resolution)
-            func_kwargs = {
-                'deterministic': expt_args['deterministic'],
-            }
-            save_controller_ppo_gif(*func_args, **func_kwargs)
+            draw_function(iter, controller_file)
 
 if __name__=='__main__':
     main()
