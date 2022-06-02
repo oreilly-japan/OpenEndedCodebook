@@ -87,7 +87,7 @@ def make_gif(filename, env, viewer, controller, controller_type, resolution=(256
     return
 
 
-def make_jpg(filename, env, viewer, controller, controller_type, padding, interval='timestep', resolution_scale=30, timestep_interval=40, distance_interval=0.8, display_timestep=True, deterministic=True):
+def make_jpg(filename, env, viewer, controller, controller_type, padding, interval='timestep', resolution_scale=50, timestep_interval=80, distance_interval=0.8, display_timestep=False, deterministic=True):
     assert controller_type in ['NEAT', 'PPO']
     assert interval in ['timestep', 'distance', 'hybrid']
 

@@ -71,7 +71,7 @@ def main():
     elif args.save_type=='jpg':
         draw_kwargs = {
             'interval': args.interval,
-            'resolution_scale': 30,
+            'resolution_scale': args.resolution_scale,
             'timestep_interval': args.timestep_interval,
             'distance_interval': args.distance_interval,
             'display_timestep': args.display_timestep,

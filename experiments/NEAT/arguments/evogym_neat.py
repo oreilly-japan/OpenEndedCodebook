@@ -93,6 +93,11 @@ def get_figure_args():
         help='in case of save type is jpg, type of interval for robot drawing (default: timestep, choose from [timestep, distance, hybrid])'
     )
     parser.add_argument(
+        '-rs', '--resolution-scale',
+        type=float, default=30.0,
+        help='jpg resolution scale. <br> when output monochrome image, try this argument change. (default: 30.0)'
+    )
+    parser.add_argument(
         '-ti', '--timestep-interval',
         type=int, default=80,
         help='timestep interval for robot drawing (default: 80, if interval is hybrid, it should be about 40)'
