@@ -53,6 +53,7 @@ def main():
 
     pop = neat_cppn.Population(config)
 
+    figure_path = os.path.join(save_path, 'figure')
     reporters = [
         neat_cppn.SaveResultReporter(save_path),
         neat_cppn.StdOutReporter(True),
@@ -61,11 +62,15 @@ def main():
         pop.add_reporter(reporter)
 
 
-    best_genome = pop.run(fitness_function=parallel.evaluate, n=args.generation)
+    try:
+        best_genome = pop.run(fitness_function=parallel.evaluate, n=args.generation)
 
-    print()
-    print('best circuit result:')
-    evaluator.print_result(decode_function(best_genome, config.genome_config))
+        print()
+        print('best circuit result:')
+        evaluator.print_result(decode_function(best_genome, config.genome_config))
+
+    finally:
+        neat_cppn.figure.make_species(save_path)
 
 if __name__=='__main__':
     main()

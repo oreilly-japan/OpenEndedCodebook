@@ -71,7 +71,10 @@ def main():
         pop.add_reporter(reporter)
 
 
-    pop.run(fitness_function=parallel.evaluate, n=args.generation)
+    try:
+        pop.run(fitness_function=parallel.evaluate, n=args.generation)
+    finally:
+        neat_cppn.figure.make_species(save_path)
 
 if __name__=='__main__':
     main()
