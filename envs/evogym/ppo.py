@@ -65,4 +65,4 @@ def run_ppo(env_id, structure, train_iters, save_file, config=None, evaluation=T
         if save_iter is not None:
             model.save(os.path.join(save_file, str(i+1)), include=['env'])
 
-    return
+    return max_reward
