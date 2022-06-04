@@ -178,7 +178,7 @@ def set_connection_weight(genome, config, input_key, output_key, weight):
 
 def activate_detail(NN, inputs):
     print(f'OPERATOR: input {inputs[0]} to neural network.')
-    print('-----NETWORK STATES-----')
+    print('----------NODE STATES----------')
 
     values = {}
     for node_key, value in zip(NN.input_nodes, inputs):
