@@ -27,6 +27,9 @@ def draw_network(genome_orig, config, fig, ax):
     network_height = 1
     network_width = len(config.input_keys)
 
+    layers = feed_forward_layers(config.input_keys, config.output_keys, genome.connections.keys())
+    valid_nodes = config.input_keys + sum(map(list,layers), [])
+
     for i,key in enumerate(config.input_keys):
         name = f'{key}'
         nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name})
@@ -34,11 +37,13 @@ def draw_network(genome_orig, config, fig, ax):
         position[name] = (pos_x, 0)
 
     for i,key in enumerate(config.output_keys):
+        if key not in valid_nodes:
+            continue
         name = f'{key}'
         nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name})
 
     for key,node in genome.nodes.items():
-        if key in nodes:
+        if key in nodes or key not in valid_nodes:
             continue
         name = f'{key}'
         nodes[key] =  (name, {'color': [0.4,0.4,0.4], 'node_size': 300, 'label': name})
@@ -46,6 +51,8 @@ def draw_network(genome_orig, config, fig, ax):
 
     conns = {}
     for (key_i, key_o), conn in genome.connections.items():
+        if key_i not in valid_nodes or key_o not in valid_nodes:
+            continue
         weight = conn.weight * genome.nodes[key_o].response
         if weight > 0:
             color = [0.9, 0.3, 0.1]
@@ -56,7 +63,6 @@ def draw_network(genome_orig, config, fig, ax):
             {'color': color, 'weight': weight, 'arrowsize': weight*4})
 
 
-    layers = feed_forward_layers(config.input_keys, config.output_keys, genome.connections.keys())
     for h_i,layer in enumerate(layers):
         layer_size = len(layer)
         for w_i,node in enumerate(layer):
@@ -178,7 +184,7 @@ def set_connection_weight(genome, config, input_key, output_key, weight):
 
 def activate_detail(NN, inputs):
     print(f'OPERATOR: input {inputs[0]} to neural network.')
-    print('----------NODE STATES----------')
+    print('----------NODES STATE----------')
 
     values = {}
     for node_key, value in zip(NN.input_nodes, inputs):
