@@ -36,37 +36,57 @@ def draw_network(genome_key, genome_file, config, figure_file):
     network_height = 1
     network_width = len(config.input_keys)
 
+    layers = feed_forward_layers(config.input_keys, config.output_keys, genome.connections.keys())
+    valid_nodes = config.input_keys + sum(map(list,layers), [])
 
     for i,key in enumerate(config.input_keys):
         name = f'in{-key-1}'
-        nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name})
+        nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name, 'edgecolor': [0.1,0.1,0.1], 'linewidth': 0})
         pos_x = (i - (len(config.input_keys)-1)/2)
         position[name] = (pos_x, 0)
 
     for i,key in enumerate(config.output_keys):
+        if key not in valid_nodes:
+            continue
         name = f'out{key}'
-        nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name})
+        node = genome.nodes[key]
+        if node.bias>0:
+            color = [0.9, 0.5, 0.2]
+        else:
+            color = [0.2, 0.5, 0.9]
+        width = np.log(abs(node.bias)*15+1)
+        nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name, 'edgecolor': color, 'linewidth': width})
 
     for key,node in genome.nodes.items():
-        if key in nodes:
+        if key in nodes or key not in valid_nodes:
             continue
         name = f'{key}'
-        nodes[key] =  (name, {'color': [0.4,0.4,0.4], 'node_size': 150, 'label': ''})
+        node = genome.nodes[key]
+        if node.bias>0:
+            color = [0.9, 0.5, 0.2]
+        else:
+            color = [0.2, 0.5, 0.9]
+        width = np.log(abs(node.bias)*15+1)
+        nodes[key] =  (name, {'color': [0.3,0.3,0.3], 'node_size': 150, 'label': '', 'edgecolor': color, 'linewidth': width})
 
 
     conns = {}
     for (key_i, key_o), conn in genome.connections.items():
+        if key_i not in valid_nodes or key_o not in valid_nodes:
+            continue
         weight = conn.weight * genome.nodes[key_o].response
-        if weight > 0:
-            color = [0.9, 0.3, 0.1]
+        if weight==0:
+            continue
+        elif weight > 0:
+            color = [0.9, 0.5, 0.2]
         else:
-            color = [0.1, 0.4, 0.9]
-        weight = np.log(abs(weight)+1)+0.3
+            color = [0.2, 0.5, 0.9]
+        weight = np.log(abs(weight)*15+1)#+0.3
         conns[(key_i, key_o)] = (nodes[key_i][0], nodes[key_o][0],
             {'color': color, 'weight': weight, 'arrowsize': weight*4})
 
 
-    layers = feed_forward_layers(config.input_keys, config.output_keys, genome.connections.keys())
+    # layers = feed_forward_layers(config.input_keys, config.output_keys, genome.connections.keys())
     for h_i,layer in enumerate(layers):
         layer_size = len(layer)
         for w_i,node in enumerate(layer):
@@ -85,16 +105,34 @@ def draw_network(genome_key, genome_file, config, figure_file):
     ax.set_xlim([-(network_width-1)/2*1.5, (network_width-1)/2*1.5])
     ax.set_ylim([-(network_height-1)-0.2, 0.2])
 
-    nx.draw_networkx(G, position, ax=ax,
+    nx.draw_networkx_nodes(G, position, ax=ax,
         node_color=[node['color'] for node in G.nodes.values()],
         node_size=[node['node_size'] for node in G.nodes.values()],
-        edge_color=[edge['color'] for edge in G.edges.values()],
-        width=[edge['weight'] for edge in G.edges.values()],
-        arrowsize=[edge['arrowsize'] for edge in G.edges.values()],
-        connectionstyle='arc3,rad=0.2',
+        linewidths=[node['linewidth'] for node in G.nodes.values()],
+        edgecolors=[node['edgecolor'] for node in G.nodes.values()])
+    nx.draw_networkx_labels(G, position, ax=ax,
         labels={node[0]: node[1]['label'] for node in nodes.values()},
         font_size=8,
         font_color=[1.0,1.0,1.0])
+    nx.draw_networkx_edges(G, position, ax=ax,
+        width=[edge['weight'] for edge in G.edges.values()],
+        edge_color=[edge['color'] for edge in G.edges.values()],
+        arrowsize=[edge['arrowsize'] for edge in G.edges.values()],
+        connectionstyle='arc3,rad=0.2',
+        alpha=0.6)
+
+    # nx.draw_networkx(G, position, ax=ax,
+        # node_color=[node['color'] for node in G.nodes.values()],
+        # node_size=[node['node_size'] for node in G.nodes.values()],
+        # linewidths=[node['linewidth'] for node in G.nodes.values()],
+        # edgecolors=[node['edgecolor'] for node in G.nodes.values()],
+        # edge_color=[edge['color'] for edge in G.edges.values()],
+        # width=[edge['weight'] for edge in G.edges.values()],
+        # arrowsize=[edge['arrowsize'] for edge in G.edges.values()],
+        # connectionstyle='arc3,rad=0.2',
+        # labels={node[0]: node[1]['label'] for node in nodes.values()},
+        # font_size=8,
+        # font_color=[1.0,1.0,1.0])
 
     ax.axis("off")
     plt.savefig(figure_file, bbox_inches='tight')

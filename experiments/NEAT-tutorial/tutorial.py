@@ -32,7 +32,7 @@ def draw_network(genome_orig, config, fig, ax):
 
     for i,key in enumerate(config.input_keys):
         name = f'{key}'
-        nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name})
+        nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name, 'edgecolor': [0.1,0.1,0.1], 'linewidth': 0})
         pos_x = (i - (len(config.input_keys)-1)/2)
         position[name] = (pos_x, 0)
 
@@ -40,13 +40,25 @@ def draw_network(genome_orig, config, fig, ax):
         if key not in valid_nodes:
             continue
         name = f'{key}'
-        nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name})
+        node = genome.nodes[key]
+        if node.bias>0:
+            color = [0.9, 0.5, 0.2]
+        else:
+            color = [0.2, 0.5, 0.9]
+        width = np.log(abs(node.bias)*15+1)
+        nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name, 'edgecolor': color, 'linewidth': width})
 
     for key,node in genome.nodes.items():
         if key in nodes or key not in valid_nodes:
             continue
         name = f'{key}'
-        nodes[key] =  (name, {'color': [0.4,0.4,0.4], 'node_size': 300, 'label': name})
+        node = genome.nodes[key]
+        if node.bias>0:
+            color = [0.9, 0.5, 0.2]
+        else:
+            color = [0.2, 0.5, 0.9]
+        width = np.log(abs(node.bias)*15+1)
+        nodes[key] =  (name, {'color': [0.3,0.3,0.3], 'node_size': 300, 'label': name, 'edgecolor': color, 'linewidth': width})
 
 
     conns = {}
@@ -54,11 +66,13 @@ def draw_network(genome_orig, config, fig, ax):
         if key_i not in valid_nodes or key_o not in valid_nodes:
             continue
         weight = conn.weight * genome.nodes[key_o].response
-        if weight > 0:
-            color = [0.9, 0.3, 0.1]
+        if weight==0:
+            continue
+        elif weight > 0:
+            color = [0.9, 0.5, 0.2]
         else:
-            color = [0.1, 0.4, 0.9]
-        weight = np.log(abs(weight)*10+1)+0.3
+            color = [0.2, 0.5, 0.9]
+        weight = np.log(abs(weight)*15+1)
         conns[(key_i, key_o)] = (nodes[key_i][0], nodes[key_o][0],
             {'color': color, 'weight': weight, 'arrowsize': weight*4})
 
@@ -84,7 +98,9 @@ def draw_network(genome_orig, config, fig, ax):
 
     nx.draw_networkx_nodes(G, position, ax=ax,
         node_color=[node['color'] for node in G.nodes.values()],
-        node_size=[node['node_size'] for node in G.nodes.values()])
+        node_size=[node['node_size'] for node in G.nodes.values()],
+        linewidths=[node['linewidth'] for node in G.nodes.values()],
+        edgecolors=[node['edgecolor'] for node in G.nodes.values()])
     nx.draw_networkx_labels(G, position, ax=ax,
         labels={node[0]: node[1]['label'] for node in nodes.values()},
         font_size=8,
