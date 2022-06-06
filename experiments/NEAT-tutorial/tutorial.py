@@ -100,13 +100,25 @@ def draw_network(genome_orig, config, fig, ax):
 
 def plot_function(NN, fig, ax):
     ax.cla()
-    inputs = np.linspace(-5,5,101)
-    outputs = [NN.activate([inp])[0] for inp in inputs]
 
-    ax.set_xlabel('input')
-    ax.set_ylabel('output')
+    inputs = [[0,0], [0,1], [1,0], [1,1]]
 
-    ax.plot(inputs, outputs)
+    states = [activate_detail(NN, inp, print_=False) for inp in inputs]
+    nodes = [eval[0] for eval in  NN.node_evals if eval[0]>=0]
+
+    nodes_state = [[f'{state[node]: =.2f}' for state in states] for node in nodes]
+
+    col_labels = [f'[{inp1}, {inp2}]' for inp1,inp2 in inputs]
+    row_labels = list(map(lambda z: f'node {z}', nodes[:-1])) + ['output']
+
+    fig.set_figwidth(4)
+    fig.set_figheight((len(row_labels)+1)*0.20+0.5)
+
+    table = ax.table(cellText=nodes_state, colLabels=col_labels, rowLabels=row_labels, loc="center", cellLoc='center', in_layout=True)
+    for pos, cell in table.get_celld().items():
+        cell.set_width(0.2)
+    ax.axis('off')
+
 
 
 
@@ -182,35 +194,40 @@ def set_connection_weight(genome, config, input_key, output_key, weight):
     print(f'OPERATOR: set weight {weight} to connection between {input_key} and {output_key}.')
 
 
-def activate_detail(NN, inputs):
-    print(f'OPERATOR: input {inputs[0]} to neural network.')
-    print('----------NODES STATE----------')
+def activate_detail(NN, inputs, print_=True):
+    if print_:
+        print(f'OPERATOR: input [{inputs[0]}, {inputs[1]}] to neural network.')
+        print('----------NODES STATE----------')
 
     values = {}
     for node_key, value in zip(NN.input_nodes, inputs):
         values[node_key] = value
-        print(f'Input  Node {node_key: =2}: {value}')
+        if print_:
+            print(f'Input  Node {node_key: =2}: {value}')
 
     for node_key, act_func, agg_func, bias, response, links in NN.node_evals[:-1]:
-        print(f'Hidden Node {node_key: =2}: ', end='')
         node_inputs = []
         for i, w in links:
             node_inputs.append(values[i] * w)
         s = agg_func(node_inputs)
         values[node_key] = act_func(bias + response * s)
-        print(f'{values[node_key]: =.3f} <- ', end='')
-        print('sigmoid( ' + ' + '.join([f'node[{input_key}]*{weight: =.2f}' for input_key,weight in links]) + f' + {bias: =.2f} )')
+        if print_:
+            print(f'Hidden Node {node_key: =2}: ', end='')
+            print(f'{values[node_key]: =.3f} <- ', end='')
+            print('sigmoid( ' + ' + '.join([f'node[{input_key}]*{weight: =.2f}' for input_key,weight in links]) + f' + {bias: =.2f} )')
 
     node_key, act_func, agg_func, bias, response, links = NN.node_evals[-1]
-    print(f'Output Node {node_key: =2}: ', end='')
     node_inputs = []
     for i, w in links:
         node_inputs.append(values[i] * w)
     s = agg_func(node_inputs)
     values[node_key] = act_func(bias + response * s)
-    print(f'{values[node_key]: =.3f} <- ', end='')
-    print('sigmoid( ' + ' + '.join([f'node[{input_key}]*{weight: =.2f}' for input_key,weight in links]) + f' + {bias: =.2f} )')
+    if print_:
+        print(f'Output Node {node_key: =2}: ', end='')
+        print(f'{values[node_key]: =.3f} <- ', end='')
+        print('sigmoid( ' + ' + '.join([f'node[{input_key}]*{weight: =.2f}' for input_key,weight in links]) + f' + {bias: =.2f} )')
 
+    return values
 
 def get_valid_input(question, options):
     while True:
@@ -237,7 +254,7 @@ def main():
 
     config_file = os.path.join(CURR_DIR, 'config', 'tutorial.cfg')
     custom_config = [
-        ('DefaultGenome', 'num_inputs', 1),
+        ('DefaultGenome', 'num_inputs', 2),
         ('DefaultGenome', 'num_hidden', 0),
         ('DefaultGenome', 'num_outputs', 1),
         # ('DefaultGenome', 'activation_default', 'identity'),
@@ -249,15 +266,16 @@ def main():
     genome = config.genome_type(1)
     genome.configure_new(config.genome_config)
 
-    InputKey = config.genome_config.input_keys[0]
+    InputKeys = config.genome_config.input_keys
     OutputKey = config.genome_config.output_keys[0]
 
     genome.nodes[OutputKey].bias = 0
     genome.nodes[OutputKey].response = 1
-    genome.connections[(InputKey, OutputKey)].weight = 1
+    genome.connections[(InputKeys[0], OutputKey)].weight = 1
+    genome.connections[(InputKeys[1], OutputKey)].weight = 1
 
-    fig_network, ax_network = plt.subplots(num='neural network')
-    fig_function, ax_function = plt.subplots(num='function plot', figsize=(4,4))
+    fig_network, ax_network = plt.subplots(num='network')
+    fig_function, ax_function = plt.subplots(num='outputs')
 
     operation_options = ['add', 'remove', 'set', 'input']
     gene_type_options = ['node', 'connection', 'conn']
@@ -271,7 +289,7 @@ def main():
         plt.pause(0.01)
 
         valid_nodes = [str(node_key) for node_key in genome.nodes.keys() if node_key!=OutputKey]
-        upstream_nodes = [str(InputKey)] + valid_nodes
+        upstream_nodes = list(map(str, InputKeys)) + valid_nodes
         downstream_nodes = [str(OutputKey)] + valid_nodes
         valid_inputs = list(set([str(input_key) for input_key,_ in genome.connections.keys()]))
         valid_outputs = list(set([str(output_key) for _,output_key in genome.connections.keys()]))
@@ -443,17 +461,26 @@ def main():
                 break
 
         elif operation=='input':
-            value = get_value(
-                question='|Input| value:  ',
+            value1 = get_value(
+                question='|Input| first input:  ',
                 options=other_operations
             )
-            if value=='back':
+            if value1=='back':
                 continue
-            elif value=='exit':
+            elif value1=='exit':
+                break
+
+            value2 = get_value(
+                question='|Input| second input:  ',
+                options=other_operations
+            )
+            if value2=='back':
+                continue
+            elif value2=='exit':
                 break
 
             print()
-            activate_detail(NN, [float(value)])
+            activate_detail(NN, [float(value1), float(value2)])
 
         elif operation=='back':
             continue
