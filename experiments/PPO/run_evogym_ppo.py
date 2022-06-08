@@ -23,7 +23,7 @@ from arguments.evogym_ppo import get_args
 class ppoConfig():
     def __init__(self, args):
         self.num_processes = args.num_processes
-        self.eval_processes = None
+        self.eval_processes = 2
         self.seed = 1
         self.steps = args.steps
         self.num_mini_batch = args.num_mini_batch
@@ -73,14 +73,16 @@ def main():
         simulate_process.start()
 
 
+    history_file = os.path.join(save_path, 'history.csv')
     run_ppo(
         env_id=args.task,
         structure=structure,
         train_iters=args.ppo_iters,
         save_file=controller_path,
         config=ppo_config,
-        evaluation=False,
-        save_iter=1)
+        deterministic=args.deterministic,
+        save_iter=1,
+        history_file=history_file)
 
 if __name__=='__main__':
     main()

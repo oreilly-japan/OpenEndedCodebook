@@ -153,7 +153,7 @@ class Substrate():
                         {
                             'name': f'robot_position_vertice{i+1}_x',
                             'dims': {
-                                'robot': 1, 'relative': 1, 'x': 1, 'pos_x': vertice[0], 'pos_x': vertice[1],
+                                'robot': 1, 'relative': 1, 'x': 1, 'pos_x': vertice[0], 'pos_y': vertice[1],
                                 'ul': vertice[2], 'ur': vertice[3], 'll': vertice[4], 'lr': vertice[5]},
                             'vector': None
                         })
@@ -161,7 +161,7 @@ class Substrate():
                         {
                             'name': f'robot_position_vertice{i+1}_y',
                             'dims': {
-                                'robot': 1, 'relative': 1, 'y': 1, 'pos_x': vertice[0], 'pos_x': vertice[1],
+                                'robot': 1, 'relative': 1, 'y': 1, 'pos_x': vertice[0], 'pos_y': vertice[1],
                                 'ul': vertice[2], 'ur': vertice[3], 'll': vertice[4], 'lr': vertice[5]},
                             'vector': None
                         })
