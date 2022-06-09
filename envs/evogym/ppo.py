@@ -1,9 +1,10 @@
 import os
 import csv
+import time
 import numpy as np
 
 from stable_baselines3 import PPO
-from stable_baselines3.common.utils import get_linear_fn
+from stable_baselines3.common.utils import get_linear_fn, update_learning_rate
 
 from gym_utils import make_vec_envs
 import ppo_config as default_config
@@ -47,6 +48,7 @@ def run_ppo(env_id, structure, train_iters, save_file, config=None, deterministi
 
 
     if save_iter is not None:
+        interval = time.time()
         model.save(os.path.join(save_file, '0'), include=['env'])
 
         history_header = ['iteration', 'reward']
@@ -67,6 +69,9 @@ def run_ppo(env_id, structure, train_iters, save_file, config=None, deterministi
 
         model.learn(total_timesteps=steps_by_iter)
 
+        # model.learning_rate = config.learning_rate * (1 - i/train_iters)
+        # model._setup_lr_schedule()
+
         eval_envs.obs_rms = train_envs.obs_rms
         reward = evaluate(model, eval_envs, num_eval=config.eval_processes, deterministic=deterministic)
         if reward > max_reward:
@@ -76,6 +81,10 @@ def run_ppo(env_id, structure, train_iters, save_file, config=None, deterministi
 
 
         if save_iter is not None:
+            now = time.time()
+            print(f'iteration: {i+1}  elapsed times: {now-interval: .3f}')
+            interval = now
+
             model.save(os.path.join(save_file, str(i+1)), include=['env'])
 
             items = {
