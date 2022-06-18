@@ -25,7 +25,7 @@ from arguments.circuit_neat import get_figure_args
 from neat.graphs import feed_forward_layers
 
 
-def draw_network(genome_key, genome_file, config, figure_file):
+def draw_network(genome_key, genome_file, config, figure_file, print_detail=False):
 
     genome_orig = pickle.load(open(genome_file, 'rb'))
 
@@ -45,6 +45,10 @@ def draw_network(genome_key, genome_file, config, figure_file):
         pos_x = (i - (len(config.input_keys)-1)/2)
         position[name] = (pos_x, 0)
 
+    if print_detail:
+        print('input nodes:  ['+', '.join(map(str, config.input_keys))+']')
+
+
     for i,key in enumerate(config.output_keys):
         if key not in valid_nodes:
             continue
@@ -56,6 +60,10 @@ def draw_network(genome_key, genome_file, config, figure_file):
             color = [0.2, 0.5, 0.9]
         width = np.log(abs(node.bias)*15+1)
         nodes[key] = (name, {'color': [0.1,0.1,0.1], 'node_size': 500, 'label': name, 'edgecolor': color, 'linewidth': width})
+        
+        if print_detail:
+            print(f'output node {key: 6}:  bias {node.bias: =+.3f}')
+
 
     for key,node in genome.nodes.items():
         if key in nodes or key not in valid_nodes:
@@ -69,6 +77,9 @@ def draw_network(genome_key, genome_file, config, figure_file):
         width = np.log(abs(node.bias)*15+1)
         nodes[key] =  (name, {'color': [0.3,0.3,0.3], 'node_size': 150, 'label': '', 'edgecolor': color, 'linewidth': width})
 
+        if print_detail:
+            print(f'hidden node {key: =6}:  bias {node.bias: =+.3f}')
+
 
     conns = {}
     for (key_i, key_o), conn in genome.connections.items():
@@ -81,12 +92,14 @@ def draw_network(genome_key, genome_file, config, figure_file):
             color = [0.9, 0.5, 0.2]
         else:
             color = [0.2, 0.5, 0.9]
-        weight = np.log(abs(weight)*15+1)#+0.3
+        weight_ = np.log(abs(weight)*15+1)#+0.3
         conns[(key_i, key_o)] = (nodes[key_i][0], nodes[key_o][0],
-            {'color': color, 'weight': weight, 'arrowsize': weight*4})
+            {'color': color, 'weight': weight_, 'arrowsize': weight_*4})
+
+        if print_detail:
+            print(f'connection {key_i: =6} -> {key_o: =6}:  weight {weight: =+.3f}')
 
 
-    # layers = feed_forward_layers(config.input_keys, config.output_keys, genome.connections.keys())
     for h_i,layer in enumerate(layers):
         layer_size = len(layer)
         for w_i,node in enumerate(layer):
@@ -120,19 +133,6 @@ def draw_network(genome_key, genome_file, config, figure_file):
         arrowsize=[edge['arrowsize'] for edge in G.edges.values()],
         connectionstyle='arc3,rad=0.2',
         alpha=0.6)
-
-    # nx.draw_networkx(G, position, ax=ax,
-        # node_color=[node['color'] for node in G.nodes.values()],
-        # node_size=[node['node_size'] for node in G.nodes.values()],
-        # linewidths=[node['linewidth'] for node in G.nodes.values()],
-        # edgecolors=[node['edgecolor'] for node in G.nodes.values()],
-        # edge_color=[edge['color'] for edge in G.edges.values()],
-        # width=[edge['weight'] for edge in G.edges.values()],
-        # arrowsize=[edge['arrowsize'] for edge in G.edges.values()],
-        # connectionstyle='arc3,rad=0.2',
-        # labels={node[0]: node[1]['label'] for node in nodes.values()},
-        # font_size=8,
-        # font_color=[1.0,1.0,1.0])
 
     ax.axis("off")
     plt.savefig(figure_file, bbox_inches='tight')
@@ -214,7 +214,8 @@ def main():
                     continue
 
                 func_args = (key, genome_file, config.genome_config, figure_file)
-                draw_network(*func_args)
+                func_kwargs = {'print_detail': True if args.specified is not None else False}
+                draw_network(*func_args, **func_kwargs)
 
 if __name__=='__main__':
     main()
