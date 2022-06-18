@@ -28,7 +28,7 @@ class ppoConfig():
         self.steps = args.steps
         self.num_mini_batch = args.num_mini_batch
         self.epochs = args.epochs
-        self.learning_rate = args.lerning_rate
+        self.learning_rate = args.learning_rate
         self.gamma = args.gamma
         self.clip_range = args.clip_range
         self.ent_coef = 0.01

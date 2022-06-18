@@ -49,9 +49,9 @@ def get_args():
         help='learning iterations of PPO (default: 100)'
     )
     parser.add_argument(
-        '-lr', '--lerning-rate',
+        '-lr', '--learning-rate',
         default=3e-4, type=float,
-        help='learning rate (default: 7e-4)'
+        help='learning rate (default: 3e-4)'
     )
     parser.add_argument(
         '--gamma',
