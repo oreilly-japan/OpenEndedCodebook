@@ -23,10 +23,11 @@ class BaseCPPNDecoder():
         return outputs
 
 class BaseHyperDecoder():
-    def __init__(self, substrate):
+    def __init__(self, substrate, activation='sin'):
 
         connections = None
         downstream_nodes = None
+        self.activation = activation
         
         self.set_attr(substrate, connections, downstream_nodes)
 
@@ -48,7 +49,7 @@ class BaseHyperDecoder():
             node_names=['value'])
 
 
-        biases = nodes[0](**self.node_inputs).numpy()*10
+        biases = nodes[0](**self.node_inputs).numpy()
         biases = self.scale_outputs(biases, output_activation)
 
         biases = {node: bias for node,bias in zip(self.node_labels, biases)}
@@ -59,17 +60,19 @@ class BaseHyperDecoder():
         connections = {edge: weight for edge,weight in zip(self.edge_labels, weights)}
 
         return FeedForwardNetwork.create_from_weights(
+            config=config,
             input_keys=self.input_nodes,
             output_keys=self.output_nodes,
             biases=biases,
             weights=connections,
-            weight_thr=0.5)
+            weight_thr=0.5,
+            default_activation=self.activation)
 
     @staticmethod
     def scale_outputs(outputs, activation):
         if activation in ['sigmoid', 'gauss', 'hat']:
-            return (outputs - 0.5) * 20
+            return (outputs - 0.5) * 10
         elif activation in ['tanh', 'sin', 'clamped']:
-            return outputs * 10
+            return outputs * 5
         else:
             return outputs

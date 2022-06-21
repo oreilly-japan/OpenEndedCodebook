@@ -35,7 +35,7 @@ class FeedForwardNetwork(FeedForwardNetwork):
 
 
     @staticmethod
-    def create_from_weights(input_keys, output_keys, biases, weights, weight_thr=0.05):
+    def create_from_weights(config, input_keys, output_keys, biases, weights, weight_thr=0.05, default_aggregation='sum', default_activation='sigmoid'):
         connections = [key for key,weight in weights.items() if abs(weight)>weight_thr]
 
         layers = feed_forward_layers(input_keys, output_keys, connections)
@@ -52,8 +52,8 @@ class FeedForwardNetwork(FeedForwardNetwork):
                         node_expr.append("v[{}] * {:.7e}".format(inode, weight))
 
                 bias = biases[node]
-                aggregation_function = sum_aggregation
-                activation_function = sigmoid_activation
+                aggregation_function = config.aggregation_function_defs.get(default_aggregation)
+                activation_function = config.activation_defs.get(default_activation)
                 node_evals.append((node, activation_function, aggregation_function, bias, 1, inputs))
 
         return FeedForwardNetwork(input_keys, output_keys, node_evals)

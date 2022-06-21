@@ -250,7 +250,7 @@ class Substrate():
             output_nodes.append(
                 {
                     'name': f'actuator{i+1}',
-                    'dims': {'pos_x': actuator[0]+0.5, 'pos_y': actuator[1]+0.5, 'horizontal': actuator[2], 'vertical': actuator[3]},
+                    'dims': {'robot': 1, 'pos_x': actuator[0]+0.5, 'pos_y': actuator[1]+0.5, 'horizontal': actuator[2], 'vertical': actuator[3]},
                     'vector': None
                 })
         self.nodes['output'] = output_nodes

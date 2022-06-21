@@ -16,10 +16,12 @@ class EvogymControllerEvaluator():
         obs = env.reset()
         episode_rewards = []
         while len(episode_rewards) < self.num_eval:
+            # t = env.env_method('get_time')[0]
             action = np.array(controller.activate(obs[0]))*2 - 1
             obs, _, done, infos = env.step([np.array(action)])
 
             if 'episode' in infos[0]:
+                # print(t)
                 reward = infos[0]['episode']['r']
                 episode_rewards.append(reward)
 

@@ -37,7 +37,7 @@ def main():
 
 
     substrate = Substrate(args.task, structure[0])
-    decoder = EvogymHyperDecoder(substrate, use_hidden=args.use_hidden)
+    decoder = EvogymHyperDecoder(substrate, use_hidden=args.use_hidden, activation='sigmoid')
     decode_function = decoder.decode
 
     evaluator = EvogymControllerEvaluator(args.task, structure, args.eval_num)
