@@ -31,7 +31,9 @@ class EvogymStructureDecoder(BaseCPPNDecoder):
 
 
 class EvogymHyperDecoder(BaseHyperDecoder):
-    def __init__(self, substrate, use_hidden=False):
+    def __init__(self, substrate, use_hidden=False, activation='sigmoid'):
+
+        self.activation = activation
 
         connections = [('input', 'output')]
         downstream_nodes = ['output']
