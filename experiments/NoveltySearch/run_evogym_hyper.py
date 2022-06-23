@@ -38,7 +38,7 @@ def main():
 
 
     substrate = Substrate(args.task, structure[0])
-    decoder = EvogymHyperDecoder(substrate, use_hidden=args.use_hidden)
+    decoder = EvogymHyperDecoder(substrate, use_hidden=args.use_hidden, activation='sigmoid')
     decode_function = decoder.decode
 
     evaluator = EvogymControllerEvaluatorNS(args.task, structure, args.eval_num)
@@ -97,7 +97,7 @@ def main():
     try:
         pop.run(evaluate_function=parallel.evaluate, n=args.generation)
     finally:
-        neat_cppn.figure.make_species(save_path)
+        ns_neat.figure.make_species(save_path)
 
 if __name__=='__main__':
     main()
