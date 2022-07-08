@@ -84,7 +84,6 @@ def main():
             for key in ids:
                 structure_file = os.path.join(expt_path, 'structure', f'{key}.npz')
                 ppo_file = os.path.join(expt_path, 'controller', f'{key}.zip')
-                draw_function(key, structure_file, ppo_file, directory=metric)
                 jobs.append(pool.apply_async(draw_function, args=(key, structure_file, ppo_file), kwds={'directory': metric}))
 
         for job in jobs:
