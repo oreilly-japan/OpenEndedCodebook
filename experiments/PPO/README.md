@@ -1,4 +1,4 @@
-# NEET
+# PPO
 
 
 ## Evogym
@@ -26,7 +26,7 @@ $python run_evogym.py
 
 ### make figure
 after run_evogym, make {gif, jpg} file for each of all controllers.
-output to "./out/evogym_ppo/{expt name}/{gif, jpg}/"
+output to "./out/evogym_ppo/{expt name}/figure/{gif, jpg}/"
 ```
 $python make_figures.py {experiment name}
 ```

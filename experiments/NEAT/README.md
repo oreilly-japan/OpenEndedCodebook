@@ -57,7 +57,7 @@ $python run_evogym.py
 
 ### make figure
 after run_evogym, make {gif, jpg} file for each of all genomes written in reward history file.
-output to "./out/evogym_neat/{expt name}/{gif, jpg}/"
+output to "./out/evogym_neat/{expt name}/figure/{gif, jpg}/"
 ```
 $python make_figures.py {experiment name}
 ```
@@ -99,7 +99,7 @@ $python run_evogym_hyper.py
 
 ### make figure
 after run_evogym_hyper, make {gif, jpg} file for each of all genomes written in reward history file.
-output to "./out/evogym_hyper/{expt name}/{gif, jpg}/"
+output to "./out/evogym_hyper/{expt name}/figure/{gif, jpg}/"
 ```
 $python make_figure_hyper.py {experiment name}
 ```
@@ -140,7 +140,7 @@ $python run_evogym_cppn.py
 
 ### make figure
 after run_evogym_cppn, make {gif, jpg} file for each of all robots written in reward history file.
-output to "./out/evogym_cppn/{expt name}/{gif, jpg}/"
+output to "./out/evogym_cppn/{expt name}/figure/{gif, jpg}/"
 ```
 $python make_figures_cppn.py {experiment name}
 ```

@@ -6,6 +6,7 @@ import numpy as np
 
 import multiprocessing
 from multiprocessing import Process
+from pyrsistent import s
 
 from stable_baselines3 import PPO
 
@@ -81,6 +82,7 @@ class EvogymControllerSimulatorPPO():
     def initialize(self):
         self.generation = -1
         self.env = make_vec_envs(self.env_id, self.structure, 0, 1, vecnormalize=True)
+        self.env.training = False
 
     def update(self):
 
@@ -160,6 +162,7 @@ class EvogymStructureSimulator():
                 if self.env is not None:
                     self.env.close()
                 self.env = make_vec_envs(self.env_id, structure, 0, 1, vecnormalize=True)
+                self.env.training = False
                 self.env.obs_rms = self.controller.env.obs_rms
                 self.generation = int(latest[0])
                 print(f'simulator update controller: generation {latest[0]}  id {latest[1]}')

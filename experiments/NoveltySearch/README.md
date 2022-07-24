@@ -64,7 +64,7 @@ $python run_evogym.py
 
 ### make figure
 after run_evogym, make {gif, jpg} file for each of all genomes written in history files.
-output to "./out/evogym_ns_neat/{expt name}/{gif, jpg}/"
+output to "./out/evogym_ns_neat/{expt name}/figure/{gif, jpg}/"
 ```
 $python make_figures.py {experiment name}
 ```
@@ -108,7 +108,7 @@ $python run_evogym_hyper.py
 
 ### make figure
 after run_evogym_hyper, make {gif, jpg} file for each of all genomes written in history files.
-output to "./out/evogym_ns_hyper/{expt name}/{gif, jpg}/"
+output to "./out/evogym_ns_hyper/{expt name}/figure/{gif, jpg}/"
 ```
 $python make_figures_hyper.py {experiment name}
 ```

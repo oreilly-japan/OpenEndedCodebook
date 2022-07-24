@@ -32,6 +32,7 @@ def run_ppo(env_id, structure, train_iters, save_file, config=None, deterministi
     train_envs.reset()
 
     eval_envs = make_vec_envs(env_id, structure, config.seed, config.eval_processes, vecnormalize=True)
+    eval_envs.training = False
 
     model = PPO(
         "MlpPolicy",

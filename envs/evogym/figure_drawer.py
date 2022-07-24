@@ -1,6 +1,9 @@
 import os
 import pickle
+import json
+from gym import Env
 import numpy as np
+import torch
 
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -45,6 +48,7 @@ RenderPaddings = {
     'Climber-v1'        : ((1, 1), (1, 1)),
     'Climber-v2'        : ((1, 1), (1, 1)),
     'BidirectionalWalker-v0': ((4, 4), (1, 6)),
+    'Parkour-v0'        : ((4, 4), (1, 8)),
 }
 
 
@@ -54,22 +58,30 @@ def pool_init_func(lock_):
 
 
 def make_gif(filename, env, viewer, controller, controller_type, resolution=(256,144), deterministic=True):
-    assert controller_type in ['NEAT', 'PPO']
+    assert controller_type in ['NEAT', 'PPO', 'PPO_torch']
 
     viewer.set_resolution(resolution)
+
+    if controller_type=='PPO_torch':
+        recurrent_hidden_states = torch.zeros(
+            1, controller.recurrent_hidden_state_size, device='cpu')
+        masks = torch.zeros(1, 1, device='cpu')
 
     done = False
     obs = env.reset()
     imgs = []
     while not done:
 
-        img = viewer.render(mode='img')
+        img = viewer.render(mode='img', hide_grid=False)
         imgs.append(img)
 
         if controller_type=='NEAT':
             action = [np.array(controller.activate(obs[0]))*2 - 1]
         elif controller_type=='PPO':
             action, _ = controller.predict(obs, deterministic=deterministic)
+        elif controller_type=='PPO_torch':
+            _, action, _, recurrent_hidden_states = controller.act(torch.from_numpy(obs), recurrent_hidden_states, masks, deterministic=deterministic)
+            action = action.detach()
         else:
             return
         obs, _, done, infos = env.step(action)
@@ -87,8 +99,8 @@ def make_gif(filename, env, viewer, controller, controller_type, resolution=(256
     return
 
 
-def make_jpg(filename, env, viewer, controller, controller_type, padding, interval='timestep', resolution_scale=50, timestep_interval=80, distance_interval=0.8, display_timestep=False, deterministic=True):
-    assert controller_type in ['NEAT', 'PPO']
+def make_jpg(filename, env, viewer, controller, controller_type, padding, interval='timestep', resolution_scale=32, timestep_interval=80, distance_interval=0.8, display_timestep=False, deterministic=True):
+    assert controller_type in ['NEAT', 'PPO', 'PPO_torch']
     assert interval in ['timestep', 'distance', 'hybrid']
 
     grid_size = env.get_attr("world", indices=None)[0].grid_size
@@ -101,6 +113,11 @@ def make_jpg(filename, env, viewer, controller, controller_type, padding, interv
     viewer.set_view_size(view_size)
     viewer.set_resolution(resolution)
     viewer.set_pos(camera_position)
+
+    if controller_type=='PPO_torch':
+        recurrent_hidden_states = torch.zeros(
+            1, controller.recurrent_hidden_state_size, device='cpu')
+        masks = torch.zeros(1, 1, device='cpu')
 
     obs = env.reset()
 
@@ -149,6 +166,9 @@ def make_jpg(filename, env, viewer, controller, controller_type, padding, interv
             action = [np.array(controller.activate(obs[0]))*2 - 1]
         elif controller_type=='PPO':
             action, _ = controller.predict(obs, deterministic=deterministic)
+        elif controller_type=='PPO_torch':
+            _, action, _, recurrent_hidden_states = controller.act(torch.from_numpy(obs), recurrent_hidden_states, masks, deterministic=deterministic)
+            action = action.detach()
         else:
             return
         obs, _, done, infos = env.step(action)
@@ -239,6 +259,7 @@ class EvogymControllerDrawerPPO():
         viewer = env.get_attr("default_viewer", indices=None)[0]
 
         controller = PPO.load(ppo_file)
+        env.training = False
         env.obs_rms = controller.env.obs_rms
 
         if self.save_type=='gif':
@@ -280,6 +301,7 @@ class EvogymStructureDrawerCPPN():
         viewer = env.get_attr("default_viewer", indices=None)[0]
 
         controller = PPO.load(ppo_file)
+        env.training = False
         env.obs_rms = controller.env.obs_rms
 
         if self.save_type=='gif':
@@ -294,108 +316,56 @@ class EvogymStructureDrawerCPPN():
         return
 
 
+class EvogymDrawerPOET():
+    from a2c_ppo_acktr.model import Policy
 
+    def __init__(self, save_path, structure, recurrent=False, overwrite=True, save_type='gif', **draw_kwargs):
+        assert save_type in ['gif', 'jpg']
 
-def save_controller_gif(env_id, structure, genome_key, genome_file, genome_config, decode_function, gif_file, resolution):
+        self.save_path = os.path.join(save_path, save_type)
+        self.env_id = 'Parkour-v0'
+        self.structure = structure
+        self.recurrent = recurrent
+        self.overwrite = overwrite
+        self.save_type = save_type
+        self.draw_kwargs = draw_kwargs
 
-    with open(genome_file, 'rb') as f:
-        genome = pickle.load(f)
+        os.makedirs(self.save_path, exist_ok=True)
 
+    def draw(self, key, terrain_file, core_file, directory=''):
+        save_dir = os.path.join(self.save_path, directory)
+        os.makedirs(save_dir, exist_ok=True)
 
-    env = make_vec_envs(env_id, structure, 0, 1, allow_early_resets=False)
-    env.get_attr("default_viewer", indices=None)[0].set_resolution(resolution)
+        filename = os.path.join(save_dir, f'{key}.{self.save_type}')
+        if not self.overwrite and os.path.exists(filename):
+            return
 
-    controller = decode_function(genome, genome_config)
+        terrain = json.load(open(terrain_file, 'r'))
+        structure = self.structure + (terrain,)
 
-    done = False
-    obs = env.reset()
-    img = env.render(mode='img')
-    imgs = [img]
-    while not done:
-        action = np.array(controller.activate(obs[0]))*2 - 1
-        obs, _, done, infos = env.step([action])
-        img = env.render(mode='img')
-        imgs.append(img)
+        env = make_vec_envs(self.env_id, structure, 0, 1, allow_early_resets=False, vecnormalize=True)
+        viewer = env.get_attr("default_viewer", indices=None)[0]
 
-    env.close()
+        params, obs_rms = torch.load(core_file)
 
-    imageio.mimsave(gif_file, imgs, duration=(1/50.0))
+        env.training = False
+        env.obs_rms = obs_rms
 
-    with lock:
-        gifsicle(sources=gif_file,
-                 destination=gif_file,
-                 optimize=False,
-                 colors=64,
-                 options=["--optimize=3","--no-warnings"])
+        controller = self.Policy(
+            env.observation_space.shape,
+            env.action_space,
+            base_kwargs={'recurrent': self.recurrent})
+        controller.to('cpu')
 
-    print(f'genome {genome_key} ... done')
-    return
+        controller.load_state_dict(params)
 
+        if self.save_type=='gif':
+            make_gif(filename, env, viewer, controller, 'PPO_torch', **self.draw_kwargs)
 
-def save_controller_ppo_gif(env_id, structure, iter, ppo_file, gif_file, resolution, deterministic=False):
+        elif self.save_type=='jpg':
+            padding = RenderPaddings[self.env_id]
+            make_jpg(filename, env, viewer, controller, 'PPO_torch', padding, **self.draw_kwargs)
 
-    controller = PPO.load(ppo_file)
-
-    env = make_vec_envs(env_id, structure, 0, 1, allow_early_resets=False, vecnormalize=True)
-    env.get_attr("default_viewer", indices=None)[0].set_resolution(resolution)
-    env.obs_rms = controller.env.obs_rms
-
-    done = False
-    obs = env.reset()
-    img = env.render(mode='img')
-    imgs = [img]
-    while not done:
-        action, _ = controller.predict(obs, deterministic=deterministic)
-        obs, _, done, infos = env.step(action)
-        img = env.render(mode='img')
-        imgs.append(img)
-
-    env.close()
-
-    imageio.mimsave(gif_file, imgs, duration=(1/50.0))
-
-    with lock:
-        gifsicle(sources=gif_file,
-                 destination=gif_file,
-                 optimize=False,
-                 colors=64,
-                 options=["--optimize=3","--no-warnings"])
-
-    print(f'iter {iter} ... done')
-    return
-
-
-def save_structure_gif(env_id, genome_key, ppo_file, structure_file, gif_file, resolution, deterministic=False):
-
-    controller = PPO.load(ppo_file)
-
-    structure_data = np.load(structure_file)
-    structure = (structure_data['robot'], structure_data['connectivity'])
-
-    env = make_vec_envs(env_id, structure, 1000, 1, allow_early_resets=False, vecnormalize=True)
-    env.get_attr("default_viewer", indices=None)[0].set_resolution(resolution)
-    env.obs_rms = controller.env.obs_rms
-
-    done = False
-    obs = env.reset()
-    img = env.render(mode='img')
-    imgs = [img]
-    while not done:
-        action, _ = controller.predict(obs, deterministic=deterministic)
-        obs, _, done, infos = env.step(action)
-        img = env.render(mode='img')
-        imgs.append(img)
-
-    env.close()
-
-    imageio.mimsave(gif_file, imgs, duration=(1/50.0))
-
-    with lock:
-        gifsicle(sources=gif_file,
-                 destination=gif_file,
-                 optimize=False,
-                 colors=64,
-                 options=["--optimize=3","--no-warnings"])
-
-    print(f'robot {genome_key} ... done')
-    return
+        env.close()
+        print(f'key {key} ... done')
+        return
