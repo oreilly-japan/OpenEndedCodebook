@@ -106,13 +106,14 @@ def get_args():
     )
 
     parser.add_argument(
-        '-p', '--num-cores',
+        '-c', '--num-cores',
         default=4, type=int,
         help='how many training CPU processes to use (default: 4)'
     )
     args = parser.parse_args()
 
     return args
+
 
 def get_figure_args():
     parser = argparse.ArgumentParser(
