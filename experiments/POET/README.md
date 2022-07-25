@@ -19,6 +19,8 @@ $python run_evogym_poet.py
 | --transfer-interval   | -t-iv   | 15              | transfer interval |
 | --save-interval       | -s-iv   | 0               | save interval, 0 means no save |
 | --reproduce-threshold | -r-th   | 5.0             | threshold of score to reproduce new niche |
+| --mc-lower            | -mc-l   | 0.1             | ratio to maximum score. used for lower minimal criteria. |
+| --mc-upper            | -mc-u   | 0.8             | ratio to maximum score. used for upper minimal criteria. |
 | --width               | -w      | 100             | width of evogym terrain |
 | --first-platform      | -fp     | 10              | first platform width of evogym terrain |
 | --steps-per-iteration | -s-ppo  | 4               | number of steps per iteration of poet |

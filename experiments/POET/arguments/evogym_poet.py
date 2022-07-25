@@ -57,6 +57,16 @@ def get_args():
         default=5.0, type=float,
         help='threshold of score to reproduce new niche (default: 5.0)'
     )
+    parser.add_argument(
+        '-mc-l', '--mc-lower',
+        default=0.1, type=float,
+        help='ratio to maximum score. used for lower minimal criteria. (default: 0.1)'
+    )
+    parser.add_argument(
+        '-mc-u', '--mc-upper',
+        default=0.8, type=float,
+        help='ratio to maximum score. used for upper minimal criteria. (default: 0.8)'
+    )
 
     parser.add_argument(
         '-w', '--width',
@@ -111,6 +121,8 @@ def get_args():
         help='how many training CPU processes to use (default: 4)'
     )
     args = parser.parse_args()
+
+    assert args.mc_lower < args.mc_upper, 'argument error: mc_lower < mc_upper'
 
     return args
 

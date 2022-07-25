@@ -45,8 +45,8 @@ def main(expt_name):
         order.append(key)
 
     arrows = []
-    style = 'Simple, tail_width=0.25, head_width=3, head_length=3'
-    arrow_kwargs = {'arrowstyle': style, 'alpha': 0.4, 'lw': 0.1}
+    style = 'Simple, tail_width=0.3, head_width=3, head_length=3'
+    arrow_kwargs = {'arrowstyle': style}
 
     interval = expt_args['transfer_interval']
     fig,ax = plt.subplots(dpi=500)
@@ -78,6 +78,7 @@ def main(expt_name):
 
         iter_i = 0
         score_past_max = float('-inf')
+        score_past_max = 0
         while iter_i < convolved_length:
             from_key = transfer_froms[iter_i]
             valid = 0
@@ -92,11 +93,15 @@ def main(expt_name):
                     connectionstyle=f'arc3,rad={rad}'
                 else:
                     connectionstyle=f'arc3,rad=-{rad}'
+                improve = (scores_cummax[iter_i+valid-1] - score_past_max) / (expt_args['width']/10)
+                alpha = max(0.08, min(0.4, improve*1.5))
+                lw = max(0.01, min(0,1, improve/5))
                 arrows.append(
                     patches.FancyArrowPatch(
                         (transfer_iter-interval, from_align),
                         (transfer_iter, niche_align),
                         connectionstyle=connectionstyle,
+                        alpha=alpha, lw=lw,
                         color=niches_dict[from_key]['color'], **arrow_kwargs))
             
             iter_i += valid

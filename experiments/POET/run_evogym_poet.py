@@ -53,6 +53,8 @@ def main():
         num_processes=args.num_processes,
         lr=args.learning_rate)
 
+    maximum_score = args.args.width/10
+
     poet_pop = POET(
         env_config,
         opt_config,
@@ -65,10 +67,10 @@ def main():
         transfer_interval=args.transfer_interval,
         save_core_interval=args.save_interval,
         repro_threshold=args.reproduce_threshold,
-        mc_lower=1,
-        mc_upper=10,
+        mc_lower=maximum_score*args.mc_lower,
+        mc_upper=maximum_score*args.mc_upper,
         clip_score_lower=0,
-        clip_score_upper=args.width/10,
+        clip_score_upper=maximum_score,
         novelty_knn=1,
         novelty_threshold=0.1)
 
