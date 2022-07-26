@@ -9,7 +9,7 @@ $python run_evogym_poet.py
 #### options:
 | option                | abbrev  | default         | detail  |
 | :---                  | :---:   | :---:           | :---    |
-| --name                | -n      | "{task}_{robot}"| experiment name |
+| --name                | -n      | default         | experiment name |
 | --robot               | -r      | cat             | robot structure name <br> built on "envs/evogym/robot_files/"           |
 | --iteration           | -i      | 3000            | iterations of poet |
 | --niche-num           | -n-num  | 10              | limit for niche to hold |

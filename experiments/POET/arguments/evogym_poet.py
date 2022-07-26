@@ -8,8 +8,8 @@ def get_args():
 
     parser.add_argument(
         '-n', '--name',
-        default='test', type=str,
-        help='experiment name (default: test)'
+        default='default', type=str,
+        help='experiment name (default: default)'
     )
     parser.add_argument(
         '-r', '--robot',
