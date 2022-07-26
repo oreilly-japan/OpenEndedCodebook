@@ -106,7 +106,6 @@ def main():
         maze_genome = make_random_maze(mcc_config, len(maze_genomes), args.wall_gene_num, args.path_gene_num)
 
         print(f'maze {maze_genome.key+1}')
-        print(maze_genome)
 
         maze_env, timesteps = MazeDecoder.decode(maze_genome, mcc_config, save=os.path.join(save_path, f'maze{maze_genome.key+1}.jpg'))
 
