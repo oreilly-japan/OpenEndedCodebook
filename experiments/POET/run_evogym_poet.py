@@ -53,7 +53,7 @@ def main():
         num_processes=args.num_processes,
         lr=args.learning_rate)
 
-    maximum_score = args.args.width/10
+    maximum_score = args.width/10
 
     poet_pop = POET(
         env_config,

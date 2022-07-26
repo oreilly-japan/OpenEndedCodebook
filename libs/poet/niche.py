@@ -1,6 +1,5 @@
 import os
 import csv
-import numpy as np
 
 
 class Niche():
@@ -78,6 +77,8 @@ class Niche():
 
         self.save_log(save_core=save_core)
 
+        self.optimizer.save_core(self.core_path, 'best')
+
     def save_log(self, save_core=False):
         with open(self.history_file, 'a') as f:
             writer = csv.DictWriter(f, fieldnames=self.history_header)
@@ -92,10 +93,6 @@ class Niche():
 
         if save_core:
             self.optimizer.save_core(self.core_path, self.steps)
-
-        if self.score > self.best_score:
-            self.best_score = self.score
-            self.optimizer.save_core(self.core_path, 'best')
 
 
     def start_step(self, pool, env_config, opt_config, imigrant_cores=None):
@@ -175,10 +172,10 @@ class Niche():
             while len(self.recent_scores)>5:
                 self.recent_scores.pop(0)
 
-            # if score > self.best_score:
-            #     self.best_score = score
-            #     if self.core_path is not None:
-            #         self.optimizer.save_core(self.core_path, 'best')
+            if score > self.best_score:
+                self.best_score = score
+                if self.core_path is not None:
+                    self.optimizer.save_core(self.core_path, 'best')
 
         else:
             for imigrant_key,_ in imigrant_cores.items():
@@ -199,10 +196,10 @@ class Niche():
                 self.transferred_scores[self.key] = max_imigrant_score
                 self.transferred_from = max_imigrant_key
 
-                # if max_imigrant_score > self.best_score:
-                #     self.best_score = max_imigrant_score
-                #     if self.core_path is not None:
-                #         self.optimizer.save_core(self.core_path, 'best')
+                if max_imigrant_score > self.best_score:
+                    self.best_score = max_imigrant_score
+                    if self.core_path is not None:
+                        self.optimizer.save_core(self.core_path, 'best')
 
                 return {max_imigrant_key: max_imigrant_score}
             else:
@@ -213,7 +210,7 @@ class Niche():
             return scores
 
     def get_accepted_keys(self, keys):
-        base_score = np.mean(self.recent_scores)
+        base_score = max(self.recent_scores)
         accepted_keys = [key for key in keys if key!=self.key and self.transferred_scores[key]>base_score]
         return accepted_keys
 
