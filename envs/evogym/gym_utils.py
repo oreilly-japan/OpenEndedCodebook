@@ -18,7 +18,7 @@ def make_env(env_id, kwargs, seed, rank, allow_early_resets):
     return _init
 
 def make_vec_envs(env_id, structure, seed, num_processes, allow_early_resets=True, vecnormalize=False, subproc=True):
-    if env_id=='Parkour-v0':
+    if env_id=='Parkour-v0' or env_id=='Parkour-v1':
         kwargs = {
             'body': structure[0],
             'connections': structure[1],

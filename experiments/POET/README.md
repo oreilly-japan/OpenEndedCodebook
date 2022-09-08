@@ -10,7 +10,8 @@ $python run_evogym_poet.py
 | option                | abbrev  | default         | detail  |
 | :---                  | :---:   | :---:           | :---    |
 | --name                | -n      | default         | experiment name |
-| --robot               | -r      | cat             | robot structure name <br> built on "envs/evogym/robot_files/"           |
+| --task                | -t      | Parkou-v0       | task name |
+| --robot               | -r      | cat             | robot structure name <br> built in "envs/evogym/robot_files/"           |
 | --iteration           | -i      | 3000            | iterations of poet |
 | --niche-num           | -n-num  | 10              | limit for niche to hold |
 | --reproduce-num       | -r-num  | 10              | number of reproduce at once |
@@ -23,7 +24,7 @@ $python run_evogym_poet.py
 | --mc-upper            | -mc-u   | 0.8             | ratio to maximum score. used for upper minimal criteria. |
 | --width               | -w      | 100             | width of evogym terrain |
 | --first-platform      | -fp     | 10              | first platform width of evogym terrain |
-| --steps-per-iteration | -s-ppo  | 4               | number of steps per iteration of poet |
+| --steps-per-iteration | -si-ppo | 4               | number of steps per iteration of poet |
 | --learning-rate       | -lr-ppo | 2.5e-4          | learning rate |
 | --epoch               | -e-ppo  | 4               | number of ppo epochs per 1 step of ppo |
 | --num-mini-batch      | -b-ppo  | 4               | number of batches for ppo |

@@ -40,6 +40,7 @@ def main():
     env_config = EnvrionmentEvogymConfig(
         structure,
         cppn_config,
+        env_id=args.task,
         max_width=args.width,
         first_platform=args.first_platform)
 
@@ -53,7 +54,11 @@ def main():
         num_processes=args.num_processes,
         lr=args.learning_rate)
 
-    maximum_score = args.width/10
+    
+    if args.task=='Parkour-v1':
+        maximum_score = args.width/10 + 10
+    else:
+        maximum_score = 10
 
     poet_pop = POET(
         env_config,
@@ -66,7 +71,7 @@ def main():
         reproduce_interval=args.reproduce_interval,
         transfer_interval=args.transfer_interval,
         save_core_interval=args.save_interval,
-        repro_threshold=args.reproduce_threshold,
+        repro_threshold=maximum_score*args.reproduce_threshold,
         mc_lower=maximum_score*args.mc_lower,
         mc_upper=maximum_score*args.mc_upper,
         clip_score_lower=0,

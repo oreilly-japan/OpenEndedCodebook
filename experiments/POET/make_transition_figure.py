@@ -6,6 +6,7 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 from matplotlib import patches
+# from matplotlib.colors import LinearSegmentedColormap
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(os.path.dirname(CURR_DIR))
@@ -49,6 +50,7 @@ def main(expt_name):
     arrow_kwargs = {'arrowstyle': style}
 
     interval = expt_args['transfer_interval']
+    max_score = expt_args['width']/10
     fig,ax = plt.subplots(dpi=500)
     max_iter = 0
     for niche_align,niche_key in enumerate(order):
@@ -64,7 +66,7 @@ def main(expt_name):
         scores = history['score'].fillna(0)
         iterations = history['step'].values[::interval] + iteration
         scores = [scores[i*interval:(i+1)*interval].max() for i in range(convolved_length)]
-        colorbar = ax.scatter(iterations, [niche_align]*len(iterations), vmin=0, vmax=expt_args['width']/10, c=scores, cmap='plasma', s=5)
+        colorbar = ax.scatter(iterations, [niche_align]*len(iterations), vmin=0, vmax=max_score, c=scores, cmap='plasma', s=5)
 
         ax.text(iterations[0]-interval, niche_align, str(niche_key), ha='right', va='center', fontsize=7)
 
@@ -85,7 +87,7 @@ def main(expt_name):
             while iter_i+valid < convolved_length and transfer_froms[iter_i+valid] in [-1, from_key]:
                 valid += 1
 
-            if from_key != -1 and scores_cummax[iter_i+valid-1] > score_past_max:
+            if from_key != -1 and scores_cummax[iter_i+valid-1] > score_past_max and not (iter_i == 0 and from_key == parent_key):
                 from_align = order.index(from_key)
                 transfer_iter = iterations[iter_i]
                 rad = 0.4/(np.log(abs(from_align - niche_align)) + 1)
@@ -93,7 +95,7 @@ def main(expt_name):
                     connectionstyle=f'arc3,rad={rad}'
                 else:
                     connectionstyle=f'arc3,rad=-{rad}'
-                improve = (scores_cummax[iter_i+valid-1] - score_past_max) / (expt_args['width']/10)
+                improve = (scores_cummax[iter_i+valid-1] - score_past_max) / max_score
                 alpha = max(0.08, min(0.4, improve*1.5))
                 lw = max(0.01, min(0,1, improve/5))
                 arrows.append(
@@ -112,7 +114,7 @@ def main(expt_name):
     for a in arrows:
         ax.add_patch(a)
     
-    fig.colorbar(colorbar, ax=ax, aspect=80, pad=0.01, label='reward')
+    colorbar = fig.colorbar(colorbar, ax=ax, aspect=80, pad=0.01, label='reward')
 
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)

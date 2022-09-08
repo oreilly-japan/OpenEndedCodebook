@@ -12,6 +12,11 @@ def get_args():
         help='experiment name (default: default)'
     )
     parser.add_argument(
+        '-t', '--task',
+        default='Parkour-v0', type=str,
+        help='task name (default: Parkour-v0)'
+    )
+    parser.add_argument(
         '-r', '--robot',
         default='cat', type=str,
         help='robot structure name (default: cat, built on "envs/evogym/robot_files/")'
@@ -54,8 +59,8 @@ def get_args():
     )
     parser.add_argument(
         '-r-th', '--reproduce-threshold',
-        default=5.0, type=float,
-        help='threshold of score to reproduce new niche (default: 5.0)'
+        default=0.5, type=float,
+        help='ratio to maximum score. used for threshold of score to reproduce new niche (default: 0.5)'
     )
     parser.add_argument(
         '-mc-l', '--mc-lower',

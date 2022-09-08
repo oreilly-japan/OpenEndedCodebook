@@ -91,13 +91,13 @@ class POET():
             writer = csv.DictWriter(f, fieldnames=self.history_header)
             writer.writeheader()
     
-    def get_niche_key(self):
+    def get_new_niche_key(self):
         return next(self.niche_indexer)
 
     def initialize_niche(self):
         print('-----   Initialize   -----')
 
-        key = self.get_niche_key()
+        key = self.get_new_niche_key()
         niche = Niche(key, self.iteration)
         environment = self.env_config.make_init()
         optimizer = self.opt_config.make_init()
@@ -214,14 +214,14 @@ class POET():
 
     def get_novelty_score(self, niche, archives):
         keys = archives.keys()
-        transfereed_scores = niche.get_transferred_scores(keys)
-        transfereed_scores = np.clip(transfereed_scores, self.clip_score_lower, self.clip_score_upper)
+        transferred_scores = niche.get_transferred_scores(keys)
+        transferred_scores = np.clip(transferred_scores, self.clip_score_lower, self.clip_score_upper)
 
         distances = []
         for _,archive_niche in archives.items():
             archive_transferred_scores = archive_niche.get_transferred_scores(keys)
             archive_transferred_scores = np.clip(archive_transferred_scores, self.clip_score_lower, self.clip_score_upper)
-            distance = np.linalg.norm(transfereed_scores - archive_transferred_scores)
+            distance = np.linalg.norm(transferred_scores - archive_transferred_scores)
             distances.append(distance)
 
         knn_distances = np.sort(distances)[:self.novelty_knn]
@@ -247,7 +247,7 @@ class POET():
         for _ in range(reproduction_num):
             
             parent_niche = random.choice(parent_niches)
-            child_key = self.get_niche_key()
+            child_key = self.get_new_niche_key()
             child_niche = parent_niche.reproduce(child_key, self.iteration, self.env_config, self.opt_config)
             child_niche_candidates[child_key] = child_niche
 

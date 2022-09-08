@@ -306,7 +306,7 @@ class OptimizerPPOConfig():
                  value_loss_coef=0.5,
                  max_grad_norm=0.5,
                  use_linear_lr_decay=True,
-                 max_steps=4*3000,
+                 max_steps=4*10000,
                  use_proper_time_limits=False,
                  recurrent_policy=False):
         self.indexer = count(0)

@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 import neat_cppn
 
 class EvogymTerrainDecoder(neat_cppn.BaseCPPNDecoder):
-    def __init__(self, width, first_platform=10):
-        self.width = width
+    def __init__(self, max_width, first_platform=10):
+        self.max_width = max_width
         self.base_height = 7
         self.first_platform = first_platform
 
@@ -58,15 +58,15 @@ class EvogymTerrainDecoder(neat_cppn.BaseCPPNDecoder):
         platform_idx = 1
         prev_voxel = 5
         # encode to platform by cppn
-        while x<self.width:
-            input_x = x / self.width * 3
+        while x<self.max_width:
+            input_x = x / self.max_width * 3
 
             # determine voxel type
             rigid, soft, empty = sort_func(cppn.activate([input_x,0,1,0]), sorts[1])
             rigid, soft, empty = (rigid+1)*terrain_param.rigid_bias, (soft+1)*terrain_param.soft_bias, (empty+1)*terrain_param.empty_bias
             voxel_type = voxel_projection[np.argmax(np.array([rigid, soft, empty]))]
 
-            # determine about platfrom 
+            # determine about platform 
             flat, height, width = sort_func(cppn.activate([input_x,1,0,0]), sorts[0])
             height = round(height * flat**2 * terrain_param.max_up_step) if height>0 \
                 else round(height * flat**2 * terrain_param.max_down_step)
@@ -74,7 +74,7 @@ class EvogymTerrainDecoder(neat_cppn.BaseCPPNDecoder):
             width = int(width * terrain_param.max_empty_width)+1 if voxel_type==0 \
                 else int(width * (terrain_param.max_soft_width-1))+2 if voxel_type==2 \
                 else int((1 - width**2) * terrain_param.max_rigid_width)+1
-            width = min(width, self.width-x)
+            width = min(width, self.max_width - x)
 
             # print(f'x: {x}, y: {y}, voxel: {voxel_type}, width: {width}, height: {height}')
 
@@ -85,7 +85,7 @@ class EvogymTerrainDecoder(neat_cppn.BaseCPPNDecoder):
                     neighbors[(x-1,y)].append((x,y))
                     neighbors[(x,y)] = [(x-1,y)]
                     x += 1
-                    if x > self.width:
+                    if x > self.max_width:
                         prev_voxel = 5
                         break
 
@@ -190,34 +190,34 @@ class EvogymTerrainDecoder(neat_cppn.BaseCPPNDecoder):
 
 class TerrainParams():
     def __init__(self, key,
-                 max_down_step=0,
-                 max_up_step=0,
                  rigid_bias=1,
                  soft_bias=0,
                  empty_bias=0,
                  max_rigid_width=10,
                  max_soft_width=3,
-                 max_empty_width=1):
+                 max_empty_width=1,
+                 max_down_step=0,
+                 max_up_step=0,):
 
         self.key = key
-        self.max_down_step = max_down_step
-        self.max_up_step = max_up_step
         self.rigid_bias = rigid_bias
         self.soft_bias = soft_bias
         self.empty_bias = empty_bias
         self.max_rigid_width = max_rigid_width
         self.max_soft_width = max_soft_width
         self.max_empty_width = max_empty_width
+        self.max_down_step = max_down_step
+        self.max_up_step = max_up_step
 
     def reproduce(self, key):
-        max_down_step   = max(0, min( 4, self.max_down_step   + np.random.normal(0.08, 0.2, 1)[0]))
-        max_up_step     = max(0, min( 3, self.max_up_step     + np.random.normal(0.08, 0.2, 1)[0]))
-        rigid_bias      = max(0, min( 1, self.rigid_bias      + np.random.normal(0.05, 0.1, 1)[0]))
-        soft_bias       = max(0, min( 1, self.soft_bias       + np.random.normal(0.05, 0.1, 1)[0]))
-        empty_bias      = max(0, min( 1, self.empty_bias      + np.random.normal(0.05, 0.1, 1)[0]))
-        max_rigid_width = max(1, min(10, self.max_rigid_width + np.random.normal(0.00, 0.8, 1)[0]))
-        max_soft_width  = max(1, min( 8, self.max_soft_width  + np.random.normal(0.15, 0.8, 1)[0]))
-        max_empty_width = max(1, min( 7, self.max_empty_width + np.random.normal(0.15, 0.8, 1)[0]))
+        rigid_bias      = max(0, min( 1, self.rigid_bias      + np.random.normal(0.05, 0.1)))
+        soft_bias       = max(0, min( 1, self.soft_bias       + np.random.normal(0.05, 0.1)))
+        empty_bias      = max(0, min( 1, self.empty_bias      + np.random.normal(0.05, 0.1)))
+        max_rigid_width = max(1, min(10, self.max_rigid_width + np.random.normal(0.00, 0.8)))
+        max_soft_width  = max(1, min( 8, self.max_soft_width  + np.random.normal(0.15, 0.8)))
+        max_empty_width = max(1, min( 7, self.max_empty_width + np.random.normal(0.15, 0.8)))
+        max_down_step   = max(0, min( 4, self.max_down_step   + np.random.normal(0.10, 0.2)))
+        max_up_step     = max(0, min( 3, self.max_up_step     + np.random.normal(0.10, 0.2)))
 
         child = TerrainParams(
             key,
@@ -255,7 +255,7 @@ class EnvironmentEvogym():
         self.terrain_params = terrain_params
         self.terrain = None
 
-    def initialize(self, decode_function, genome_config):
+    def make_terrain(self, decode_function, genome_config):
         terrain = decode_function(self.cppn_genome, genome_config, self.terrain_params)
         self.terrain = terrain
         for platform in terrain['objects'].values():
@@ -320,7 +320,7 @@ class EnvironmentEvogym():
         child_cppn = config.reproduce_cppn_genome(self.cppn_genome)
         child_params = config.reproduce_terrain_params(self.terrain_params)
         child = EnvironmentEvogym(key, child_cppn, child_params)
-        child.initialize(config.decode_cppn, config.neat_config.genome_config)
+        child.make_terrain(config.decode_cppn, config.neat_config.genome_config)
         return child
 
 
@@ -329,10 +329,11 @@ class EnvrionmentEvogymConfig():
     def __init__(self,
                  structure,
                  neat_config,
+                 env_id='Parkour-v0',
                  max_width=80,
                  first_platform=10):
 
-        self.env_id = 'Parkour-v0'
+        self.env_id = env_id
         self.structure = structure
         self.neat_config = neat_config
         self.env_indexer = count(0)
@@ -355,7 +356,7 @@ class EnvrionmentEvogymConfig():
 
         env_key = next(self.env_indexer)
         environment = EnvironmentEvogym(env_key, cppn_genome, terrain_params)
-        environment.initialize(self.decode_cppn, self.neat_config.genome_config)
+        environment.make_terrain(self.decode_cppn, self.neat_config.genome_config)
         return environment
 
     def reproduce_cppn_genome(self, genome):
