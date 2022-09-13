@@ -10,7 +10,7 @@ $python run_evogym_poet.py
 | option                | abbrev  | default         | detail  |
 | :---                  | :---:   | :---:           | :---    |
 | --name                | -n      | default         | experiment name |
-| --task                | -t      | Parkou-v0       | task name |
+| --task                | -t      | Parkour-v0      | task name |
 | --robot               | -r      | cat             | robot structure name <br> built in "envs/evogym/robot_files/"           |
 | --iteration           | -i      | 3000            | iterations of poet |
 | --niche-num           | -n-num  | 10              | limit for niche to hold |
@@ -19,9 +19,9 @@ $python run_evogym_poet.py
 | --reproduce-interval  | -r-iv   | 30              | reproduce interval |
 | --transfer-interval   | -t-iv   | 15              | transfer interval |
 | --save-interval       | -s-iv   | 0               | save interval, 0 means no save |
-| --reproduce-threshold | -r-th   | 5.0             | threshold of score to reproduce new niche |
-| --mc-lower            | -mc-l   | 0.1             | ratio to maximum score. used for lower minimal criteria. |
-| --mc-upper            | -mc-u   | 0.8             | ratio to maximum score. used for upper minimal criteria. |
+| --reproduce-threshold | -r-th   | 5.0             | threshold of reward to reproduce new niche |
+| --mc-lower            | -mc-l   | 0.1             | ratio to maximum reward. used for lower minimal criteria. |
+| --mc-upper            | -mc-u   | 0.8             | ratio to maximum reward. used for upper minimal criteria. |
 | --width               | -w      | 100             | width of evogym terrain |
 | --first-platform      | -fp     | 10              | first platform width of evogym terrain |
 | --steps-per-iteration | -si-ppo | 4               | number of steps per iteration of poet |

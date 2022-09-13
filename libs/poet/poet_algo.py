@@ -45,8 +45,8 @@ class POET():
                  repro_threshold=5.0,
                  mc_lower=1,
                  mc_upper=10,
-                 clip_score_lower=0,
-                 clip_score_upper=10,
+                 clip_reward_lower=0,
+                 clip_reward_upper=10,
                  novelty_knn=1,
                  novelty_threshold=0.1,
                  reset_optimizer=True):
@@ -67,8 +67,8 @@ class POET():
         self.mc_lower = mc_lower
         self.mc_upper = mc_upper
         
-        self.clip_score_lower = clip_score_lower
-        self.clip_score_upper = clip_score_upper
+        self.clip_reward_lower = clip_reward_lower
+        self.clip_reward_upper = clip_reward_upper
         self.novelty_knn = novelty_knn
         self.novelty_threshold = novelty_threshold
 
@@ -79,7 +79,8 @@ class POET():
         self.niches = {}
         self.niches_archive = {}
         self.niche_indexer = count(0)
-        self.pool = NonDaemonPool(num_workers)
+        self.num_workers = num_workers
+        self.pool = None
 
         self.save_path = save_path
         self.niche_path = os.path.join(save_path, 'niche')
@@ -140,7 +141,7 @@ class POET():
             niche.start_evaluate(self.pool, self.env_config, self.opt_config, imigrant_cores=imigrant_cores)
         
         for key,niche in niches.items():
-            score = niche.end_evaluate(self.env_config, self.opt_config, imigrant_cores=imigrant_cores)
+            reward = niche.end_evaluate(self.env_config, self.opt_config, imigrant_cores=imigrant_cores)
     
     def develop_niches(self):
         print('-----   Develop   -----')
@@ -153,10 +154,10 @@ class POET():
 
         self.evaluate_niches(self.niches)
 
-        print('  niche     steps     score      best  ')
+        print('  niche     steps    reward      best  ')
         print('            =====   ========   ========')
         for key,niche in self.niches.items():
-            print(f' {key: =6} :   {niche.steps: =5}   {niche.score: =+8.2f}   {niche.best_score: =+8.2f}')
+            print(f' {key: =6} :   {niche.steps: =5}   {niche.reward: =+8.2f}   {niche.best_reward: =+8.2f}')
         print()
 
     def transfer(self, reciever_niches, child=False):
@@ -184,7 +185,7 @@ class POET():
 
         # finish evalution and invaded optimizer
         if not child:
-            print('  niche     transferred    from     score  ')
+            print('  niche     transferred    from     reward ')
             print('            ===========   ======   ========')
             print_end = '\n'
         else:
@@ -198,8 +199,8 @@ class POET():
                 assert len(invader)<2
                 if len(invader)==1:
                     invader_key = list(invader.keys())[0]
-                    score = invader[invader_key]
-                    print(f' {reciever_key: =6} :           yes   {invader_key: =6}   {score: =+8.2f}', end=print_end)
+                    reward = invader[invader_key]
+                    print(f' {reciever_key: =6} :           yes   {invader_key: =6}   {reward: =+8.2f}', end=print_end)
 
             if reciever_key not in adapts or len(invader)==0:
                 print(f' {reciever_key: =6} :            no                    ', end=print_end)
@@ -210,18 +211,18 @@ class POET():
         print()
 
     def pass_mc(self, niche):
-        return niche.score > self.mc_lower and niche.score < self.mc_upper
+        return niche.reward > self.mc_lower and niche.reward < self.mc_upper
 
     def get_novelty_score(self, niche, archives):
         keys = archives.keys()
-        transferred_scores = niche.get_transferred_scores(keys)
-        transferred_scores = np.clip(transferred_scores, self.clip_score_lower, self.clip_score_upper)
+        transferred_rewards = niche.get_transferred_rewards(keys)
+        transferred_rewards = np.clip(transferred_rewards, self.clip_reward_lower, self.clip_reward_upper)
 
         distances = []
         for _,archive_niche in archives.items():
-            archive_transferred_scores = archive_niche.get_transferred_scores(keys)
-            archive_transferred_scores = np.clip(archive_transferred_scores, self.clip_score_lower, self.clip_score_upper)
-            distance = np.linalg.norm(transferred_scores - archive_transferred_scores)
+            archive_transferred_rewards = archive_niche.get_transferred_rewards(keys)
+            archive_transferred_rewards = np.clip(archive_transferred_rewards, self.clip_reward_lower, self.clip_reward_upper)
+            distance = np.linalg.norm(transferred_rewards - archive_transferred_rewards)
             distances.append(distance)
 
         knn_distances = np.sort(distances)[:self.novelty_knn]
@@ -235,7 +236,7 @@ class POET():
         niche_cores = {key: niche.get_optimizer_core() for key,niche in self.niches.items()}
         self.evaluate_niches(all_niches, imigrant_cores=niche_cores)
 
-        parent_niches = [niche for niche in self.niches.values() if niche.score>self.repro_threshold]
+        parent_niches = [niche for niche in self.niches.values() if niche.reward>self.repro_threshold]
 
         if len(parent_niches) == 0:
             print('  no parent niches')
@@ -254,16 +255,16 @@ class POET():
         # evaluation self
         self.evaluate_niches(child_niche_candidates)
 
-        # evaluation of niches passed mc by all niches
+        # evaluate niches, passed mc, by all niches
         child_niches_pass = {key: niche for key,niche in child_niche_candidates.items() if self.pass_mc(niche)}
         self.evaluate_niches(child_niches_pass, imigrant_cores=all_niche_cores)
 
         child_niches = []
-        print('  child     parent     score     mc     novelty')
+        print('  child     parent    reward     mc     novelty')
         print('            ======   ========   ====   ========')
         for child_key,child_niche in child_niche_candidates.items():
 
-            print(f' {child_key: =6} :   {child_niche.parent: =6}   {child_niche.score: =+8.2f}', end='   ')
+            print(f' {child_key: =6} :   {child_niche.parent: =6}   {child_niche.reward: =+8.2f}', end='   ')
 
             if child_key in child_niches_pass:
                 novelty_score = self.get_novelty_score(child_niche, all_niches)
@@ -289,7 +290,7 @@ class POET():
             return
 
         print('transfer to child niche')
-        print('  niche     transferred    from     score     admitted')
+        print('  niche     transferred    from     reward    admitted')
         print('            ===========   ======   ========   ========')
         admitted = 0
         for niche_key,child_niche,_ in child_niches:
@@ -310,14 +311,16 @@ class POET():
     def update_niche_status(self):
         keys = self.niches.keys()
         for key,niche in self.niches.items():
-            niche.reset_transferred_scores(keys)
+            niche.reset_transferred_rewards(keys)
 
     def start_iteration(self):
         print(f'********************  ITERATION {self.iteration+1: =6}   ********************')
         self.iteration_start_time = time.time()
         print()
 
-    def end_iteratin(self):
+        self.pool = NonDaemonPool(self.num_workers)
+
+    def end_iteration(self):
         save_core = self.save_core_interval > 0 and (self.iteration+1) % self.save_core_interval == 0
         for key,niche in self.niches.items():
             niche.save_log(save_core=save_core)
@@ -325,6 +328,8 @@ class POET():
         iteration_end_time = time.time()
         print(f'elapsed time: {iteration_end_time-self.iteration_start_time: =.1f} sec')
         print('\n')
+
+        self.pool.close()
 
     
     def optimize(self, iterations=2000):
@@ -342,7 +347,7 @@ class POET():
 
             self.develop_niches()
 
-            self.end_iteratin()
+            self.end_iteration()
 
             self.iteration += 1
 

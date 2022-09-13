@@ -19,7 +19,7 @@ def get_args():
     parser.add_argument(
         '-r', '--robot',
         default='cat', type=str,
-        help='robot structure name (default: cat, built on "envs/evogym/robot_files/")'
+        help='robot structure name (default: cat, built in "envs/evogym/robot_files/")'
     )
 
     parser.add_argument(
@@ -60,17 +60,17 @@ def get_args():
     parser.add_argument(
         '-r-th', '--reproduce-threshold',
         default=0.5, type=float,
-        help='ratio to maximum score. used for threshold of score to reproduce new niche (default: 0.5)'
+        help='ratio to maximum reward. used for threshold of reward to reproduce new niche (default: 0.5)'
     )
     parser.add_argument(
         '-mc-l', '--mc-lower',
         default=0.1, type=float,
-        help='ratio to maximum score. used for lower minimal criteria. (default: 0.1)'
+        help='ratio to maximum reward. used for lower minimal criteria. (default: 0.1)'
     )
     parser.add_argument(
         '-mc-u', '--mc-upper',
         default=0.8, type=float,
-        help='ratio to maximum score. used for upper minimal criteria. (default: 0.8)'
+        help='ratio to maximum reward. used for upper minimal criteria. (default: 0.8)'
     )
 
     parser.add_argument(

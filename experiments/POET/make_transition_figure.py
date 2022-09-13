@@ -50,7 +50,7 @@ def main(expt_name):
     arrow_kwargs = {'arrowstyle': style}
 
     interval = expt_args['transfer_interval']
-    max_score = expt_args['width']/10
+    max_reward = expt_args['width']/10 + (10 if expt_args['task']=='Parkour-v1' else 0)
     fig,ax = plt.subplots(dpi=500)
     max_iter = 0
     for niche_align,niche_key in enumerate(order):
@@ -59,14 +59,14 @@ def main(expt_name):
 
         niche_path = os.path.join(expt_path, 'niche', f'{niche_key}')
         history_file = os.path.join(niche_path, 'history.csv')
-        history = pd.read_csv(history_file, dtype={'step': 'Int64', 'score': 'Float64', 'transferred_from': 'Int64'})
+        history = pd.read_csv(history_file, dtype={'step': 'Int64', 'reward': 'Float64', 'transferred_from': 'Int64'})
 
         convolved_length = math.ceil(len(history)/interval)
         
-        scores = history['score'].fillna(0)
+        rewards = history['reward'].fillna(0)
         iterations = history['step'].values[::interval] + iteration
-        scores = [scores[i*interval:(i+1)*interval].max() for i in range(convolved_length)]
-        colorbar = ax.scatter(iterations, [niche_align]*len(iterations), vmin=0, vmax=max_score, c=scores, cmap='plasma', s=5)
+        rewards = [rewards[i*interval:(i+1)*interval].max() for i in range(convolved_length)]
+        colorbar = ax.scatter(iterations, [niche_align]*len(iterations), vmin=0, vmax=max_reward, c=rewards, cmap='plasma', s=5)
 
         ax.text(iterations[0]-interval, niche_align, str(niche_key), ha='right', va='center', fontsize=7)
 
@@ -76,18 +76,18 @@ def main(expt_name):
 
         transfer_froms = history['transferred_from'].fillna(-1)
         transfer_froms = [transfer_froms[k*interval:(k+1)*interval].max() for k in range(convolved_length)]
-        scores_cummax = np.maximum.accumulate(scores)
+        rewards_cummax = np.maximum.accumulate(rewards)
 
         iter_i = 0
-        score_past_max = float('-inf')
-        score_past_max = 0
+        reward_past_max = float('-inf')
+        reward_past_max = 0
         while iter_i < convolved_length:
             from_key = transfer_froms[iter_i]
             valid = 0
             while iter_i+valid < convolved_length and transfer_froms[iter_i+valid] in [-1, from_key]:
                 valid += 1
 
-            if from_key != -1 and scores_cummax[iter_i+valid-1] > score_past_max and not (iter_i == 0 and from_key == parent_key):
+            if from_key != -1 and rewards_cummax[iter_i+valid-1] > reward_past_max and not (iter_i == 0 and from_key == parent_key):
                 from_align = order.index(from_key)
                 transfer_iter = iterations[iter_i]
                 rad = 0.4/(np.log(abs(from_align - niche_align)) + 1)
@@ -95,7 +95,7 @@ def main(expt_name):
                     connectionstyle=f'arc3,rad={rad}'
                 else:
                     connectionstyle=f'arc3,rad=-{rad}'
-                improve = (scores_cummax[iter_i+valid-1] - score_past_max) / max_score
+                improve = (rewards_cummax[iter_i+valid-1] - reward_past_max) / max_reward
                 alpha = max(0.08, min(0.4, improve*1.5))
                 lw = max(0.01, min(0,1, improve/5))
                 arrows.append(
@@ -107,7 +107,7 @@ def main(expt_name):
                         color=niches_dict[from_key]['color'], **arrow_kwargs))
             
             iter_i += valid
-            score_past_max = scores_cummax[iter_i-1]
+            reward_past_max = rewards_cummax[iter_i-1]
 
         max_iter = max(max_iter, iterations.max())
 

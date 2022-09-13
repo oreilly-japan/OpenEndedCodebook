@@ -56,9 +56,9 @@ def main():
 
     
     if args.task=='Parkour-v1':
-        maximum_score = args.width/10 + 10
+        maximum_reward = args.width/10 + 10
     else:
-        maximum_score = 10
+        maximum_reward = args.width/10
 
     poet_pop = POET(
         env_config,
@@ -71,11 +71,11 @@ def main():
         reproduce_interval=args.reproduce_interval,
         transfer_interval=args.transfer_interval,
         save_core_interval=args.save_interval,
-        repro_threshold=maximum_score*args.reproduce_threshold,
-        mc_lower=maximum_score*args.mc_lower,
-        mc_upper=maximum_score*args.mc_upper,
-        clip_score_lower=0,
-        clip_score_upper=maximum_score,
+        repro_threshold=maximum_reward*args.reproduce_threshold,
+        mc_lower=maximum_reward*args.mc_lower,
+        mc_upper=maximum_reward*args.mc_upper,
+        clip_reward_lower=0,
+        clip_reward_upper=maximum_reward,
         novelty_knn=1,
         novelty_threshold=0.1)
 

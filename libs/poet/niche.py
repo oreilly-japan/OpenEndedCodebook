@@ -14,10 +14,10 @@ class Niche():
         self.steps = 0
         self.developed = False
         
-        self.score = float('-inf')
-        self.best_score = float('-inf')
-        self.recent_scores = []
-        self.transferred_scores = {}
+        self.reward = float('-inf')
+        self.best_reward = float('-inf')
+        self.recent_rewards = []
+        self.transferred_rewards = {}
         self.transferred_from = parent
 
         self.processes = {}
@@ -66,7 +66,7 @@ class Niche():
         self.optimizer.save(save_path)
 
         self.history_file = os.path.join(save_path, 'history.csv')
-        self.history_header = ['step', 'score', 'transferred_from']
+        self.history_header = ['step', 'reward', 'transferred_from']
 
         with open(self.history_file, 'w') as f:
             writer = csv.DictWriter(f, fieldnames=self.history_header)
@@ -84,7 +84,7 @@ class Niche():
             writer = csv.DictWriter(f, fieldnames=self.history_header)
             items = {
                     'step': self.steps,
-                    'score': self.score,
+                    'reward': self.reward,
                     'transferred_from': self.transferred_from
             }
             writer.writerow(items)
@@ -152,8 +152,8 @@ class Niche():
         
         else:
             for imigrant_key,imigrant_core in imigrant_cores.items():
-                if not invasion and imigrant_key in self.transferred_scores:
-                    self.processes[imigrant_key] = pool.apply_async(self.transferred_scores.get, args=(imigrant_key,))
+                if not invasion and imigrant_key in self.transferred_rewards:
+                    self.processes[imigrant_key] = pool.apply_async(self.transferred_rewards.get, args=(imigrant_key,))
 
                 else:
                     func, kwargs = self.optimizer.get_evaluate(opt_config, core=imigrant_core)
@@ -161,62 +161,64 @@ class Niche():
 
     def end_evaluate(self, env_config, opt_config, imigrant_cores=None, invasion=False, reset_optimizer=True):
 
-        scores = {}
+        rewards = {}
         if imigrant_cores is None:
             assert self.key in self.processes
-            score = self.processes.pop(self.key).get()
-            scores[self.key] = score
+            reward = self.processes.pop(self.key).get()
+            rewards[self.key] = reward
 
-            self.score = score
-            self.recent_scores.append(score)
-            while len(self.recent_scores)>5:
-                self.recent_scores.pop(0)
+            self.reward = reward
+            self.recent_rewards.append(reward)
+            while len(self.recent_rewards)>5:
+                self.recent_rewards.pop(0)
 
-            if score > self.best_score:
-                self.best_score = score
+            if reward > self.best_reward:
+                self.best_reward = reward
                 if self.core_path is not None:
                     self.optimizer.save_core(self.core_path, 'best')
 
         else:
             for imigrant_key,_ in imigrant_cores.items():
                 assert imigrant_key in self.processes
-                score = self.processes.pop(imigrant_key).get()
-                scores[imigrant_key] = score
+                reward = self.processes.pop(imigrant_key).get()
+                rewards[imigrant_key] = reward
+
+        assert len(self.processes)==0
         
         if invasion:
-            assert self.key not in scores
+            assert self.key not in rewards
 
-            max_imigrant_key, max_imigrant_score = max(scores.items(), key=lambda z: z[1])
-            if max_imigrant_score > self.score:
+            max_imigrant_key, max_imigrant_reward = max(rewards.items(), key=lambda z: z[1])
+            if max_imigrant_reward > self.reward:
                 max_imigrant_core = imigrant_cores[max_imigrant_key]
                 self.optimizer.set_core(max_imigrant_core, opt_config, reset=reset_optimizer)
 
-                self.score = max_imigrant_score
-                self.recent_scores = [max_imigrant_score]
-                self.transferred_scores[self.key] = max_imigrant_score
+                self.reward = max_imigrant_reward
+                self.recent_rewards = [max_imigrant_reward]
+                self.transferred_rewards[self.key] = max_imigrant_reward
                 self.transferred_from = max_imigrant_key
 
-                if max_imigrant_score > self.best_score:
-                    self.best_score = max_imigrant_score
+                if max_imigrant_reward > self.best_reward:
+                    self.best_reward = max_imigrant_reward
                     if self.core_path is not None:
                         self.optimizer.save_core(self.core_path, 'best')
 
-                return {max_imigrant_key: max_imigrant_score}
+                return {max_imigrant_key: max_imigrant_reward}
             else:
                 return {}
 
         else:
-            self.transferred_scores.update(scores)
-            return scores
+            self.transferred_rewards.update(rewards)
+            return rewards
 
     def get_accepted_keys(self, keys):
-        base_score = max(self.recent_scores)
-        accepted_keys = [key for key in keys if key!=self.key and self.transferred_scores[key]>base_score]
+        base_reward = max(self.recent_rewards)
+        accepted_keys = [key for key in keys if key!=self.key and self.transferred_rewards[key]>base_reward]
         return accepted_keys
 
-    def get_transferred_scores(self, keys):
-        return [self.transferred_scores[key] for key in keys]
+    def get_transferred_rewards(self, keys):
+        return [self.transferred_rewards[key] for key in keys]
 
-    def reset_transferred_scores(self, keys):
+    def reset_transferred_rewards(self, keys):
         for key in keys:
-            self.transferred_scores.pop(key, None)
+            self.transferred_rewards.pop(key, None)
