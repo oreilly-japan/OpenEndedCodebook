@@ -6,18 +6,19 @@
 $python run_evogym_cppn.py
 ```
 #### options:
-| option          | abbrev  | default         | detail  |
-| :---            | :---:   | :---:           | :---    |
-| --name          | -n      | "{task}_{robot}"| experiment name |
-| --task          | -t      | Walker-v0       | evogym environment id |
-| --shape         | -s      | (5,5)           | robot shape <br> usage: "-s {height} {width}" |
-| --batch-size    | -b      | 4               | genome number to evaluate in one generation |
-| --generation    | -g      | 500             | iterations of NEAT |
-| --ppo-iters     | -i      | 5               | learning iterations of PPO algo <br> on the more complex task, need more. |
-| --deterministic | -d      | *false*         | evaluate robot on deterministic action |
-| --num-cores     | -c      | 1               | number of parallel evaluation processes |
-| --no-plot       |         | *false*         | not open window of progress figure |
-| --no-view       |         | *false*         | not open simulation window of best robot |
+| option                | abbrev  | default         | detail  |
+| :---                  | :---:   | :---:           | :---    |
+| --name                | -n      | "{task}_{robot}"| experiment name |
+| --task                | -t      | Walker-v0       | evogym environment id |
+| --shape               | -s      | (5,5)           | robot shape <br> usage: "-s {height} {width}" |
+| --batch-size          | -b      | 4               | genome number to evaluate in one generation |
+| --generation          | -g      | 500             | iterations of NEAT |
+| --ppo-iters           | -i      | 125             | learning iterations of PPO algo <br> on the more complex task, need more. |
+| --evaluation-interval | -ei     | 25              | frequency to evaluatie policy |
+| --deterministic       | -d      | *false*         | evaluate robot on deterministic action |
+| --num-cores           | -c      | 1               | number of parallel evaluation processes |
+| --no-plot             |         | *false*         | not open window of progress figure |
+| --no-view             |         | *false*         | not open simulation window of best robot |
 
 ### make figure
 after run_evogym_cppn, make {gif, jpg} file for each of all robots written in population history file.

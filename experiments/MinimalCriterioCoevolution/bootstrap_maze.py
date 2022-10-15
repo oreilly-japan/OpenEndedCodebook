@@ -10,14 +10,13 @@ LIB_DIR = os.path.join(ROOT_DIR, 'libs')
 sys.path.append(LIB_DIR)
 import mcc
 import ns_neat
-from parallel import ParallelEvaluator
+from parallel import EvaluatorParallel
 from experiment_utils import initialize_experiment
 
 ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'maze')
 sys.path.append(ENV_DIR)
 from maze_genome import MazeGenome
 from maze_genome_decoder import MazeGenomeDecoder
-from maze_environment_numpy import MazeEnvironment
 from evaluator import MazeControllerEvaluatorNS
 
 
@@ -110,7 +109,7 @@ def main():
         maze_env, timesteps = MazeDecoder.decode(maze_genome, mcc_config, save=os.path.join(save_path, f'maze{maze_genome.key+1}.jpg'))
 
         evaluator = MazeControllerEvaluatorNS(maze_env, timesteps)
-        parallel = ParallelEvaluator(
+        parallel = EvaluatorParallel(
             num_workers=args.num_cores,
             evaluate_function=evaluator.evaluate_agent,
             decode_function=ns_neat.FeedForwardNetwork.create

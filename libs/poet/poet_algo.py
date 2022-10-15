@@ -6,23 +6,6 @@ import time
 import multiprocessing.pool
 import multiprocessing as mp
 
-class NoDaemonProcess(mp.Process):
-    # make 'daemon' attribute always return False
-    def _get_daemon(self):
-        return False
-    def _set_daemon(self, value):
-        pass
-    daemon = property(_get_daemon, _set_daemon)
-
-# We sub-class multiprocessing.pool.Pool instead of multiprocessing.Pool
-# because the latter is only a wrapper function, not a proper class.
-
-class NonDaemonPool(mp.pool.Pool):
-    def Process(self, *args, **kwds):
-        proc = super(NonDaemonPool, self).Process(*args, **kwds)
-        proc.__class__ = NoDaemonProcess
-        return proc
-
 import random
 from itertools import count
 import numpy as np
@@ -318,7 +301,7 @@ class POET():
         self.iteration_start_time = time.time()
         print()
 
-        self.pool = NonDaemonPool(self.num_workers)
+        self.pool = mp.pool.Pool(self.num_workers)
 
     def end_iteration(self):
         save_core = self.save_core_interval > 0 and (self.iteration+1) % self.save_core_interval == 0
@@ -330,6 +313,7 @@ class POET():
         print('\n')
 
         self.pool.close()
+        self.pool.join()
 
     
     def optimize(self, iterations=2000):

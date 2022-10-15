@@ -26,7 +26,7 @@ class NonDaemonPool(mp.pool.Pool):
         return proc
 
 
-class ParallelEvaluator():
+class EvaluatorParallel():
     def __init__(self, num_workers, decode_function, evaluate_function, revaluate=False, timeout=None, parallel=True):
         self.num_workers = num_workers
         self.decode_function = decode_function
@@ -75,7 +75,7 @@ class ParallelEvaluator():
                     setattr(genome, attr, data)
 
 
-class MCCParallelEvaluator():
+class MCCEvaluatorParallel():
     def __init__(self, num_workers, evaluate_function, decode_function1, decode_function2, timeout=None):
         self.num_workers = num_workers
         self.evaluate_function = evaluate_function
@@ -141,14 +141,14 @@ class MCCParallelEvaluator():
         if (config.genome1_limit > 0 and achieve1.value >= config.genome1_limit) or\
            (config.genome2_limit > 0 and achieve2.value >= config.genome2_limit):
             return count_up
-        if achieve1.value >= config.genome1_criteria and achieve2.value >= config.genome2_criteria:
+        if achieve1.value >= config.genome1_criterion and achieve2.value >= config.genome2_criterion:
             return count_up
 
         success = evaluate_function(phenome1, phenome2, generation)
 
         if success:
-            if (achieve1.value < config.genome1_criteria and (config.genome2_limit == 0 or achieve2.value < config.genome2_limit)) or \
-               (achieve2.value < config.genome2_criteria and (config.genome1_limit == 0 or achieve1.value < config.genome1_limit)):
+            if (achieve1.value < config.genome1_criterion and (config.genome2_limit == 0 or achieve2.value < config.genome2_limit)) or \
+               (achieve2.value < config.genome2_criterion and (config.genome1_limit == 0 or achieve1.value < config.genome1_limit)):
 
                achieve1.value += 1
                achieve2.value += 1

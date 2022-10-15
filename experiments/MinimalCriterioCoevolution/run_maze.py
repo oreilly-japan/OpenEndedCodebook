@@ -9,14 +9,13 @@ ROOT_DIR = os.path.dirname(os.path.dirname(CURR_DIR))
 LIB_DIR = os.path.join(ROOT_DIR, 'libs')
 sys.path.append(LIB_DIR)
 import mcc
-from parallel import MCCParallelEvaluator
+from parallel import MCCEvaluatorParallel
 from experiment_utils import initialize_experiment, load_experiment
 
 ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'maze')
 sys.path.append(ENV_DIR)
 from maze_genome import MazeGenome
 from maze_genome_decoder import MazeGenomeDecoder
-from maze_environment_numpy import MazeEnvironment
 
 
 from arguments.maze_mcc import get_args
@@ -64,8 +63,8 @@ def main():
         ('MCC', 'generation', args.generation),
         ('MCC', 'genome1_pop_size', args.agent_pop),
         ('MCC', 'genome2_pop_size', args.maze_pop),
-        ('MCC', 'genome1_criteria', args.agent_criteria),
-        ('MCC', 'genome2_criteria', args.maze_criteria),
+        ('MCC', 'genome1_criterion', args.agent_criterion),
+        ('MCC', 'genome2_criterion', args.maze_criterion),
         ('MCC', 'genome1_offspring_size', args.agent_batch),
         ('MCC', 'genome2_offspring_size', args.maze_batch),
         ('MCC', 'genome1_limit', args.agent_limit),
@@ -95,7 +94,7 @@ def main():
 
     agent_decode_function = mcc.FeedForwardNetwork.create
 
-    evaluator = MCCParallelEvaluator(
+    evaluator = MCCEvaluatorParallel(
         num_workers=args.num_cores,
         evaluate_function=simulate_maze,
         decode_function1=agent_decode_function,

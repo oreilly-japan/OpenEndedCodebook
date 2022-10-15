@@ -7,21 +7,23 @@
 $python run_evogym.py
 ```
 #### options:
-| option          | abbrev  | default         | detail  |
-| :---            | :---:   | :---:           | :---    |
-| --name          | -n      | "{task}_{robot}"| experiment name |
-| --task          | -t      | Walker-v0       | evogym environment id |
-| --robot         | -r      | default         | robot structure name <br> built on "envs/evogym/robot_files/" <br> if "default", load default robot for the task |
-| --num-processes | -p      | 4               | how many training CPU processes to use |
-| --steps         | -s      | 128             | num steps to use in PPO |
-| --num-mini-batch| -b      | 4               | number of batches for ppo |
-| --epochs        | -e      | 8               | number of ppo epochs |
-| --ppo-iters     | -i      | 100             | learning iterations of PPO |
-| --lerning-rate  | -lr     | 3e-4            | learning rate |
-| --gamma         |         | 0.99            | discount factor for rewards |
-| --clip-range    | -c      | 0.3             | ppo clip parameter |
-| --deterministic | -d      | *false*         | robot act deterministic |
-| --no-view       |         | *false*         | not open simulation window of best robot |
+| option                | abbrev  | default         | detail  |
+| :---                  | :---:   | :---:           | :---    |
+| --name                | -n      | "{task}_{robot}"| experiment name |
+| --task                | -t      | Walker-v0       | evogym environment id |
+| --robot               | -r      | default         | robot structure name <br> built on "envs/evogym/robot_files/" <br> if "default", load default robot for the task |
+| --num-processes       | -p      | 4               | how many training CPU processes to use |
+| --steps               | -s      | 256             | num steps to use in PPO |
+| --num-mini-batch      | -b      | 8               | number of batches for ppo |
+| --epochs              | -e      | 8               | number of ppo epochs |
+| --train-iters         | -i      | 2500            | learning iterations of PPO |
+| --evaluation-interval | -ei     | 25              | frequency to evaluate policy |
+| --lerning-rate        | -lr     | 3e-4            | learning rate |
+| --gamma               |         | 0.99            | discount factor for rewards |
+| --clip-range          | -c      | 0.3             | ppo clip parameter |
+| --init-log-std        | -std    | 0.1             | initial log std of action distribution |
+| --deterministic       | -d      | *false*         | robot act deterministic |
+| --no-view             |         | *false*         | not open simulation window of best robot |
 
 
 ### make figure

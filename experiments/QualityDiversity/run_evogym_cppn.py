@@ -11,7 +11,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(CURR_DIR))
 LIB_DIR = os.path.join(ROOT_DIR, 'libs')
 sys.path.append(LIB_DIR)
 import me_neat
-from parallel import ParallelEvaluator
+from parallel import EvaluatorParallel
 from experiment_utils import initialize_experiment
 
 ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'evogym')
@@ -51,10 +51,10 @@ def main():
     constraint = EvogymStructureConstraint(decode_function)
     constraint_function = constraint.eval_constraint
 
-    evaluator = EvogymStructureEvaluatorME(args.task, save_path, args.ppo_iters, bd_dictionary, deterministic=args.deterministic)
+    evaluator = EvogymStructureEvaluatorME(args.task, save_path, args.ppo_iters, args.evaluation_interval, bd_dictionary, deterministic=args.deterministic)
     evaluate_function = evaluator.evaluate_structure
 
-    parallel = ParallelEvaluator(
+    parallel = EvaluatorParallel(
         num_workers=args.num_cores,
         evaluate_function=evaluate_function,
         decode_function=decode_function

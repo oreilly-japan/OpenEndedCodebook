@@ -19,7 +19,7 @@ def get_args():
     parser.add_argument(
         '-r', '--robot',
         default='cat', type=str,
-        help='robot structure name (default: cat, built in "envs/evogym/robot_files/")'
+        help='robot structure name (default: cat, built on "envs/evogym/robot_files/")'
     )
 
     parser.add_argument(
@@ -65,12 +65,12 @@ def get_args():
     parser.add_argument(
         '-mc-l', '--mc-lower',
         default=0.1, type=float,
-        help='ratio to maximum reward. used for lower minimal criteria. (default: 0.1)'
+        help='ratio to maximum reward. used for lower minimal criterion. (default: 0.1)'
     )
     parser.add_argument(
         '-mc-u', '--mc-upper',
         default=0.8, type=float,
-        help='ratio to maximum reward. used for upper minimal criteria. (default: 0.8)'
+        help='ratio to maximum reward. used for upper minimal criterion. (default: 0.8)'
     )
 
     parser.add_argument(
@@ -105,7 +105,7 @@ def get_args():
         help='number of batches for ppo (default: 4)'
     )
     parser.add_argument(
-        '-c-ppo', '--clip-param',
+        '-c-ppo', '--clip-range',
         default=0.1, type=float,
         help='ppo clip parameter (default: 0.1)'
     )
@@ -118,6 +118,11 @@ def get_args():
         '-p-ppo', '--num-processes',
         default=4, type=int,
         help='number of paralell environment processes for ppo (default: 4)'
+    )
+    parser.add_argument(
+        '-std-ppo', '--init-log-std',
+        default=0.0, type=float,
+        help='initial log std of action distribution (default: 0.0)'
     )
 
     parser.add_argument(

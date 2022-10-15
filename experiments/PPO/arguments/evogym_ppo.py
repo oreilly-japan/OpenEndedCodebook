@@ -30,13 +30,13 @@ def get_args():
     )
     parser.add_argument(
         '-s', '--steps',
-        default=128, type=int,
-        help='num steps to use in PPO (default: 128)'
+        default=256, type=int,
+        help='num steps to use in PPO (default: 256)'
     )
     parser.add_argument(
         '-b','--num-mini-batch',
-        default=4, type=int,
-        help='number of batches for ppo (default: 4)'
+        default=8, type=int,
+        help='number of batches for ppo (default: 8)'
     )
     parser.add_argument(
         '-e', '--epochs',
@@ -44,9 +44,14 @@ def get_args():
         help='number of ppo epochs (default: 8)'
     )
     parser.add_argument(
-        '-i', '--ppo-iters',
-        default=100, type=int,
-        help='learning iterations of PPO (default: 100)'
+        '-i', '--train-iters',
+        default=2500, type=int,
+        help='learning iterations of PPO (default: 2500)'
+    )
+    parser.add_argument(
+        '-ei', '--evaluation-interval',
+        default=25, type=int,
+        help='frequency of evaluation policy (default: 25)'
     )
     parser.add_argument(
         '-lr', '--learning-rate',
@@ -62,6 +67,11 @@ def get_args():
         '-c', '--clip-range',
         default=0.3, type=float,
         help='ppo clip parameter (default: 0.3)'
+    )
+    parser.add_argument(
+        '-std', '--init-log-std',
+        default=0.1, type=float,
+        help='initial log std of action distribution (default: 0.1)'
     )
     parser.add_argument(
         '-d', '--deterministic',

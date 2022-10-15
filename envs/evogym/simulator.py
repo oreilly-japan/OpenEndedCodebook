@@ -3,12 +3,13 @@ import csv
 import time
 import pickle
 import numpy as np
+import torch
 
 import multiprocessing
 from multiprocessing import Process
 from pyrsistent import s
 
-from stable_baselines3 import PPO
+from ppo import Policy
 
 from gym_utils import make_vec_envs
 
@@ -69,12 +70,13 @@ class EvogymControllerSimulator():
             self.env.render()
 
 class EvogymControllerSimulatorPPO():
-    def __init__(self, env_id, structure, load_path, deterministic=False):
+    def __init__(self, env_id, structure, load_path, interval, deterministic=False):
         self.env_id = env_id
         self.structure = structure
         self.load_path = load_path
+        self.interval = interval
         self.deterministic = deterministic
-        self.iter = -1
+        self.iter = -interval
         self.generation = self.iter
         self.env = None
         self.controller = None
@@ -83,26 +85,29 @@ class EvogymControllerSimulatorPPO():
         self.generation = -1
         self.env = make_vec_envs(self.env_id, self.structure, 0, 1, vecnormalize=True)
         self.env.training = False
+        self.controller = Policy(self.env.observation_space, self.env.action_space, device='cpu')
 
     def update(self):
 
-        iter = self.iter + 1
-        controller_file = os.path.join(self.load_path, f'{iter}.zip')
+        iter = self.iter + self.interval
+        controller_file = os.path.join(self.load_path, f'{iter}.pt')
         while os.path.exists(controller_file):
-            iter += 1
-            controller_file = os.path.join(self.load_path, f'{iter}.zip')
+            iter += self.interval
+            controller_file = os.path.join(self.load_path, f'{iter}.pt')
 
-        if self.iter==iter-1:
+        if self.iter==iter:
             time.sleep(0.1)
             return
 
-        if self.iter < iter-1:
-            self.iter = iter - 1
+        if self.iter < iter-self.interval:
+            self.iter = iter - self.interval
             self.generation = self.iter
-            controller_file = os.path.join(self.load_path, f'{self.iter}.zip')
+            controller_file = os.path.join(self.load_path, f'{self.iter}.pt')
 
-            self.controller = PPO.load(controller_file)
-            self.env.obs_rms = self.controller.env.obs_rms
+            params, obs_rms = torch.load(controller_file)
+            self.controller.load_state_dict(params)
+            self.env.obs_rms = obs_rms
+            
             print(f'simulator update controller: iter {self.iter}')
 
 
@@ -113,7 +118,8 @@ class EvogymControllerSimulatorPPO():
         done = False
         obs = self.env.reset()
         while not done:
-            action, _ = self.controller.predict(obs, deterministic=self.deterministic)
+            with torch.no_grad():
+                action = self.controller.predict(obs, deterministic=self.deterministic)
             obs, _, done, infos = self.env.step(action)
             self.env.render()
 
@@ -154,16 +160,22 @@ class EvogymStructureSimulator():
             latest = lines[-1]
             if self.generation<int(latest[0]):
                 structure_file = os.path.join(self.load_path, 'structure', f'{latest[1]}.npz')
-                controller_file = os.path.join(self.load_path, 'controller', f'{latest[1]}.zip')
+                controller_file = os.path.join(self.load_path, 'controller', f'{latest[1]}.pt')
 
                 structure_data = np.load(structure_file)
                 structure = (structure_data['robot'], structure_data['connectivity'])
-                self.controller = PPO.load(controller_file)
+
                 if self.env is not None:
                     self.env.close()
+
                 self.env = make_vec_envs(self.env_id, structure, 0, 1, vecnormalize=True)
                 self.env.training = False
-                self.env.obs_rms = self.controller.env.obs_rms
+                self.controller = Policy(self.env.observation_space, self.env.action_space, device='cpu')
+
+                params, obs_rms = torch.load(controller_file)
+                self.controller.load_state_dict(params)
+                self.env.obs_rms = obs_rms
+
                 self.generation = int(latest[0])
                 print(f'simulator update controller: generation {latest[0]}  id {latest[1]}')
         else:
@@ -176,7 +188,9 @@ class EvogymStructureSimulator():
         done = False
         obs = self.env.reset()
         while not done:
-            action, _ = self.controller.predict(obs, deterministic=self.deterministic)
+            with torch.no_grad():
+                action = self.controller.predict(obs, deterministic=self.deterministic)
+            # action, _ = self.controller.predict(obs, deterministic=self.deterministic)
             obs, _, done, infos = self.env.step(action)
             self.env.render()
 
@@ -202,6 +216,9 @@ class SimulateProcess():
         self.process = None
 
     def __del__(self):
+        if self.simulator.env is not None:
+            self.simulator.env.close()
+            
         if self.process is not None:
             self.process.terminate()
 

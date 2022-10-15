@@ -12,7 +12,7 @@ from pygifsicle import gifsicle
 
 from gym_utils import make_vec_envs
 
-from stable_baselines3 import PPO
+from ppo import Policy
 
 
 RenderPaddings = {
@@ -78,10 +78,8 @@ def make_gif(filename, env, viewer, controller, controller_type, resolution=(256
         if controller_type=='NEAT':
             action = [np.array(controller.activate(obs[0]))*2 - 1]
         elif controller_type=='PPO':
-            action, _ = controller.predict(obs, deterministic=deterministic)
-        elif controller_type=='PPO_torch':
-            _, action, _, recurrent_hidden_states = controller.act(torch.from_numpy(obs), recurrent_hidden_states, masks, deterministic=deterministic)
-            action = action.detach()
+            with torch.no_grad():
+                action = controller.predict(obs, deterministic=deterministic)
         else:
             return
         obs, _, done, infos = env.step(action)
@@ -165,10 +163,8 @@ def make_jpg(filename, env, viewer, controller, controller_type, padding, interv
         if controller_type=='NEAT':
             action = [np.array(controller.activate(obs[0]))*2 - 1]
         elif controller_type=='PPO':
-            action, _ = controller.predict(obs, deterministic=deterministic)
-        elif controller_type=='PPO_torch':
-            _, action, _, recurrent_hidden_states = controller.act(torch.from_numpy(obs), recurrent_hidden_states, masks, deterministic=deterministic)
-            action = action.detach()
+            with torch.no_grad():
+                action = controller.predict(obs, deterministic=deterministic)
         else:
             return
         obs, _, done, infos = env.step(action)
@@ -258,9 +254,13 @@ class EvogymControllerDrawerPPO():
         env = make_vec_envs(self.env_id, self.structure, 0, 1, allow_early_resets=False, vecnormalize=True)
         viewer = env.get_attr("default_viewer", indices=None)[0]
 
-        controller = PPO.load(ppo_file)
+
+        controller = Policy(env.observation_space, env.action_space, device='cpu')
+        params, obs_rms = torch.load(ppo_file)
+        controller.load_state_dict(params)
+
         env.training = False
-        env.obs_rms = controller.env.obs_rms
+        env.obs_rms = obs_rms
 
         if self.save_type=='gif':
             make_gif(filename, env, viewer, controller, 'PPO', **self.draw_kwargs)
@@ -300,9 +300,12 @@ class EvogymStructureDrawerCPPN():
         env = make_vec_envs(self.env_id, structure, 0, 1, allow_early_resets=False, vecnormalize=True)
         viewer = env.get_attr("default_viewer", indices=None)[0]
 
-        controller = PPO.load(ppo_file)
+        controller = Policy(env.observation_space, env.action_space, device='cpu')
+        params, obs_rms = torch.load(ppo_file)
+        controller.load_state_dict(params)
+
         env.training = False
-        env.obs_rms = controller.env.obs_rms
+        env.obs_rms = obs_rms
 
         if self.save_type=='gif':
             make_gif(filename, env, viewer, controller, 'PPO', **self.draw_kwargs)
@@ -317,8 +320,6 @@ class EvogymStructureDrawerCPPN():
 
 
 class EvogymDrawerPOET():
-    from a2c_ppo_acktr.model import Policy
-
     def __init__(self, save_path, structure, recurrent=False, overwrite=True, save_type='gif', **draw_kwargs):
         assert save_type in ['gif', 'jpg']
 
@@ -348,23 +349,19 @@ class EvogymDrawerPOET():
 
         params, obs_rms = torch.load(core_file)
 
+        controller = Policy(env.observation_space, env.action_space, device='cpu')
+        params, obs_rms = torch.load(core_file)
+        controller.load_state_dict(params)
+
         env.training = False
         env.obs_rms = obs_rms
 
-        controller = self.Policy(
-            env.observation_space.shape,
-            env.action_space,
-            base_kwargs={'recurrent': self.recurrent})
-        controller.to('cpu')
-
-        controller.load_state_dict(params)
-
         if self.save_type=='gif':
-            make_gif(filename, env, viewer, controller, 'PPO_torch', **self.draw_kwargs)
+            make_gif(filename, env, viewer, controller, 'PPO', **self.draw_kwargs)
 
         elif self.save_type=='jpg':
             padding = RenderPaddings[self.env_id]
-            make_jpg(filename, env, viewer, controller, 'PPO_torch', padding, **self.draw_kwargs)
+            make_jpg(filename, env, viewer, controller, 'PPO', padding, **self.draw_kwargs)
 
         env.close()
         print(f'key {key} ... done')

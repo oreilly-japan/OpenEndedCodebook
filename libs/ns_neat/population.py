@@ -1,5 +1,5 @@
 from neat_cppn import Population
-from . import distances
+from . import metrices
 
 
 class CompleteExtinctionException(Exception):
@@ -13,7 +13,7 @@ class Population(Population):
         self.archive = {}
         self.novelty_threshold = config.threshold_init
         self.time_out = 0
-        self.metric_func = getattr(distances, config.metric, None)
+        self.metric_func = getattr(metrices, config.metric, None)
         assert self.metric_func is not None, f'metric {config.metric} is not impelemented in distances.py'
 
     def run(self, evaluate_function, constraint_function=None, n=None):
@@ -96,26 +96,26 @@ class Population(Population):
                 genome.fitness = -1
                 continue
 
-            distances_archive = self._map_distance(key, genome, self.archive)
-            distances_new_arhicve = self._map_distance(key, genome, new_archive)
-            distances_current = self._map_distance(key, genome, self.population)
+            distances_archive = self.map_distance(key, genome, self.archive)
+            distances_new_archive = self.map_distance(key, genome, new_archive)
+            distances_current = self.map_distance(key, genome, self.population)
 
-            distances_archive.update(distances_new_arhicve)
-            novelty_archive = self._knn(list(distances_archive.values()))
+            distances_archive.update(distances_new_archive)
+            novelty_archive = self.knn(list(distances_archive.values()))
 
             if novelty_archive > self.novelty_threshold:
                 new_archive[key] = genome
 
             distances_current.update(distances_archive)
-            novelty = self._knn(
+            novelty = self.knn(
                 list(distances_current.values()),
                 k=self.config.neighbors)
 
             genome.fitness = novelty
 
-        self._update_novelty_archive(new_archive)
+        self.update_novelty_archive(new_archive)
 
-    def _map_distance(self, key1, genome1, genomes):
+    def map_distance(self, key1, genome1, genomes):
         distances = {}
         for key2,genome2 in genomes.items():
             if key1==key2:
@@ -126,17 +126,17 @@ class Population(Population):
 
         return distances
 
-    def _knn(self, distances, k=1):
+    def knn(self, distances, k=1):
         if len(distances)==0:
             return float('inf')
 
         distances.sort()
 
         knn = distances[:k]
-        density = sum(knn) / len(distances)
+        density = sum(knn) / len(knn)
         return density
 
-    def _update_novelty_archive(self, new_archive):
+    def update_novelty_archive(self, new_archive):
         if len(new_archive)>0:
             self.time_out = 0
         else:

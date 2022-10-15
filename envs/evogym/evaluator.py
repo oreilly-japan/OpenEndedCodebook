@@ -25,6 +25,8 @@ class EvogymControllerEvaluator():
                 reward = infos[0]['episode']['r']
                 episode_rewards.append(reward)
 
+        env.close()
+
         results = {
             'fitness': np.mean(episode_rewards),
         }
@@ -69,6 +71,8 @@ class EvogymControllerEvaluatorNS():
                 reward = infos[0]['episode']['r']
                 episode_rewards.append(reward)
 
+        env.close()
+
         results = {
             'reward': np.mean(episode_rewards),
             'data': np.mean(np.vstack(episode_data),axis=0)
@@ -87,15 +91,16 @@ class EvogymControllerEvaluatorNS():
         return covar
 
 
-from ppo import run_ppo
+from run_ppo import run_ppo
 
 class EvogymStructureEvaluator():
-    def __init__(self, env_id, save_path, ppo_iters, deterministic=False):
+    def __init__(self, env_id, save_path, ppo_iters, eval_interval, deterministic=False):
         self.env_id = env_id
         self.save_path = save_path
         self.structure_save_path = os.path.join(save_path, 'structure')
         self.controller_save_path = os.path.join(save_path, 'controller')
         self.ppo_iters = ppo_iters
+        self.eval_interval = eval_interval
         self.deterministic = deterministic
 
         os.makedirs(self.structure_save_path, exist_ok=True)
@@ -111,6 +116,7 @@ class EvogymStructureEvaluator():
             env_id=self.env_id,
             structure=structure,
             train_iters=self.ppo_iters,
+            eval_interval=self.eval_interval,
             save_file=file_controller,
             deterministic=self.deterministic
         )
@@ -121,12 +127,13 @@ class EvogymStructureEvaluator():
         return results
 
 class EvogymStructureEvaluatorME():
-    def __init__(self, env_id, save_path, ppo_iters, bd_dictionary, deterministic=False):
+    def __init__(self, env_id, save_path, ppo_iters, eval_interval, bd_dictionary, deterministic=False):
         self.env_id = env_id
         self.save_path = save_path
         self.structure_save_path = os.path.join(save_path, 'structure')
         self.controller_save_path = os.path.join(save_path, 'controller')
         self.ppo_iters = ppo_iters
+        self.eval_interval = eval_interval
         self.bd_dictionary = bd_dictionary
         self.deterministic = deterministic
 
@@ -143,6 +150,7 @@ class EvogymStructureEvaluatorME():
             env_id=self.env_id,
             structure=structure,
             train_iters=self.ppo_iters,
+            eval_interval=self.eval_interval,
             save_file=file_controller,
             deterministic=self.deterministic
         )

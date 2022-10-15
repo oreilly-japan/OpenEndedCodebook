@@ -41,8 +41,8 @@ class Population():
             evaluate_function(genome1_offsprings, genome2_offsprings,
                               self.genome1_pop, self.genome2_pop, self.config, self.generation)
 
-            genome1_survivors = {key: genome for key,genome in genome1_offsprings.items() if genome.fitness>=1}
-            genome2_survivors = {key: genome for key,genome in genome2_offsprings.items() if genome.fitness>=1}
+            genome1_survivors = {key: genome for key,genome in genome1_offsprings.items() if genome.fitness>=self.config.genome1_criterion}
+            genome2_survivors = {key: genome for key,genome in genome2_offsprings.items() if genome.fitness>=self.config.genome2_criterion}
 
             self.reporters.post_evaluate(self.config, genome1_survivors, genome2_survivors)
 
@@ -57,7 +57,8 @@ class Population():
 
     @staticmethod
     def update_pop(pop, survivors, pop_size, config):
-        pop_unite = list(pop.values()) + list(survivors.values())
-        pop_unite = sorted(pop_unite, key=lambda g: g.generation)
-        pop_alive = {g.key: g for g in pop_unite[-pop_size:]}
+        pop_unite = list(pop.items()) + list(survivors.items())
+        pop_unite = sorted(pop_unite, key=lambda z: z[0])
+        pop_alive = dict(pop_unite[-pop_size:])
+        # pop_alive = {g.key: g for g in pop_unite[-pop_size:]}
         return pop_alive

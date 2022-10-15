@@ -47,12 +47,24 @@ def main():
     opt_config = OptimizerPPOConfig(
         steps_per_iteration=args.steps_per_iteration,
         transfer_steps=args.steps_per_iteration,
-        clip_param=args.clip_param,
-        ppo_epoch=args.epoch,
+        clip_range=args.clip_range,
+        epochs=args.epoch,
         num_mini_batch=args.num_mini_batch,
-        num_steps=args.steps,
+        steps=args.steps,
         num_processes=args.num_processes,
-        lr=args.learning_rate)
+        learning_rate=args.learning_rate,
+        init_log_std=args.init_log_std,
+        max_steps=args.steps_per_iteration*args.reproduce_interval*20)
+
+    # opt_config = OptimizerPPOConfig(
+    #     steps_per_iteration=args.steps_per_iteration,
+    #     transfer_steps=args.steps_per_iteration,
+    #     clip_param=args.clip_range,
+    #     ppo_epoch=args.epoch,
+    #     num_mini_batch=args.num_mini_batch,
+    #     num_steps=args.steps,
+    #     num_processes=args.num_processes,
+    #     lr=args.learning_rate)
 
     
     if args.task=='Parkour-v1':

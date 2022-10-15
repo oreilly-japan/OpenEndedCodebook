@@ -24,12 +24,12 @@ def get_args():
     )
 
     parser.add_argument(
-        '--agent-criteria',
+        '--agent-criterion',
         default=1, type=int,
         help='minimal number to solve maze for each agent to survive (default: 1)'
     )
     parser.add_argument(
-        '--maze-criteria',
+        '--maze-criterion',
         default=1, type=int,
         help='minimal number of agent to solve for each maze to survive (default: 1)'
     )

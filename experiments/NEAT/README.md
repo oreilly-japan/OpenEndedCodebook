@@ -126,17 +126,18 @@ $python make_figure_hyper.py {experiment name}
 $python run_evogym_cppn.py
 ```
 #### options:
-| option          | abbrev  | default         | detail  |
-| :---            | :---:   | :---:           | :---    |
-| --name          | -n      | "{task}_{robot}"| experiment name |
-| --task          | -t      | Walker-v0       | evogym environment id |
-| --shape         | -s      | (5,5)           | robot shape <br> usage: "-s {height} {width}" |
-| --pop-size      | -p      | 4               | population size of NEAT |
-| --generation    | -g      | 500             | iterations of NEAT |
-| --ppo-iters     | -i      | 5               | learning iterations of PPO algo <br> on the more complex task, need more. |
-| --deterministic | -d      | *false*         | evaluate robot on deterministic action |
-| --num-cores     | -c      | 1               | number of parallel evaluation processes |
-| --no-view       |         | *false*         | not open simulation window of best robot |
+| option                | abbrev  | default         | detail  |
+| :---                  | :---:   | :---:           | :---    |
+| --name                | -n      | "{task}_{robot}"| experiment name |
+| --task                | -t      | Walker-v0       | evogym environment id |
+| --shape               | -s      | (5,5)           | robot shape <br> usage: "-s {height} {width}" |
+| --pop-size            | -p      | 4               | population size of NEAT |
+| --generation          | -g      | 500             | iterations of NEAT |
+| --ppo-iters           | -i      | 125             | learning iterations of PPO algo <br> on the more complex task, need more. |
+| --evaluation-interval | -ei     | 25              | frequency to evaluatie policy |
+| --deterministic       | -d      | *false*         | evaluate robot on deterministic action |
+| --num-cores           | -c      | 1               | number of parallel evaluation processes |
+| --no-view             |         | *false*         | not open simulation window of best robot |
 
 ### make figure
 after run_evogym_cppn, make {gif, jpg} file for each of all robots written in reward history file.

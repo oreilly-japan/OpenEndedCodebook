@@ -83,7 +83,7 @@ def main():
         for metric,ids in robot_ids.items():
             for key in ids:
                 structure_file = os.path.join(expt_path, 'structure', f'{key}.npz')
-                ppo_file = os.path.join(expt_path, 'controller', f'{key}.zip')
+                ppo_file = os.path.join(expt_path, 'controller', f'{key}.pt')
                 jobs.append(pool.apply_async(draw_function, args=(key, structure_file, ppo_file), kwds={'directory': metric}))
 
         for job in jobs:
@@ -98,7 +98,7 @@ def main():
         for metric,ids in robot_ids.items():
             for key in ids:
                 structure_file = os.path.join(expt_path, 'structure', f'{key}.npz')
-                ppo_file = os.path.join(expt_path, 'controller', f'{key}.zip')
+                ppo_file = os.path.join(expt_path, 'controller', f'{key}.pt')
                 draw_function(key, structure_file, ppo_file, directory=metric)
 
 if __name__=='__main__':

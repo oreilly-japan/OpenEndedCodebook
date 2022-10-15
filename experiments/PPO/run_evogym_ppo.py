@@ -13,9 +13,9 @@ from experiment_utils import initialize_experiment
 
 ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'evogym')
 sys.path.append(ENV_DIR)
-from ppo import run_ppo
+from run_ppo import run_ppo
 from simulator import EvogymControllerSimulatorPPO, SimulateProcess
-from gym_utils import make_vec_envs, load_robot
+from gym_utils import load_robot
 
 
 from arguments.evogym_ppo import get_args
@@ -23,8 +23,9 @@ from arguments.evogym_ppo import get_args
 class ppoConfig():
     def __init__(self, args):
         self.num_processes = args.num_processes
-        self.eval_processes = 2
+        self.eval_processes = 1
         self.seed = 1
+
         self.steps = args.steps
         self.num_mini_batch = args.num_mini_batch
         self.epochs = args.epochs
@@ -32,14 +33,11 @@ class ppoConfig():
         self.gamma = args.gamma
         self.clip_range = args.clip_range
         self.ent_coef = 0.01
-
-        self.learning_steps = 50
-
-        self.policy_kwargs = {
-            'log_std_init'  : 0.0,
-            'ortho_init'    : True,
-            'squash_output' : False,
-        }
+        self.vf_coef = 0.5
+        self.max_grad_norm = 0.5
+        self.lr_decay = True
+        self.gae_lambda = 0.95
+        self.init_log_std = args.init_log_std
 
 
 def main():
@@ -63,11 +61,12 @@ def main():
             env_id=args.task,
             structure=structure,
             load_path=controller_path,
+            interval=args.evaluation_interval,
             deterministic=args.deterministic)
 
         simulate_process = SimulateProcess(
             simulator=simulator,
-            generations=args.ppo_iters)
+            generations=args.train_iters)
 
         simulate_process.init_process()
         simulate_process.start()
@@ -77,11 +76,12 @@ def main():
     run_ppo(
         env_id=args.task,
         structure=structure,
-        train_iters=args.ppo_iters,
+        train_iters=args.train_iters,
+        eval_interval=args.evaluation_interval,
         save_file=controller_path,
         config=ppo_config,
         deterministic=args.deterministic,
-        save_iter=1,
+        save_iter=True,
         history_file=history_file)
 
 if __name__=='__main__':

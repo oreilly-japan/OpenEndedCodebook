@@ -29,21 +29,21 @@ $python bootstrap_maze.py
 $python run_maze.py
 ```
 #### options:
-| option          | abbrev  | default       | detail  |
-| :---            | :---:   | :---:         | :---    |
-| --name          | -n      | "{bootstrap}" | experiment name |
-| --bootstrap     | -b      | default       | name of bootstrap to use as initial state |
-| --generation    | -g      | 1000          | iterations |
-| --agent-criteria|         | 1             | minimal number to solve maze for each agent to survive |
-| --maze-criteria |         | 1             | minimal number of agent to solve for each maze to survive |
-| --agent-pop     |         | 160           | maximum size of agent population |
-| --maze-pop      |         | 40            | maximum size of maze population |
-| --agent-limit   |         | 0             | resource limit of agent <br> 0 means no limit |
-| --maze-limit    |         | 4             | resource limit of maze |
-| --agent-bacth   |         | 40            | agent number to evaluate in one iteration |
-| --maze-batch    |         | 10            | maze number to evaluate in one iteration |
-| --num-cores     | -c      | 4             | number of parallel evaluation processes |
-| --print-maze    |         | *false*       | print detail of survived maze genome every iteration |
+| option            | abbrev  | default       | detail  |
+| :---              | :---:   | :---:         | :---    |
+| --name            | -n      | "{bootstrap}" | experiment name |
+| --bootstrap       | -b      | default       | name of bootstrap to use as initial state |
+| --generation      | -g      | 1000          | iterations |
+| --agent-criterion |         | 1             | minimal number to solve maze for each agent to survive |
+| --maze-criterion  |         | 1             | minimal number of agent to solve for each maze to survive |
+| --agent-pop       |         | 160           | maximum size of agent population |
+| --maze-pop        |         | 40            | maximum size of maze population |
+| --agent-limit     |         | 0             | resource limit of agent <br> 0 means no limit |
+| --maze-limit      |         | 4             | resource limit of maze |
+| --agent-bacth     |         | 40            | agent number to evaluate in one iteration |
+| --maze-batch      |         | 10            | maze number to evaluate in one iteration |
+| --num-cores       | -c      | 4             | number of parallel evaluation processes |
+| --print-maze      |         | *false*       | print detail of survived maze genome every iteration |
 
 ### make figure
 ```

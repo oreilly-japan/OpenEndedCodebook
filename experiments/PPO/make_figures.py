@@ -36,9 +36,9 @@ def main():
 
     controller_path = os.path.join(expt_path, 'controller')
     if args.specified is not None:
-        controller_files = [os.path.join(controller_path, f'{args.specified}.zip')]
+        controller_files = [os.path.join(controller_path, f'{args.specified}.pt')]
     else:
-        controller_files = glob(os.path.join(controller_path, '*.zip'))
+        controller_files = glob(os.path.join(controller_path, '*.pt'))
 
 
     figure_path = os.path.join(expt_path, 'figure')

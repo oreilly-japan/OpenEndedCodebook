@@ -11,7 +11,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(CURR_DIR))
 LIB_DIR = os.path.join(ROOT_DIR, 'libs')
 sys.path.append(LIB_DIR)
 import ns_neat
-from parallel import ParallelEvaluator
+from parallel import EvaluatorParallel
 from experiment_utils import initialize_experiment
 
 ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'evogym')
@@ -44,7 +44,7 @@ def main():
     evaluator = EvogymControllerEvaluatorNS(args.task, structure, args.eval_num)
     evaluate_function = evaluator.evaluate_controller
 
-    parallel = ParallelEvaluator(
+    parallel = EvaluatorParallel(
         num_workers=args.num_cores,
         evaluate_function=evaluate_function,
         decode_function=decode_function
