@@ -32,7 +32,7 @@ def main():
     expt_args = load_experiment(expt_path)
 
 
-    structure = load_robot(ROOT_DIR, expt_args['robot'], task=expt_args['task'])
+    robot = load_robot(ROOT_DIR, expt_args['robot'], task=expt_args['task'])
 
 
     decode_function = ns_neat.FeedForwardNetwork.create
@@ -79,7 +79,7 @@ def main():
     drawer = EvogymControllerDrawerNEAT(
         save_path=figure_path,
         env_id=expt_args['task'],
-        structure=structure,
+        robot=robot,
         genome_config=config.genome_config,
         decode_function=decode_function,
         overwrite=not args.not_overwrite,

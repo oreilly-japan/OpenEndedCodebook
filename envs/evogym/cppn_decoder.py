@@ -25,9 +25,9 @@ class EvogymStructureDecoder(BaseCPPNDecoder):
         output = np.vstack([output[key] for key in self.output_keys])
         material = np.argmax(output, axis=0)
 
-        robot = np.reshape(material, self.size)
-        connectivity = get_full_connectivity(robot)
-        return (robot, connectivity)
+        body = np.reshape(material, self.size)
+        connections = get_full_connectivity(body)
+        return {'body': body, 'connections': connections}
 
 
 class EvogymHyperDecoder(BaseHyperDecoder):

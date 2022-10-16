@@ -5,7 +5,7 @@ from .feedforward import FeedForwardNetwork
 from .pytorch_neat.cppn import create_cppn
 
 
-class BaseCPPNDecoder():
+class BaseCPPNDecoder:
     def __init__(self):
         self.inputs = None
         self.output_keys = None
@@ -22,7 +22,7 @@ class BaseCPPNDecoder():
 
         return outputs
 
-class BaseHyperDecoder():
+class BaseHyperDecoder:
     def __init__(self, substrate, activation='sin'):
 
         connections = None

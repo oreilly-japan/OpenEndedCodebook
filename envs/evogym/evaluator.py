@@ -4,14 +4,14 @@ import numpy as np
 from gym_utils import make_vec_envs
 
 
-class EvogymControllerEvaluator():
-    def __init__(self, env_id, structure, num_eval=1):
+class EvogymControllerEvaluator:
+    def __init__(self, env_id, robot, num_eval=1):
         self.env_id = env_id
-        self.structure = structure
+        self.robot = robot
         self.num_eval = num_eval
 
     def evaluate_controller(self, key, controller, generation):
-        env = make_vec_envs(self.env_id, self.structure, 0, 1)
+        env = make_vec_envs(self.env_id, self.robot, 0, 1)
 
         obs = env.reset()
         episode_rewards = []
@@ -33,14 +33,14 @@ class EvogymControllerEvaluator():
         return results
 
 
-class EvogymControllerEvaluatorNS():
-    def __init__(self, env_id, structure, num_eval=1):
+class EvogymControllerEvaluatorNS:
+    def __init__(self, env_id, robot, num_eval=1):
         self.env_id = env_id
-        self.structure = structure
+        self.robot = robot
         self.num_eval = num_eval
 
     def evaluate_controller(self, key, controller, generation):
-        env = make_vec_envs(self.env_id, self.structure, 0, 1)
+        env = make_vec_envs(self.env_id, self.robot, 0, 1)
 
         obs = env.reset()
 
@@ -93,28 +93,28 @@ class EvogymControllerEvaluatorNS():
 
 from run_ppo import run_ppo
 
-class EvogymStructureEvaluator():
+class EvogymStructureEvaluator:
     def __init__(self, env_id, save_path, ppo_iters, eval_interval, deterministic=False):
         self.env_id = env_id
         self.save_path = save_path
-        self.structure_save_path = os.path.join(save_path, 'structure')
+        self.robot_save_path = os.path.join(save_path, 'robot')
         self.controller_save_path = os.path.join(save_path, 'controller')
         self.ppo_iters = ppo_iters
         self.eval_interval = eval_interval
         self.deterministic = deterministic
 
-        os.makedirs(self.structure_save_path, exist_ok=True)
+        os.makedirs(self.robot_save_path, exist_ok=True)
         os.makedirs(self.controller_save_path, exist_ok=True)
 
-    def evaluate_structure(self, key, structure, generation):
+    def evaluate_structure(self, key, robot, generation):
 
-        file_structure = os.path.join(self.structure_save_path, f'{key}')
+        file_robot = os.path.join(self.robot_save_path, f'{key}')
         file_controller = os.path.join(self.controller_save_path, f'{key}')
-        np.savez(file_structure, robot=structure[0], connectivity=structure[1])
+        np.savez(file_robot, **robot)
 
         fitness = run_ppo(
             env_id=self.env_id,
-            structure=structure,
+            robot=robot,
             train_iters=self.ppo_iters,
             eval_interval=self.eval_interval,
             save_file=file_controller,
@@ -126,35 +126,35 @@ class EvogymStructureEvaluator():
         }
         return results
 
-class EvogymStructureEvaluatorME():
+class EvogymStructureEvaluatorME:
     def __init__(self, env_id, save_path, ppo_iters, eval_interval, bd_dictionary, deterministic=False):
         self.env_id = env_id
         self.save_path = save_path
-        self.structure_save_path = os.path.join(save_path, 'structure')
+        self.robot_save_path = os.path.join(save_path, 'robot')
         self.controller_save_path = os.path.join(save_path, 'controller')
         self.ppo_iters = ppo_iters
         self.eval_interval = eval_interval
         self.bd_dictionary = bd_dictionary
         self.deterministic = deterministic
 
-        os.makedirs(self.structure_save_path, exist_ok=True)
+        os.makedirs(self.robot_save_path, exist_ok=True)
         os.makedirs(self.controller_save_path, exist_ok=True)
 
-    def evaluate_structure(self, key, structure, generation):
+    def evaluate_structure(self, key, robot, generation):
 
-        file_structure = os.path.join(self.structure_save_path, f'{key}')
+        file_robot = os.path.join(self.robot_save_path, f'{key}')
         file_controller = os.path.join(self.controller_save_path, f'{key}')
-        np.savez(file_structure, robot=structure[0], connectivity=structure[1])
+        np.savez(file_robot, **robot)
 
         fitness = run_ppo(
             env_id=self.env_id,
-            structure=structure,
+            robot=robot,
             train_iters=self.ppo_iters,
             eval_interval=self.eval_interval,
             save_file=file_controller,
             deterministic=self.deterministic
         )
-        bd = {bd_name: bd_func.evaluate(*structure) for bd_name,bd_func in self.bd_dictionary.items()}
+        bd = {bd_name: bd_func.evaluate(robot) for bd_name,bd_func in self.bd_dictionary.items()}
 
         results = {
             'fitness': fitness,

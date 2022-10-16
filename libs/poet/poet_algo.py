@@ -13,7 +13,7 @@ import numpy as np
 from .niche import Niche
 
 
-class POET():
+class POET:
     def __init__(self, 
                  environment_config,
                  optimizer_config,

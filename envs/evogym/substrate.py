@@ -64,7 +64,7 @@ ObservationDimensions = {
     'goal_distance_x'           : ['goal', 'relative', 'x'],
 }
 
-class Substrate():
+class Substrate:
     def __init__(self, env_id, robot):
         self.env_id = env_id
         self.robot = robot[::-1].T

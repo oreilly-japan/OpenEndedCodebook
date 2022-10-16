@@ -1,32 +1,8 @@
-"""
-Runs evaluation functions in parallel subprocesses
-in order to evaluate multiple genomes at once.
-"""
+
 import multiprocessing.pool
 import multiprocessing as mp
 
-class NoDaemonProcess(mp.Process):
-    # make 'daemon' attribute always return False
-    def _get_daemon(self):
-        return False
-    def _set_daemon(self, value):
-        pass
-    daemon = property(_get_daemon, _set_daemon)
-
-# We sub-class multiprocessing.pool.Pool instead of multiprocessing.Pool
-# because the latter is only a wrapper function, not a proper class.
-
-# class Pool(mp.pool.Pool):
-#     Process = NoDaemonProcess
-
-class NonDaemonPool(mp.pool.Pool):
-    def Process(self, *args, **kwds):
-        proc = super(NonDaemonPool, self).Process(*args, **kwds)
-        proc.__class__ = NoDaemonProcess
-        return proc
-
-
-class EvaluatorParallel():
+class EvaluatorParallel:
     def __init__(self, num_workers, decode_function, evaluate_function, revaluate=False, timeout=None, parallel=True):
         self.num_workers = num_workers
         self.decode_function = decode_function
@@ -34,7 +10,7 @@ class EvaluatorParallel():
         self.revaluate = revaluate
         self.timeout = timeout
         self.parallel = parallel
-        self.pool = NonDaemonPool(num_workers) if parallel and num_workers>0 else None
+        self.pool = mp.pool.Pool(num_workers) if parallel and num_workers>0 else None
 
     def __del__(self):
         if self.pool is not None:
@@ -75,7 +51,7 @@ class EvaluatorParallel():
                     setattr(genome, attr, data)
 
 
-class MCCEvaluatorParallel():
+class MCCEvaluatorParallel:
     def __init__(self, num_workers, evaluate_function, decode_function1, decode_function2, timeout=None):
         self.num_workers = num_workers
         self.evaluate_function = evaluate_function
@@ -83,7 +59,7 @@ class MCCEvaluatorParallel():
         self.decode_function2 = decode_function2
         self.timeout = timeout
 
-        self.pool = NonDaemonPool(num_workers)
+        self.pool = mp.pool.Pool(num_workers)
         self.manager = mp.Manager()
 
     def __del__(self):

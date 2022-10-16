@@ -1,6 +1,6 @@
 import numpy as np
 
-class LinerBehavioralDescriotir():
+class LinerBehavioralDescriptor:
     def __init__(self, name, value_range, resolution):
         self.name = name
         self.value_range = value_range

@@ -30,7 +30,7 @@ def main():
 
     initialize_experiment(args.name, save_path, args)
 
-    structure = load_robot(ROOT_DIR, args.robot)
+    robot = load_robot(ROOT_DIR, args.robot)
 
     config_file = os.path.join(CURR_DIR, 'config', 'terrain_cppn.cfg')
     cppn_config = neat_cppn.make_config(config_file)
@@ -38,7 +38,7 @@ def main():
     cppn_config.save(cppn_config_file)
 
     env_config = EnvrionmentEvogymConfig(
-        structure,
+        robot,
         cppn_config,
         env_id=args.task,
         max_width=args.width,
@@ -56,17 +56,6 @@ def main():
         init_log_std=args.init_log_std,
         max_steps=args.steps_per_iteration*args.reproduce_interval*20)
 
-    # opt_config = OptimizerPPOConfig(
-    #     steps_per_iteration=args.steps_per_iteration,
-    #     transfer_steps=args.steps_per_iteration,
-    #     clip_param=args.clip_range,
-    #     ppo_epoch=args.epoch,
-    #     num_mini_batch=args.num_mini_batch,
-    #     num_steps=args.steps,
-    #     num_processes=args.num_processes,
-    #     lr=args.learning_rate)
-
-    
     if args.task=='Parkour-v1':
         maximum_reward = args.width/10 + 10
     else:

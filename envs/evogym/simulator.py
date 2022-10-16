@@ -14,10 +14,10 @@ from ppo import Policy
 from gym_utils import make_vec_envs
 
 
-class EvogymControllerSimulator():
-    def __init__(self, env_id, structure, decode_function, load_path, history_file, genome_config):
+class EvogymControllerSimulator:
+    def __init__(self, env_id, robot, decode_function, load_path, history_file, genome_config):
         self.env_id = env_id
-        self.structure = structure
+        self.robot = robot
         self.decode_function = decode_function
         self.load_path = load_path
         self.history_file = os.path.join(load_path, history_file)
@@ -28,7 +28,7 @@ class EvogymControllerSimulator():
 
     def initialize(self):
         self.generation = -1
-        self.env = make_vec_envs(self.env_id, self.structure, 0, 1)
+        self.env = make_vec_envs(self.env_id, self.robot, 0, 1)
 
     def update(self):
         if not os.path.exists(self.history_file):
@@ -69,10 +69,10 @@ class EvogymControllerSimulator():
             obs, _, done, infos = self.env.step([np.array(action)])
             self.env.render()
 
-class EvogymControllerSimulatorPPO():
-    def __init__(self, env_id, structure, load_path, interval, deterministic=False):
+class EvogymControllerSimulatorPPO:
+    def __init__(self, env_id, robot, load_path, interval, deterministic=False):
         self.env_id = env_id
-        self.structure = structure
+        self.robot = robot
         self.load_path = load_path
         self.interval = interval
         self.deterministic = deterministic
@@ -83,7 +83,7 @@ class EvogymControllerSimulatorPPO():
 
     def initialize(self):
         self.generation = -1
-        self.env = make_vec_envs(self.env_id, self.structure, 0, 1, vecnormalize=True)
+        self.env = make_vec_envs(self.env_id, self.robot, 0, 1, vecnormalize=True)
         self.env.training = False
         self.controller = Policy(self.env.observation_space, self.env.action_space, device='cpu')
 
@@ -129,7 +129,7 @@ class EvogymControllerSimulatorPPO():
                     print(f'simulator reward: {reward: =.5f}')
 
 
-class EvogymStructureSimulator():
+class EvogymStructureSimulator:
     def __init__(self, env_id, load_path, history_file, deterministic=False):
         self.env_id = env_id
         self.load_path = load_path
@@ -159,16 +159,15 @@ class EvogymStructureSimulator():
         if len(lines)>1:
             latest = lines[-1]
             if self.generation<int(latest[0]):
-                structure_file = os.path.join(self.load_path, 'structure', f'{latest[1]}.npz')
+                robot_file = os.path.join(self.load_path, 'robot', f'{latest[1]}.npz')
                 controller_file = os.path.join(self.load_path, 'controller', f'{latest[1]}.pt')
 
-                structure_data = np.load(structure_file)
-                structure = (structure_data['robot'], structure_data['connectivity'])
+                robot = np.load(robot_file)
 
                 if self.env is not None:
                     self.env.close()
 
-                self.env = make_vec_envs(self.env_id, structure, 0, 1, vecnormalize=True)
+                self.env = make_vec_envs(self.env_id, robot, 0, 1, vecnormalize=True)
                 self.env.training = False
                 self.controller = Policy(self.env.observation_space, self.env.action_space, device='cpu')
 
@@ -190,7 +189,6 @@ class EvogymStructureSimulator():
         while not done:
             with torch.no_grad():
                 action = self.controller.predict(obs, deterministic=self.deterministic)
-            # action, _ = self.controller.predict(obs, deterministic=self.deterministic)
             obs, _, done, infos = self.env.step(action)
             self.env.render()
 
@@ -209,7 +207,7 @@ def run_process(simulator, generations):
         simulator.simulate()
 
 
-class SimulateProcess():
+class SimulateProcess:
     def __init__(self, simulator, generations):
         self.simulator = simulator
         self.generations = generations

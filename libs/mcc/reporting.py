@@ -4,7 +4,7 @@ import os
 import pickle
 import csv
 
-class ReporterSet():
+class ReporterSet:
     def __init__(self):
         self.reporters = []
 
@@ -27,7 +27,7 @@ class ReporterSet():
             r.post_evaluate(config, offsprings1, offsprings2)
 
 
-class BaseReporter():
+class BaseReporter:
     def start_generation(self, generation):
         pass
 

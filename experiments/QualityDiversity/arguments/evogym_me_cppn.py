@@ -36,13 +36,13 @@ def get_args():
 
     parser.add_argument(
         '-i', '--ppo-iters',
-        default=125, type=int,
-        help='learning iterations of PPO algo. on the more complex task, need more. (default: 125)'
+        default=100, type=int,
+        help='learning iterations of PPO algo. on the more complex task, need more. (default: 100)'
     )
     parser.add_argument(
         '-ei', '--evaluation-interval',
-        default=25, type=int,
-        help='frequency to evaluate policy (default: 25)'
+        default=20, type=int,
+        help='frequency to evaluate policy (default: 20)'
     )
     parser.add_argument(
         '-d', '--deterministic',

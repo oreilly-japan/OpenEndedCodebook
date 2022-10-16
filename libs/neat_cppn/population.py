@@ -8,7 +8,7 @@ from neat.reporting import ReporterSet
 class CompleteExtinctionException(Exception):
     pass
 
-class Population():
+class Population:
     """
     This class implements the core evolution algorithm:
         1. Evaluate fitness of all genomes.

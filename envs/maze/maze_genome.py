@@ -4,7 +4,7 @@ import random
 
 from neat_cppn.config import ConfigParameter, write_pretty_params
 
-class PathGene():
+class PathGene:
     def __init__(self, key, start_gene=False):
         self.key = key
         self.start_gene = start_gene
@@ -35,7 +35,7 @@ class PathGene():
             self.pathpoint = (self.pathpoint[0]+shift[0], self.pathpoint[1]+shift[1])
         self.horizontal = bool(random.getrandbits(1))
 
-class WallGene():
+class WallGene:
     def __init__(self, key, depth):
         self.key = key
         self.wall_location = None
@@ -66,7 +66,7 @@ class WallGene():
 
 
 
-class MazeGenomeConfig():
+class MazeGenomeConfig:
     """Sets up and holds configuration information for the MazeGenome class."""
 
     def __init__(self, params):
@@ -152,7 +152,7 @@ class MazeGenomeConfig():
 
 
 
-class MazeGenome():
+class MazeGenome:
 
     @classmethod
     def parse_config(cls, param_dict):

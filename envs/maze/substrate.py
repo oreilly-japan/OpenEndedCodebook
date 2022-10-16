@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-class Substrate():
+class Substrate:
     def __init__(self):
         self.nodes = None
         self.dims = None

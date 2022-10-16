@@ -188,7 +188,7 @@ class EvogymTerrainDecoder(neat_cppn.BaseCPPNDecoder):
 
         return terrain
 
-class TerrainParams():
+class TerrainParams:
     def __init__(self, key,
                  rigid_bias=1,
                  soft_bias=0,
@@ -248,7 +248,7 @@ class TerrainParams():
             json.dump(params, f)
 
 
-class EnvironmentEvogym():
+class EnvironmentEvogym:
     def __init__(self, key, cppn_genome, terrain_params):
         self.key = key
         self.cppn_genome = cppn_genome
@@ -306,11 +306,11 @@ class EnvironmentEvogym():
 
     def get_env_info(self, config):
 
-        structure = config.structure + (self.terrain,)
+        env_kwargs = dict(**config.robot, terrain=self.terrain)
 
         make_env_kwargs = {
             'env_id': config.env_id,
-            'structure': structure,
+            'env_kwargs': env_kwargs,
             'seed': 0,
         }
         return make_env_kwargs
@@ -325,16 +325,16 @@ class EnvironmentEvogym():
 
 
 
-class EnvrionmentEvogymConfig():
+class EnvrionmentEvogymConfig:
     def __init__(self,
-                 structure,
+                 robot,
                  neat_config,
                  env_id='Parkour-v0',
                  max_width=80,
                  first_platform=10):
 
         self.env_id = env_id
-        self.structure = structure
+        self.robot = robot
         self.neat_config = neat_config
         self.env_indexer = count(0)
         self.cppn_indexer = count(0)

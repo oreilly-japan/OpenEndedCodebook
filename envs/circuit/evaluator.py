@@ -36,7 +36,7 @@ def load_circuit(ROOT_DIR, data_name):
     return input_data, output_data
 
 
-class CircuitEvaluator():
+class CircuitEvaluator:
     def __init__(self, input_data, output_data, error_type='mse'):
 
         assert error_type in ['mse', 'mae'], 'choise error_type from [mse, mae].'

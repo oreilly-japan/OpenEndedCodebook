@@ -31,12 +31,12 @@ def main():
     initialize_experiment(args.name, save_path, args)
 
 
-    structure = load_robot(ROOT_DIR, args.robot, task=args.task)
+    robot = load_robot(ROOT_DIR, args.robot, task=args.task)
 
 
     decode_function = ns_neat.FeedForwardNetwork.create
 
-    evaluator = EvogymControllerEvaluatorNS(args.task, structure, args.eval_num)
+    evaluator = EvogymControllerEvaluatorNS(args.task, robot, args.eval_num)
     evaluate_function = evaluator.evaluate_controller
 
     parallel = EvaluatorParallel(
@@ -46,7 +46,7 @@ def main():
     )
 
 
-    env = make_vec_envs(args.task, structure, 0, 1)
+    env = make_vec_envs(args.task, robot, 0, 1)
     num_inputs = env.observation_space.shape[0]
     num_outputs = env.action_space.shape[0]
     env.close()
@@ -80,7 +80,7 @@ def main():
     if not args.no_view:
         simulator = EvogymControllerSimulator(
             env_id=args.task,
-            structure=structure,
+            robot=robot,
             decode_function=decode_function,
             load_path=save_path,
             history_file='history_reward.csv',

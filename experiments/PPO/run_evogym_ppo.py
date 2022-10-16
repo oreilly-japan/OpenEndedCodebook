@@ -20,7 +20,7 @@ from gym_utils import load_robot
 
 from arguments.evogym_ppo import get_args
 
-class ppoConfig():
+class ppoConfig:
     def __init__(self, args):
         self.num_processes = args.num_processes
         self.eval_processes = 1
@@ -48,7 +48,7 @@ def main():
     initialize_experiment(args.name, save_path, args)
 
 
-    structure = load_robot(ROOT_DIR, args.robot, task=args.task)
+    robot = load_robot(ROOT_DIR, args.robot, task=args.task)
 
     ppo_config = ppoConfig(args)
 
@@ -59,7 +59,7 @@ def main():
     if not args.no_view:
         simulator = EvogymControllerSimulatorPPO(
             env_id=args.task,
-            structure=structure,
+            robot=robot,
             load_path=controller_path,
             interval=args.evaluation_interval,
             deterministic=args.deterministic)
@@ -75,7 +75,7 @@ def main():
     history_file = os.path.join(save_path, 'history.csv')
     run_ppo(
         env_id=args.task,
-        structure=structure,
+        robot=robot,
         train_iters=args.train_iters,
         eval_interval=args.evaluation_interval,
         save_file=controller_path,

@@ -15,7 +15,7 @@ def make_config(config_file, extra_info=None, custom_config=None):
     return config
 
 
-class NSConfig():
+class NSConfig:
     """A simple container for user-configurable parameters of NS-NEAT."""
 
     __params = [ConfigParameter('pop_size', int),

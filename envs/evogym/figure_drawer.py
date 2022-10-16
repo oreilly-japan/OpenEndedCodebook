@@ -188,13 +188,13 @@ def make_jpg(filename, env, viewer, controller, controller_type, padding, interv
     return
 
 
-class EvogymControllerDrawerNEAT():
-    def __init__(self, save_path, env_id, structure, genome_config, decode_function, overwrite=True, save_type='gif', **draw_kwargs):
+class EvogymControllerDrawerNEAT:
+    def __init__(self, save_path, env_id, robot, genome_config, decode_function, overwrite=True, save_type='gif', **draw_kwargs):
         assert save_type in ['gif', 'jpg']
 
         self.save_path = os.path.join(save_path, save_type)
         self.env_id = env_id
-        self.structure = structure
+        self.robot = robot
         self.genome_config = genome_config
         self.decode_function = decode_function
         self.overwrite = overwrite
@@ -211,7 +211,7 @@ class EvogymControllerDrawerNEAT():
         if not self.overwrite and os.path.exists(filename):
             return
 
-        env = make_vec_envs(self.env_id, self.structure, 0, 1, allow_early_resets=False)
+        env = make_vec_envs(self.env_id, self.robot, 0, 1, allow_early_resets=False)
         viewer = env.get_attr("default_viewer", indices=None)[0]
 
         with open(genome_file, 'rb') as f:
@@ -230,13 +230,13 @@ class EvogymControllerDrawerNEAT():
         return
 
 
-class EvogymControllerDrawerPPO():
-    def __init__(self, save_path, env_id, structure, overwrite=True, save_type='gif', **draw_kwargs):
+class EvogymControllerDrawerPPO:
+    def __init__(self, save_path, env_id, robot, overwrite=True, save_type='gif', **draw_kwargs):
         assert save_type in ['gif', 'jpg']
 
         self.save_path = os.path.join(save_path, save_type)
         self.env_id = env_id
-        self.structure = structure
+        self.robot = robot
         self.overwrite = overwrite
         self.save_type = save_type
         self.draw_kwargs = draw_kwargs
@@ -251,7 +251,7 @@ class EvogymControllerDrawerPPO():
         if not self.overwrite and os.path.exists(filename):
             return
 
-        env = make_vec_envs(self.env_id, self.structure, 0, 1, allow_early_resets=False, vecnormalize=True)
+        env = make_vec_envs(self.env_id, self.robot, 0, 1, allow_early_resets=False, vecnormalize=True)
         viewer = env.get_attr("default_viewer", indices=None)[0]
 
 
@@ -274,7 +274,7 @@ class EvogymControllerDrawerPPO():
         return
 
 
-class EvogymStructureDrawerCPPN():
+class EvogymStructureDrawerCPPN:
     def __init__(self, save_path, env_id, overwrite=True, save_type='gif', **draw_kwargs):
         assert save_type in ['gif', 'jpg']
 
@@ -286,7 +286,7 @@ class EvogymStructureDrawerCPPN():
 
         os.makedirs(self.save_path, exist_ok=True)
 
-    def draw(self, key, structure_file, ppo_file, directory=''):
+    def draw(self, key, robot_file, ppo_file, directory=''):
         save_dir = os.path.join(self.save_path, directory)
         os.makedirs(save_dir, exist_ok=True)
 
@@ -294,10 +294,9 @@ class EvogymStructureDrawerCPPN():
         if not self.overwrite and os.path.exists(filename):
             return
 
-        structure_data = np.load(structure_file)
-        structure = (structure_data['robot'], structure_data['connectivity'])
+        robot = np.load(robot_file)
 
-        env = make_vec_envs(self.env_id, structure, 0, 1, allow_early_resets=False, vecnormalize=True)
+        env = make_vec_envs(self.env_id, robot, 0, 1, allow_early_resets=False, vecnormalize=True)
         viewer = env.get_attr("default_viewer", indices=None)[0]
 
         controller = Policy(env.observation_space, env.action_space, device='cpu')
@@ -319,13 +318,13 @@ class EvogymStructureDrawerCPPN():
         return
 
 
-class EvogymDrawerPOET():
-    def __init__(self, save_path, structure, recurrent=False, overwrite=True, save_type='gif', **draw_kwargs):
+class EvogymDrawerPOET:
+    def __init__(self, save_path, robot, recurrent=False, overwrite=True, save_type='gif', **draw_kwargs):
         assert save_type in ['gif', 'jpg']
 
         self.save_path = os.path.join(save_path, save_type)
         self.env_id = 'Parkour-v0'
-        self.structure = structure
+        self.robot = robot
         self.recurrent = recurrent
         self.overwrite = overwrite
         self.save_type = save_type
@@ -342,9 +341,8 @@ class EvogymDrawerPOET():
             return
 
         terrain = json.load(open(terrain_file, 'r'))
-        structure = self.structure + (terrain,)
-
-        env = make_vec_envs(self.env_id, structure, 0, 1, allow_early_resets=False, vecnormalize=True)
+        env_kwargs = dict(**self.robot, terrain=terrain)
+        env = make_vec_envs(self.env_id, env_kwargs, 0, 1, allow_early_resets=False, vecnormalize=True)
         viewer = env.get_attr("default_viewer", indices=None)[0]
 
         params, obs_rms = torch.load(core_file)

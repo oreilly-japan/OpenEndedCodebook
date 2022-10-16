@@ -4,7 +4,7 @@ import numpy as np
 from .reproduction import Reproduction
 from .reporting import ReporterSet
 
-class Population():
+class Population:
     def __init__(self, config):
         self.config = config
         self.reporters = ReporterSet()

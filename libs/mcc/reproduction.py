@@ -2,7 +2,7 @@ import random
 from itertools import count
 from copy import deepcopy
 
-class Reproduction():
+class Reproduction:
     def __init__(self, population, config):
         self.config = config
         self.indexer = count(max(population.keys())+1)

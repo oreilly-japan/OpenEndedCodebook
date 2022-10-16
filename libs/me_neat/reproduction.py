@@ -2,7 +2,7 @@ import random
 import itertools
 from copy import deepcopy
 
-class Reproduction():
+class Reproduction:
     def __init__(self, config, genome_type):
         self.config = config
         self.genome_type = genome_type

@@ -4,8 +4,7 @@ from .reproduction import Reproduction
 from .reporting import ReporterSet
 
 
-class Population():
-
+class Population:
     def __init__(self, config, genome1_pop_file, genome2_pop_file):
 
         self.reporters = ReporterSet()

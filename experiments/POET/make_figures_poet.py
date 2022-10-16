@@ -30,7 +30,7 @@ def main():
     expt_args = load_experiment(expt_path)
 
 
-    structure = load_robot(ROOT_DIR, expt_args['robot'])
+    robot = load_robot(ROOT_DIR, expt_args['robot'])
 
 
     if args.specified is not None:
@@ -58,7 +58,7 @@ def main():
         }
     drawer = EvogymDrawerPOET(
         save_path=figure_path,
-        structure=structure,
+        robot=robot,
         recurrent=False,
         overwrite=not args.not_overwrite,
         save_type=args.save_type, **draw_kwargs)

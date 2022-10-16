@@ -1,6 +1,6 @@
 
 
-class MazeControllerEvaluator():
+class MazeControllerEvaluator:
     def __init__(self, maze, timesteps):
         self.maze = maze
         self.timesteps = timesteps
@@ -30,7 +30,7 @@ class MazeControllerEvaluator():
         return results
 
 
-class MazeControllerEvaluatorNS():
+class MazeControllerEvaluatorNS:
     def __init__(self, maze, timesteps):
         self.maze = maze
         self.timesteps = timesteps

@@ -2,7 +2,7 @@ import os
 import csv
 
 
-class Niche():
+class Niche:
     def __init__(self, key, iteration, parent=None):
         self.key = key
         self.iteration = iteration

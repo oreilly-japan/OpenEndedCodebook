@@ -10,7 +10,7 @@ def update_linear_schedule(optimizer, epoch, total_num_epochs, initial_lr):
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
-class PPO():
+class PPO:
     def __init__(self,
         policy,
         env,

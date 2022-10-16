@@ -133,8 +133,8 @@ $python run_evogym_cppn.py
 | --shape               | -s      | (5,5)           | robot shape <br> usage: "-s {height} {width}" |
 | --pop-size            | -p      | 4               | population size of NEAT |
 | --generation          | -g      | 500             | iterations of NEAT |
-| --ppo-iters           | -i      | 125             | learning iterations of PPO algo <br> on the more complex task, need more. |
-| --evaluation-interval | -ei     | 25              | frequency to evaluatie policy |
+| --ppo-iters           | -i      | 100             | learning iterations of PPO algo <br> on the more complex task, need more. |
+| --evaluation-interval | -ei     | 20              | frequency to evaluatie policy |
 | --deterministic       | -d      | *false*         | evaluate robot on deterministic action |
 | --num-cores           | -c      | 1               | number of parallel evaluation processes |
 | --no-view             |         | *false*         | not open simulation window of best robot |

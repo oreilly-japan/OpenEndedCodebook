@@ -24,14 +24,14 @@ def evaluate(policy, envs, num_eval=1, deterministic=False):
     return np.mean(episode_rewards)
 
 
-def run_ppo(env_id, structure, train_iters, eval_interval, save_file, config=None, deterministic=False, save_iter=False, history_file=None):
+def run_ppo(env_id, robot, train_iters, eval_interval, save_file, config=None, deterministic=False, save_iter=False, history_file=None):
 
     if config is None:
         config = default_config
 
-    train_envs = make_vec_envs(env_id, structure, config.seed, config.num_processes, gamma=config.gamma, vecnormalize=True)
+    train_envs = make_vec_envs(env_id, robot, config.seed, config.num_processes, gamma=config.gamma, vecnormalize=True)
 
-    eval_envs = make_vec_envs(env_id, structure, config.seed, config.eval_processes, gamma=None, vecnormalize=True)
+    eval_envs = make_vec_envs(env_id, robot, config.seed, config.eval_processes, gamma=None, vecnormalize=True)
     eval_envs.training = False
 
     policy = Policy(

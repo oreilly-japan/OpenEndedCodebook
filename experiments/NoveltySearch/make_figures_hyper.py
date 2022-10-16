@@ -34,10 +34,10 @@ def main():
     expt_args = load_experiment(expt_path)
 
 
-    structure = load_robot(ROOT_DIR, expt_args['robot'], task=expt_args['task'])
+    robot = load_robot(ROOT_DIR, expt_args['robot'], task=expt_args['task'])
 
 
-    substrate = Substrate(expt_args['task'], structure[0])
+    substrate = Substrate(expt_args['task'], robot['body'])
     decoder = EvogymHyperDecoder(substrate, use_hidden=expt_args['use_hidden'])
     decode_function = decoder.decode
 
@@ -83,7 +83,7 @@ def main():
     drawer = EvogymControllerDrawerNEAT(
         save_path=figure_path,
         env_id=expt_args['task'],
-        structure=structure,
+        robot=robot,
         genome_config=config.genome_config,
         decode_function=decode_function,
         overwrite=not args.not_overwrite,

@@ -12,7 +12,7 @@ def make_config(config_file, extra_info=None, custom_config=None):
     return config
 
 
-class MEConfig():
+class MEConfig:
     """A simple container for user-configurable parameters of ME-NEAT."""
 
     __params = [ConfigParameter('offspring_size', int),

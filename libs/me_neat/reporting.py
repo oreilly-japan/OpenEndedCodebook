@@ -5,8 +5,7 @@ import csv
 import pickle
 import numpy as np
 
-class ReporterSet(object):
-
+class ReporterSet:
     def __init__(self):
         self.reporters = []
 
@@ -33,7 +32,7 @@ class ReporterSet(object):
             r.found_solution(config, population, best_genome)
 
 
-class BaseReporter():
+class BaseReporter:
     def start_generation(self, generation):
         pass
 

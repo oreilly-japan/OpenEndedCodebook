@@ -15,8 +15,8 @@ def dummy():
     return
 
 
-def transfer_step(make_env_kwargs, config, params, obs_rms):
-    envs = make_vec_envs(**make_env_kwargs)
+def transfer_step(env_kwargs, config, params, obs_rms):
+    envs = make_vec_envs(**env_kwargs)
     envs.obs_rms = obs_rms
 
     policy = Policy(
@@ -57,8 +57,8 @@ def transfer_step(make_env_kwargs, config, params, obs_rms):
     return params, obs_rms
 
 
-def evaluate(make_env_kwargs, params, obs_rms):
-    envs = make_vec_envs(**make_env_kwargs)
+def evaluate(env_kwargs, params, obs_rms):
+    envs = make_vec_envs(**env_kwargs)
     envs.training = False
     envs.obs_rms = obs_rms
 
@@ -81,7 +81,7 @@ def evaluate(make_env_kwargs, params, obs_rms):
 
 
 
-class OptimizerPPO():
+class OptimizerPPO:
     def __init__(self, key, params=None, obs_rms=None):
         self.key = key
         self.params = params
@@ -91,9 +91,22 @@ class OptimizerPPO():
         self.algo = None
 
     def set_env_info(self, make_env_kwargs, config):
-        self.make_env_kwargs_main = {**make_env_kwargs, **{'num_processes': config.num_processes, 'gamma': config.gamma, 'vecnormalize': True, 'subproc': True}}
-        self.make_env_kwargs_transfer = {**make_env_kwargs, **{'num_processes': config.num_processes, 'vecnormalize': True, 'subproc': False}}
-        self.make_env_kwargs_eval = {**make_env_kwargs, **{'num_processes': 1, 'vecnormalize': True, 'subproc': False}}
+        self.make_env_kwargs_main = dict(
+            **make_env_kwargs,
+            num_processes=config.num_processes,
+            gamma=config.gamma,
+            vecnormalize=True,
+            subproc=True)
+        self.make_env_kwargs_transfer = dict(
+            **make_env_kwargs,
+            num_processes=config.num_processes,
+            vecnormalize=True,
+            subproc=False)
+        self.make_env_kwargs_eval = dict(
+            **make_env_kwargs,
+            num_processes=1,
+            vecnormalize=True,
+            subproc=False)
 
     def get_core(self):
         return self.params, self.obs_rms
@@ -175,7 +188,7 @@ class OptimizerPPO():
 
         func = evaluate
         kwargs = {
-            'make_env_kwargs': self.make_env_kwargs_eval,
+            'env_kwargs': self.make_env_kwargs_eval,
             'params': params,
             'obs_rms': obs_rms}
         return func, kwargs
@@ -192,7 +205,7 @@ class OptimizerPPO():
 
             func = transfer_step
             kwargs = {'hoge': {
-                'make_env_kwargs': self.make_env_kwargs_transfer,
+                'env_kwargs': self.make_env_kwargs_transfer,
                 'config': config,
                 'params': params,
                 'obs_rms': obs_rms}
@@ -214,7 +227,7 @@ class OptimizerPPO():
 
 
 
-class OptimizerPPOConfig():
+class OptimizerPPOConfig:
     def __init__(self,
                  steps_per_iteration=4,
                  transfer_steps=4,

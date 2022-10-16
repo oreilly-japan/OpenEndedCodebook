@@ -4,13 +4,13 @@ from evogym import BASELINE_ENV_NAMES
 
 def get_args():
     parser = argparse.ArgumentParser(
-        description='Evogym CPPN experiment'
+        description='Evogym PPO experiment'
     )
 
     parser.add_argument(
         '-n', '--name',
         default='', type=str,
-        help='experiment name (default: "{task}")'
+        help='experiment name (default: "{task}_{robot}")'
     )
     parser.add_argument(
         '-t', '--task',
@@ -18,42 +18,55 @@ def get_args():
         help='evogym environment id (default: Walker-v0)'
     )
     parser.add_argument(
-        '-s', '--shape',
-        default=[5,5], nargs='+', type=int,
-        help='robot shape (default: (5,5), useage: "--shape {height} {width}")'
+        '-r', '--robot',
+        default='default', type=str,
+        help='robot structure name (default: default, built on "envs/evogym/robot_files/", if "default", load default robot of task)'
     )
 
     parser.add_argument(
-        '-p', '--pop-size',
+        '-p', '--num-processes',
         default=4, type=int,
-        help='population size of NEAT (default: 4)'
+        help='how many training CPU processes to use (default: 4)'
     )
     parser.add_argument(
-        '-g', '--generation',
-        default=500, type=int,
-        help='iterations of NEAT (default: 500)'
+        '-s', '--steps',
+        default=128, type=int,
+        help='num steps to use in PPO (default: 128)'
     )
-
+    parser.add_argument(
+        '-b','--num-mini-batch',
+        default=4, type=int,
+        help='number of batches for ppo (default: 4)'
+    )
+    parser.add_argument(
+        '-e', '--epochs',
+        default=8, type=int,
+        help='number of ppo epochs (default: 8)'
+    )
     parser.add_argument(
         '-i', '--ppo-iters',
         default=100, type=int,
-        help='learning iterations of PPO algo. on the more complex task, need more. (default: 100)'
+        help='learning iterations of PPO (default: 100)'
     )
     parser.add_argument(
-        '-ei', '--evaluation-interval',
-        default=20, type=int,
-        help='frequency to evaluate policy (default: 20)'
+        '-lr', '--learning-rate',
+        default=3e-4, type=float,
+        help='learning rate (default: 3e-4)'
+    )
+    parser.add_argument(
+        '--gamma',
+        default=0.99, type=float,
+        help='discount factor for rewards (default: 0.99)'
+    )
+    parser.add_argument(
+        '-c', '--clip-range',
+        default=0.3, type=float,
+        help='ppo clip parameter (default: 0.3)'
     )
     parser.add_argument(
         '-d', '--deterministic',
         action='store_true', default=False,
-        help='evaluate robot on deterministic action (default: False)'
-    )
-
-    parser.add_argument(
-        '-c', '--num-cores',
-        default=1, type=int,
-        help='number of parallel evaluation processes (default: 1)'
+        help='robot act deterministic (default: False)'
     )
     parser.add_argument(
         '--no-view',
@@ -63,12 +76,10 @@ def get_args():
     args = parser.parse_args()
 
     if args.name=='':
-        args.name = args.task
+        args.name = f'{args.task}_{args.robot}'
 
     assert args.task in BASELINE_ENV_NAMES,\
-        f'argumented task id "{args.task}" is not prepared, so pick from ['+', '.join(BASELINE_ENV_NAMES)+'].'
-
-    assert len(args.shape)==2, 'argument error: use "-s --shape" option as "-s {height} {width}"'
+        f'argumented task id "{args.task}" is not prepared, pick from ['+', '.join(BASELINE_ENV_NAMES)+'].'
 
     return args
 
@@ -86,7 +97,7 @@ def get_figure_args():
     parser.add_argument(
         '-s', '--specified',
         type=int,
-        help='input id, make figure for the only specified robot (usage: "-s {id}")'
+        help='input iter, make figure for the only specified controller (usage: "-s {iter}")'
     )
 
     parser.add_argument(
@@ -125,12 +136,6 @@ def get_figure_args():
         '--display-timestep',
         action='store_true', default=False,
         help='display timestep above robot'
-    )
-
-    parser.add_argument(
-        '-d', '--deterministic',
-        action='store_true', default=False,
-        help='robot act deterministic (default: False)'
     )
 
     parser.add_argument(

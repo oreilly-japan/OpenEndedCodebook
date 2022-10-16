@@ -31,7 +31,7 @@ def main():
     expt_args = load_experiment(expt_path)
 
 
-    structure = load_robot(ROOT_DIR, expt_args['robot'], task=expt_args['task'])
+    robot = load_robot(ROOT_DIR, expt_args['robot'], task=expt_args['task'])
 
 
     controller_path = os.path.join(expt_path, 'controller')
@@ -60,7 +60,7 @@ def main():
     drawer = EvogymControllerDrawerPPO(
         save_path=figure_path,
         env_id=expt_args['task'],
-        structure=structure,
+        robot=robot,
         overwrite=not args.not_overwrite,
         save_type=args.save_type, **draw_kwargs)
 
