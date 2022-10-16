@@ -130,6 +130,12 @@ def get_args():
         default=4, type=int,
         help='how many training CPU processes to use (default: 4)'
     )
+
+    parser.add_argument(
+        '--reset-pool',
+        action='store_true', default=False,
+        help='reset pool instance every iteration (default: False)'
+    )
     args = parser.parse_args()
 
     assert args.mc_lower < args.mc_upper, 'argument error: mc_lower < mc_upper'

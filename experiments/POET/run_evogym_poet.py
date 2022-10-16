@@ -78,7 +78,8 @@ def main():
         clip_reward_lower=0,
         clip_reward_upper=maximum_reward,
         novelty_knn=1,
-        novelty_threshold=0.1)
+        novelty_threshold=0.1,
+        reset_pool=args.reset_pool)
 
     poet_pop.initialize_niche()
     poet_pop.optimize(iterations=args.iteration)

@@ -33,6 +33,7 @@ $python run_evogym_poet.py
 | --num-processes       | -p-ppo  | 4               | number of paralell environment processes for ppo |
 | --init-log-std        | -std-ppo| 0.0             | initial log std of action distribution |
 | --num-cores           | -c      | 4               | number of parallel evaluation processes |
+| --reset-pool          |         | **false**       | reset pool instance every iteration |
 
 
 ### make figure

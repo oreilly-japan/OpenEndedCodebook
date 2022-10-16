@@ -32,7 +32,8 @@ class POET:
                  clip_reward_upper=10,
                  novelty_knn=1,
                  novelty_threshold=0.1,
-                 reset_optimizer=True):
+                 reset_optimizer=True,
+                 reset_pool=False):
 
         self.env_config = environment_config
         self.opt_config = optimizer_config
@@ -62,8 +63,13 @@ class POET:
         self.niches = {}
         self.niches_archive = {}
         self.niche_indexer = count(0)
+
+        self.reset_pool = reset_pool
         self.num_workers = num_workers
-        self.pool = None
+        if self.reset_pool:
+            self.pool = None
+        else:
+            self.pool = mp.pool.Pool(self.num_workers)
 
         self.save_path = save_path
         self.niche_path = os.path.join(save_path, 'niche')
@@ -301,7 +307,8 @@ class POET:
         self.iteration_start_time = time.time()
         print()
 
-        self.pool = mp.pool.Pool(self.num_workers)
+        if self.reset_pool:
+            self.pool = mp.pool.Pool(self.num_workers)
 
     def end_iteration(self):
         save_core = self.save_core_interval > 0 and (self.iteration+1) % self.save_core_interval == 0
@@ -312,8 +319,9 @@ class POET:
         print(f'elapsed time: {iteration_end_time-self.iteration_start_time: =.1f} sec')
         print('\n')
 
-        self.pool.close()
-        self.pool.join()
+        if self.reset_pool:
+            self.pool.close()
+            self.pool.join()
 
     
     def optimize(self, iterations=2000):
