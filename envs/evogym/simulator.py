@@ -7,7 +7,6 @@ import torch
 
 import multiprocessing
 from multiprocessing import Process
-from pyrsistent import s
 
 from ppo import Policy
 

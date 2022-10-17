@@ -12,6 +12,26 @@ import numpy as np
 
 from .niche import Niche
 
+class NoDaemonProcess(mp.Process):
+    # make 'daemon' attribute always return False
+    def _get_daemon(self):
+        return False
+    def _set_daemon(self, value):
+        pass
+    daemon = property(_get_daemon, _set_daemon)
+
+# We sub-class multiprocessing.pool.Pool instead of multiprocessing.Pool
+# because the latter is only a wrapper function, not a proper class.
+
+# class Pool(mp.pool.Pool):
+#     Process = NoDaemonProcess
+
+class NonDaemonPool(mp.pool.Pool):
+    def Process(self, *args, **kwds):
+        proc = super(NonDaemonPool, self).Process(*args, **kwds)
+        proc.__class__ = NoDaemonProcess
+        return proc
+
 
 class POET:
     def __init__(self, 
@@ -69,7 +89,7 @@ class POET:
         if self.reset_pool:
             self.pool = None
         else:
-            self.pool = mp.pool.Pool(self.num_workers)
+            self.pool = NonDaemonPool(self.num_workers)
 
         self.save_path = save_path
         self.niche_path = os.path.join(save_path, 'niche')
@@ -308,7 +328,7 @@ class POET:
         print()
 
         if self.reset_pool:
-            self.pool = mp.pool.Pool(self.num_workers)
+            self.pool = NonDaemonPool(self.num_workers)
 
     def end_iteration(self):
         save_core = self.save_core_interval > 0 and (self.iteration+1) % self.save_core_interval == 0
