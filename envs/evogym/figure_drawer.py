@@ -49,6 +49,7 @@ RenderPaddings = {
     'Climber-v2'        : ((1, 1), (1, 1)),
     'BidirectionalWalker-v0': ((4, 4), (1, 6)),
     'Parkour-v0'        : ((4, 4), (1, 8)),
+    'Parkour-v1'        : ((4, 4), (1, 8)),
 }
 
 
@@ -57,15 +58,23 @@ def pool_init_func(lock_):
     lock = lock_
 
 
-def make_gif(filename, env, viewer, controller, controller_type, resolution=(256,144), deterministic=True):
-    assert controller_type in ['NEAT', 'PPO', 'PPO_torch']
+def make_gif(filename, env, viewer, controller, controller_type, padding, track=True, resolution_scale=32, deterministic=True):
+    assert controller_type in ['NEAT', 'PPO']
 
-    viewer.set_resolution(resolution)
+    if track:
+        resolution = (8*resolution_scale, 144/32*resolution_scale)
+        viewer.set_resolution(resolution)
+    else:
+        grid_size = env.get_attr("world", indices=None)[0].grid_size
+        view_size = (grid_size[0]+padding[0][0]+padding[0][1], grid_size[1]+padding[1][0]+padding[1][1])
+        resolution = (view_size[0]*resolution_scale, view_size[1]*resolution_scale)
+        camera_position = ((grid_size[0]-padding[0][0]+padding[0][1])/2, (grid_size[1]-padding[1][0]+padding[1][1])/2)
 
-    if controller_type=='PPO_torch':
-        recurrent_hidden_states = torch.zeros(
-            1, controller.recurrent_hidden_state_size, device='cpu')
-        masks = torch.zeros(1, 1, device='cpu')
+        viewer.track_objects()
+        viewer.set_view_size(view_size)
+        viewer.set_resolution(resolution)
+        viewer.set_pos(camera_position)
+
 
     done = False
     obs = env.reset()
@@ -97,9 +106,9 @@ def make_gif(filename, env, viewer, controller, controller_type, resolution=(256
     return
 
 
-def make_jpg(filename, env, viewer, controller, controller_type, padding, interval='timestep', resolution_scale=32, timestep_interval=80, distance_interval=0.8, display_timestep=False, deterministic=True):
-    assert controller_type in ['NEAT', 'PPO', 'PPO_torch']
-    assert interval in ['timestep', 'distance', 'hybrid']
+def make_jpg(filename, env, viewer, controller, controller_type, padding, interval='timestep', resolution_scale=32, start_timestep=0, timestep_interval=80, distance_interval=0.8, blur=0, blur_temperature=0.6, display_timestep=False, draw_trajectory=False, deterministic=True):
+    assert controller_type in ['NEAT', 'PPO']
+    assert interval in ['timestep', 'distance']
 
     grid_size = env.get_attr("world", indices=None)[0].grid_size
 
@@ -112,53 +121,40 @@ def make_jpg(filename, env, viewer, controller, controller_type, padding, interv
     viewer.set_resolution(resolution)
     viewer.set_pos(camera_position)
 
-    if controller_type=='PPO_torch':
-        recurrent_hidden_states = torch.zeros(
-            1, controller.recurrent_hidden_state_size, device='cpu')
-        masks = torch.zeros(1, 1, device='cpu')
-
     obs = env.reset()
 
     images = []
-    alphas = []
-    position_history = {}
+    draw_times = []
+    blur_images = {}
+    position_history = []
     prev_position = None
     done = False
     while not done:
 
         position = env.env_method('get_pos_com_obs', object_name='robot')[0]
+        position_history.append(position)
         time = env.env_method('get_time')[0]
         draw = False
-        hide_voxels = False
-        draw_main = True
         if interval=='timestep':
-            if time%timestep_interval==0:
+            if time>=start_timestep and (time-start_timestep)%timestep_interval==0:
                 draw = True
-                mix_value = len(images)
+                mix_value = len(images) + 3
         elif interval=='distance':
-            if time==0 or np.linalg.norm(position-prev_position)>distance_interval:
+            if time>=start_timestep and np.linalg.norm(position-prev_position)>distance_interval:
                 draw = True
-                mix_value = len(position_history)
-        elif interval=='hybrid':
-            if time==0 or np.linalg.norm(position-prev_position)>distance_interval:
-                draw = True
-                mix_value = len(position_history)
-            elif time%timestep_interval==0:
-                draw = True
-                mix_value = -2
-                hide_voxels = True
-                draw_main = False
+                mix_value = len(images) + 3
 
         if draw:
-            image = viewer.render(mode='img', hide_grid=True, hide_voxels=hide_voxels)
-            alpha = np.where(np.mean(image, axis=-1)>240, 1e-3, 2**mix_value)
+            image = viewer.render(mode='img', hide_grid=True)
+            alpha = np.where(np.mean(image, axis=-1)>240, 1e-5, 2**mix_value)
+            images.append((image, np.expand_dims(alpha, axis=-1)))
+            draw_times.append(time)
 
-            images.append(image)
-            alphas.append(np.expand_dims(alpha, axis=-1))
+            prev_position = position
 
-            if draw_main:
-                position_history[time] = position
-                prev_position = position
+        elif blur>0:
+            image = viewer.render(mode='img', hide_grid=True, hide_edges=True)
+            blur_images[time] = image
 
         if controller_type=='NEAT':
             action = [np.array(controller.activate(obs[0]))*2 - 1]
@@ -169,17 +165,43 @@ def make_jpg(filename, env, viewer, controller, controller_type, padding, interv
             return
         obs, _, done, infos = env.step(action)
 
-    image = sum([image*alpha for image,alpha in zip(images, alphas)]) / sum(alphas)
+    if blur>0:
+        for draw_time in draw_times:
+            for diff,m in enumerate(np.linspace(0.2, 1.0, blur)[:min(blur, draw_time)]):
+                time = draw_time - diff - 1
+                if time in draw_times:
+                    break
+
+                image = blur_images[time]
+                image = np.maximum(image, 60)
+                image = image + (255-image) * m**blur_temperature
+                image = np.minimum(image, 247)
+                alpha = np.where(np.mean(image, axis=-1)>240, 1e-5, 1e-1)
+                images.append((image, np.expand_dims(alpha, axis=-1)))
+
+    image = sum([image*alpha for image,alpha in images]) / sum([alpha for _,alpha in images])
     image = image.astype('uint8')
 
     fig, ax = plt.subplots(figsize=(view_size[0]/3, view_size[1]/3), dpi=4*resolution_scale)
     ax.imshow(image)
 
     if display_timestep:
-        for time,position in position_history.items():
+        for draw_time in draw_times:
+            position = position_history[draw_time]
             x = (padding[0][0] + position[0]*10) * resolution_scale
             y = (padding[1][1] + grid_size[1] - position[1]*10 - 3.2) * resolution_scale
-            ax.text(x,y,f't={time}', ha='center', fontsize=12)
+            ax.text(x,y,f't={draw_time}', ha='center', fontsize=12)
+
+    if draw_trajectory:
+        data = []
+        for i,position in enumerate(position_history):
+            x = (padding[0][0] + position[0]*10) * resolution_scale
+            y = (padding[1][1] + grid_size[1] - position[1]*10) * resolution_scale
+            data.append((x, y))
+
+        cmap = plt.get_cmap('gist_earth')
+        for i in range(len(data)-1):
+            ax.plot([data[i][0],data[i+1][0]], [data[i][1],data[i+1][1]], c=cmap(int(i/len(data)*255)), linewidth=1.0, alpha=1.0, marker='None')
 
     ax.axis('off')
     plt.savefig(filename, bbox_inches='tight')
@@ -200,6 +222,7 @@ class EvogymControllerDrawerNEAT:
         self.overwrite = overwrite
         self.save_type = save_type
         self.draw_kwargs = draw_kwargs
+        self.padding = RenderPaddings[self.env_id]
 
         os.makedirs(self.save_path, exist_ok=True)
 
@@ -219,11 +242,10 @@ class EvogymControllerDrawerNEAT:
         controller = self.decode_function(genome, self.genome_config)
 
         if self.save_type=='gif':
-            make_gif(filename, env, viewer, controller, 'NEAT', **self.draw_kwargs)
+            make_gif(filename, env, viewer, controller, 'NEAT', self.padding, **self.draw_kwargs)
 
         elif self.save_type=='jpg':
-            padding = RenderPaddings[self.env_id]
-            make_jpg(filename, env, viewer, controller, 'NEAT', padding, **self.draw_kwargs)
+            make_jpg(filename, env, viewer, controller, 'NEAT', self.padding, **self.draw_kwargs)
 
         env.close()
         print(f'genome {key} ... done')
@@ -240,6 +262,7 @@ class EvogymControllerDrawerPPO:
         self.overwrite = overwrite
         self.save_type = save_type
         self.draw_kwargs = draw_kwargs
+        self.padding = RenderPaddings[self.env_id]
 
         os.makedirs(self.save_path, exist_ok=True)
 
@@ -263,11 +286,10 @@ class EvogymControllerDrawerPPO:
         env.obs_rms = obs_rms
 
         if self.save_type=='gif':
-            make_gif(filename, env, viewer, controller, 'PPO', **self.draw_kwargs)
+            make_gif(filename, env, viewer, controller, 'PPO', self.padding, **self.draw_kwargs)
 
         elif self.save_type=='jpg':
-            padding = RenderPaddings[self.env_id]
-            make_jpg(filename, env, viewer, controller, 'PPO', padding, **self.draw_kwargs)
+            make_jpg(filename, env, viewer, controller, 'PPO', self.padding, **self.draw_kwargs)
 
         env.close()
         print(f'iter {iter} ... done')
@@ -283,6 +305,7 @@ class EvogymStructureDrawerCPPN:
         self.overwrite = overwrite
         self.save_type = save_type
         self.draw_kwargs = draw_kwargs
+        self.padding = RenderPaddings[self.env_id]
 
         os.makedirs(self.save_path, exist_ok=True)
 
@@ -307,11 +330,10 @@ class EvogymStructureDrawerCPPN:
         env.obs_rms = obs_rms
 
         if self.save_type=='gif':
-            make_gif(filename, env, viewer, controller, 'PPO', **self.draw_kwargs)
+            make_gif(filename, env, viewer, controller, 'PPO', self.padding, **self.draw_kwargs)
 
         elif self.save_type=='jpg':
-            padding = RenderPaddings[self.env_id]
-            make_jpg(filename, env, viewer, controller, 'PPO', padding, **self.draw_kwargs)
+            make_jpg(filename, env, viewer, controller, 'PPO', self.padding, **self.draw_kwargs)
 
         env.close()
         print(f'genome {key} ... done')
@@ -329,6 +351,7 @@ class EvogymDrawerPOET:
         self.overwrite = overwrite
         self.save_type = save_type
         self.draw_kwargs = draw_kwargs
+        self.padding = RenderPaddings[self.env_id]
 
         os.makedirs(self.save_path, exist_ok=True)
 
@@ -355,11 +378,10 @@ class EvogymDrawerPOET:
         env.obs_rms = obs_rms
 
         if self.save_type=='gif':
-            make_gif(filename, env, viewer, controller, 'PPO', **self.draw_kwargs)
+            make_gif(filename, env, viewer, controller, 'PPO', self.padding, **self.draw_kwargs)
 
         elif self.save_type=='jpg':
-            padding = RenderPaddings[self.env_id]
-            make_jpg(filename, env, viewer, controller, 'PPO', padding, **self.draw_kwargs)
+            make_jpg(filename, env, viewer, controller, 'PPO', self.padding, **self.draw_kwargs)
 
         env.close()
         print(f'key {key} ... done')

@@ -166,25 +166,40 @@ def get_figure_args():
     )
 
     parser.add_argument(
-        '-r', '--resolution-ratio',
-        default=0.2, type=float,
-        help='gif resolution ratio (default: 0.2 -> 256:144)'
+        '-tr', '--track-robot',
+        action='store_true', default=False,
+        help='track robot with camera in gif'
     )
 
     parser.add_argument(
         '-i', '--interval',
         type=str, default='timestep',
-        help='in case of save type is jpg, type of interval for robot drawing (default: timestep, choose from [timestep, distance, hybrid])'
+        help='in case of save type is jpg, type of interval for robot drawing (default: timestep, choose from [timestep, distance])'
     )
     parser.add_argument(
         '-rs', '--resolution-scale',
         type=float, default=32.0,
-        help='jpg resolution scale. <br> when output monochrome image, try this argument change. (default: 32.0)'
+        help='resolution scale. <br> when output monochrome image, try this argument change. (default: 32.0)'
+    )
+    parser.add_argument(
+        '--start-timestep',
+        type=int, default=0,
+        help='start timestep of render (default: 0)'
     )
     parser.add_argument(
         '-ti', '--timestep-interval',
         type=int, default=80,
         help='timestep interval for robot drawing (default: 80, if interval is hybrid, it should be about 40)'
+    )
+    parser.add_argument(
+        '-b', '--blur',
+        type=int, default=0,
+        help='in case of jpg, timesteps for rendering motion blur (default: 0, 0 means no blur)'
+    )
+    parser.add_argument(
+        '-bt', '--blur-temperature',
+        type=float, default=0.6,
+        help='blur temperature (default: 0.6, up to 1.0)'
     )
     parser.add_argument(
         '-di', '--distance-interval',
@@ -195,6 +210,11 @@ def get_figure_args():
         '--display-timestep',
         action='store_true', default=False,
         help='display timestep above robot'
+    )
+    parser.add_argument(
+        '--draw-trajectory',
+        action='store_true', default=False,
+        help='draw robot trajectory as line'
     )
 
     parser.add_argument(
