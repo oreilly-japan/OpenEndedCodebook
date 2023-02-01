@@ -9,7 +9,7 @@ from ppo import Policy, PPO
 from gym_utils import make_vec_envs
 import ppo_config as default_config
 
-def evaluate(policy, envs, num_eval=1, deterministic=False):
+def evaluate(policy, envs, num_eval=1, deterministic=True):
 
     obs = envs.reset()
     episode_rewards = []
@@ -24,7 +24,7 @@ def evaluate(policy, envs, num_eval=1, deterministic=False):
     return np.mean(episode_rewards)
 
 
-def run_ppo(env_id, robot, train_iters, eval_interval, save_file, config=None, deterministic=False, save_iter=False, history_file=None):
+def run_ppo(env_id, robot, train_iters, eval_interval, save_file, config=None, deterministic=True, save_iter=False, history_file=None):
 
     if config is None:
         config = default_config

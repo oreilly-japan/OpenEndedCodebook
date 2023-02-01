@@ -22,7 +22,7 @@ $python run_evogym.py
 | --gamma               |         | 0.99            | discount factor for rewards |
 | --clip-range          | -c      | 0.3             | ppo clip parameter |
 | --init-log-std        | -std    | 0.1             | initial log std of action distribution |
-| --deterministic       | -d      | *false*         | robot act deterministic |
+| --probabilistic       |         | *false*         | evaluate robot on probabilistic action |
 | --no-view             |         | *false*         | not open simulation window of best robot |
 
 
@@ -48,6 +48,7 @@ $python make_figures.py {experiment name}
 | --distance-interval | -di     | 0.8     | distance interval for robot drawing |
 | --display-timestep  |         | *false* | display timestep above robot |
 | --draw-trajectory   |         | *false* | draw robot trajectory as line |
+| --probabilistic     |         | *false* | robot act probabilistically |
 | --num-cores         | -c      | 1       | number of parallel making processes |
 | --not-overwrite     |         | *false* | skip process if already figure exists |
 | --no-multi          |         | *false* | do without using multiprocessing. if error occur, try this option. |

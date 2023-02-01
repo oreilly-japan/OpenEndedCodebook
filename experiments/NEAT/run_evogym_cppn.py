@@ -39,7 +39,7 @@ def main():
     constraint = EvogymStructureConstraint(decode_function)
     constraint_function = constraint.eval_constraint
 
-    evaluator = EvogymStructureEvaluator(args.task, save_path, args.ppo_iters, args.evaluation_interval, deterministic=args.deterministic)
+    evaluator = EvogymStructureEvaluator(args.task, save_path, args.ppo_iters, args.evaluation_interval, deterministic=not args.probabilistic)
     evaluate_function = evaluator.evaluate_structure
 
     parallel = EvaluatorParallel(
@@ -72,7 +72,8 @@ def main():
         simulator = EvogymStructureSimulator(
             env_id=args.task,
             load_path=save_path,
-            history_file='history_reward.csv')
+            history_file='history_reward.csv',
+            deterministic=not args.probabilistic)
 
         simulate_process = SimulateProcess(
             simulator=simulator,

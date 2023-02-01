@@ -45,9 +45,9 @@ def get_args():
         help='frequency to evaluate policy (default: 20)'
     )
     parser.add_argument(
-        '-d', '--deterministic',
+        '--probabilistic',
         action='store_true', default=False,
-        help='evaluate robot on deterministic action (default: False)'
+        help='evaluate robot on probabilistic action (default: False)'
     )
 
     parser.add_argument(
@@ -148,9 +148,9 @@ def get_figure_args():
     )
 
     parser.add_argument(
-        '-d', '--deterministic',
+        '--probabilistic',
         action='store_true', default=False,
-        help='robot act deterministic (default: False)'
+        help='robot act probabilistically (default: False)'
     )
 
     parser.add_argument(

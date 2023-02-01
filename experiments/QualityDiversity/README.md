@@ -15,7 +15,7 @@ $python run_evogym_cppn.py
 | --generation          | -g      | 500             | iterations of NEAT |
 | --ppo-iters           | -i      | 100             | learning iterations of PPO algo <br> on the more complex task, need more. |
 | --evaluation-interval | -ei     | 20              | frequency to evaluatie policy |
-| --deterministic       | -d      | *false*         | evaluate robot on deterministic action |
+| --probabilistic       |         | *false*         | evaluate robot on probabilistic action |
 | --num-cores           | -c      | 1               | number of parallel evaluation processes |
 | --no-plot             |         | *false*         | not open window of progress figure |
 | --no-view             |         | *false*         | not open simulation window of best robot |
@@ -32,13 +32,17 @@ $python make_figures_cppn.py {experiment name}
 |                     |         |         | name of experiment for making figures |
 | --specified         | -s      |         | input id, make figure for the only specified robot |
 | --save-type         | -st     | gif     | file type (choose from [gif, jpg])
-| --resolution-ratio  | -r      | 0.2     | gif resolution ratio (0.2 -> (256,144)) |
-| --interval          | -i      | timestep| in case of save type is jpg, type of interval for robot drawing <br>(choose from [timestep, distance, hybrid]) |
+| --track-robot       | -rt     | *false* | in case of save type is gif, track robot with camera |
+| --interval          | -i      | timestep| in case of save type is jpg, type of interval for robot drawing <br>(choose from [timestep, distance]) |
 | --resolution-scale  | -rs     | 32.0    | jpg resolution scale <br> when output monochrome image, try this argument change. |
+| --start-timestep    |         | 0       | start timestep of render |
 | --timestep-interval | -ti     | 80      | timestep interval for robot drawing <br>(if interval is hybrid, it should be about 40) |
+| --blur              | -b      | 0       |in case of jpg, timesteps for rendering motion blur, 0 means no blur |
+| --blur-temperature  | -bt     | 0.6     | blur temperature, up to 1.0 |
 | --distance-interval | -di     | 0.8     | distance interval for robot drawing |
 | --display-timestep  |         | *false* | display timestep above robot |
-| --deterministic     | -d      | *false* | robot act deterministically |
+| --draw-trajectory   |         | *false* | draw robot trajectory as line |
+| --probabilistic     |         | *false* | robot act probabilistically |
 | --num-cores         | -c      | 1       | number of parallel making processes |
 | --not-overwrite     |         | *false* | skip process if already figure exists |
 | --no-multi          |         | *false* | do without using multiprocessing. if error occur, try this option. |

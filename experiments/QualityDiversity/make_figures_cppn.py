@@ -53,17 +53,22 @@ def main():
     draw_kwargs = {}
     if args.save_type=='gif':
         draw_kwargs = {
-            'resolution': (1280*args.resolution_ratio, 720*args.resolution_ratio),
-            'deterministic': args.deterministic
+            'track': args.track_robot,
+            'resolution_scale': args.resolution_scale,
+            'deterministic': not args.probabilistic
         }
     elif args.save_type=='jpg':
         draw_kwargs = {
             'interval': args.interval,
             'resolution_scale': args.resolution_scale,
+            'start_timestep': args.start_timestep,
             'timestep_interval': args.timestep_interval,
             'distance_interval': args.distance_interval,
+            'blur': args.blur,
+            'blur_temperature': args.blur_temperature,
             'display_timestep': args.display_timestep,
-            'deterministic': args.deterministic
+            'draw_trajectory': args.draw_trajectory,
+            'deterministic': not args.probabilistic
         }
     drawer = EvogymStructureDrawerCPPN(
         save_path=figure_path,

@@ -55,7 +55,7 @@ def main():
         draw_kwargs = {
             'track': args.track_robot,
             'resolution_scale': args.resolution_scale,
-            'deterministic': args.deterministic
+            'deterministic': not args.probabilistic
         }
     elif args.save_type=='jpg':
         draw_kwargs = {
@@ -68,7 +68,7 @@ def main():
             'blur_temperature': args.blur_temperature,
             'display_timestep': args.display_timestep,
             'draw_trajectory': args.draw_trajectory,
-            'deterministic': args.deterministic
+            'deterministic': not args.probabilistic
         }
     drawer = EvogymStructureDrawerCPPN(
         save_path=figure_path,

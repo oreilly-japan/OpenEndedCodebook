@@ -143,7 +143,7 @@ $python run_evogym_cppn.py
 | --generation          | -g      | 500             | iterations of NEAT |
 | --ppo-iters           | -i      | 100             | learning iterations of PPO algo <br> on the more complex task, need more. |
 | --evaluation-interval | -ei     | 20              | frequency to evaluatie policy |
-| --deterministic       | -d      | *false*         | evaluate robot on deterministic action |
+| --probabilistic       |         | *false*         | evaluate robot on probabilistic action |
 | --num-cores           | -c      | 1               | number of parallel evaluation processes |
 | --no-view             |         | *false*         | not open simulation window of best robot |
 
@@ -169,7 +169,7 @@ $python make_figures_cppn.py {experiment name}
 | --distance-interval | -di     | 0.8     | distance interval for robot drawing |
 | --display-timestep  |         | *false* | display timestep above robot |
 | --draw-trajectory   |         | *false* | draw robot trajectory as line |
-| --deterministic     | -d      | *false* | robot act deterministically |
+| --probabilistic     |         | *false* | robot act probabilistically |
 | --num-cores         | -c      | 1       | number of parallel making processes |
 | --not-overwrite     |         | *false* | skip process if already figure exists |
 | --no-multi          |         | *false* | do without using multiprocessing. if error occur, try this option. |

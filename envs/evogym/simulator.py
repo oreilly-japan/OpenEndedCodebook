@@ -69,7 +69,7 @@ class EvogymControllerSimulator:
             self.env.render()
 
 class EvogymControllerSimulatorPPO:
-    def __init__(self, env_id, robot, load_path, interval, deterministic=False):
+    def __init__(self, env_id, robot, load_path, interval, deterministic=True):
         self.env_id = env_id
         self.robot = robot
         self.load_path = load_path
@@ -129,7 +129,7 @@ class EvogymControllerSimulatorPPO:
 
 
 class EvogymStructureSimulator:
-    def __init__(self, env_id, load_path, history_file, deterministic=False):
+    def __init__(self, env_id, load_path, history_file, deterministic=True):
         self.env_id = env_id
         self.load_path = load_path
         self.history_file = os.path.join(self.load_path, history_file)

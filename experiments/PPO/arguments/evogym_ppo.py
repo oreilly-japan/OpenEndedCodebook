@@ -74,9 +74,9 @@ def get_args():
         help='initial log std of action distribution (default: 0.1)'
     )
     parser.add_argument(
-        '-d', '--deterministic',
+        '--probabilistic',
         action='store_true', default=False,
-        help='robot act deterministic (default: False)'
+        help='robot act probabilistic (default: False)'
     )
     parser.add_argument(
         '--no-view',
@@ -166,6 +166,12 @@ def get_figure_args():
         '--draw-trajectory',
         action='store_true', default=False,
         help='draw robot trajectory as line'
+    )
+
+    parser.add_argument(
+        '--probabilistic',
+        action='store_true', default=False,
+        help='robot act probabilistically (default: False)'
     )
 
     parser.add_argument(

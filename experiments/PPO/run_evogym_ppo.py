@@ -62,7 +62,7 @@ def main():
             robot=robot,
             load_path=controller_path,
             interval=args.evaluation_interval,
-            deterministic=args.deterministic)
+            deterministic=not args.probabilistic)
 
         simulate_process = SimulateProcess(
             simulator=simulator,
@@ -80,7 +80,7 @@ def main():
         eval_interval=args.evaluation_interval,
         save_file=controller_path,
         config=ppo_config,
-        deterministic=args.deterministic,
+        deterministic=not args.probabilistic,
         save_iter=True,
         history_file=history_file)
 

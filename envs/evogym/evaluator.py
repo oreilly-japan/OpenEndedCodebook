@@ -94,7 +94,7 @@ class EvogymControllerEvaluatorNS:
 from run_ppo import run_ppo
 
 class EvogymStructureEvaluator:
-    def __init__(self, env_id, save_path, ppo_iters, eval_interval, deterministic=False):
+    def __init__(self, env_id, save_path, ppo_iters, eval_interval, deterministic=True):
         self.env_id = env_id
         self.save_path = save_path
         self.robot_save_path = os.path.join(save_path, 'robot')
@@ -127,7 +127,7 @@ class EvogymStructureEvaluator:
         return results
 
 class EvogymStructureEvaluatorME:
-    def __init__(self, env_id, save_path, ppo_iters, eval_interval, bd_dictionary, deterministic=False):
+    def __init__(self, env_id, save_path, ppo_iters, eval_interval, bd_dictionary, deterministic=True):
         self.env_id = env_id
         self.save_path = save_path
         self.robot_save_path = os.path.join(save_path, 'robot')
