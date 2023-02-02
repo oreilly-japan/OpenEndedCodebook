@@ -163,6 +163,13 @@ def get_bootstrap_args():
 
     args = parser.parse_args()
 
+    assert args.agent_num % args.maze_num == 0, 'set agent num as an integral multiple of maze num.'
+    assert args.agent_limit >= 0 and args.maze_limit >= 0, 'set agent limit and maze limit 0 and over.'
+    if args.agent_limit > 0:
+        assert args.agent_limit > args.agent_criteria, 'set agent limit greater than agent criteria.'
+    if args.maze_limit > 0:
+        assert args.maze_limit > args.maze_criteria, 'set maze limit greater than maze criteria.'
+
     return args
 
 
@@ -175,6 +182,17 @@ def get_figure_args():
         'name',
         type=str,
         help='name of experiment for making figures'
+    )
+
+    parser.add_argument(
+        '-sg', '--start-generation',
+        default=0, type=int,
+        help='draw all of mazes produced since this generation (default: 0)'
+    )
+    parser.add_argument(
+        '-eg', '--end-generation',
+        default=2**16, type=int,
+        help='draw all of mazes produced up to this generation (default: 2^16)'
     )
 
     parser.add_argument(

@@ -119,7 +119,9 @@ def main():
     with open(maze_history_file, 'r') as f:
         reader = csv.reader(f)
         histories = list(reader)[1:]
-        pairs = [(int(hist[1]),ast.literal_eval(hist[3])[0]) for hist in histories]
+
+        condition = lambda z: z >= args.start_generation and z < args.end_generation
+        pairs = [(int(hist[1]), ast.literal_eval(hist[3])[0]) for hist in histories if condition(int(hist[0]))]
 
 
     if not args.no_multi:

@@ -50,10 +50,12 @@ $python run_maze.py
 $python make_figures.py {experiment name}
 ```
 #### options:
-| option          | abbrev  | default | detail  |
-| :---            | :---:   | :---:   | :---    |
-|                 |         |         | name of experiment for making figures |
-| --colorbar      | -cb     | *false* | plot colorbar of timestep |
-| --num-cores     | -c      | 1       | number of parallel making processes |
-| --not-overwrite |         | *false* | skip process if already gif exists |
-| --no-multi      |         | *false* | do without using multiprocessing. if error occur, try this option. |
+| option            | abbrev  | default | detail  |
+| :---              | :---:   | :---:   | :---    |
+|                   |         |         | name of experiment for making figures |
+| --start-generation| -sg     | 0       | draw all of mazes produced since this generation |
+| --end-generation  | -eg     | 2^16    | draw all of mazes produced up to this generation |
+| --colorbar        | -cb     | *false* | plot colorbar of timestep |
+| --num-cores       | -c      | 1       | number of parallel making processes |
+| --not-overwrite   |         | *false* | skip process if already gif exists |
+| --no-multi        |         | *false* | do without using multiprocessing. if error occur, try this option. |
