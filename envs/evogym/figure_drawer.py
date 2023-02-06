@@ -341,11 +341,11 @@ class EvogymStructureDrawerCPPN:
 
 
 class EvogymDrawerPOET:
-    def __init__(self, save_path, robot, recurrent=False, overwrite=True, save_type='gif', **draw_kwargs):
+    def __init__(self, env_id, save_path, robot, recurrent=False, overwrite=True, save_type='gif', **draw_kwargs):
         assert save_type in ['gif', 'jpg']
 
         self.save_path = os.path.join(save_path, save_type)
-        self.env_id = 'Parkour-v0'
+        self.env_id = env_id
         self.robot = robot
         self.recurrent = recurrent
         self.overwrite = overwrite

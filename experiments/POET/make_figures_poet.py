@@ -64,6 +64,7 @@ def main():
             'deterministic': True
         }
     drawer = EvogymDrawerPOET(
+        env_id=expt_args['task'],
         save_path=figure_path,
         robot=robot,
         recurrent=False,
