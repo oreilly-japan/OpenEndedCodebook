@@ -20,7 +20,7 @@ from gym_utils import load_robot
 
 from arguments.evogym_ppo import get_args
 
-class ppoConfig:
+class PpoConfig:
     def __init__(self, args):
         self.num_processes = args.num_processes
         self.eval_processes = 1
@@ -50,7 +50,7 @@ def main():
 
     robot = load_robot(ROOT_DIR, args.robot, task=args.task)
 
-    ppo_config = ppoConfig(args)
+    ppo_config = PpoConfig(args)
 
 
     controller_path = os.path.join(save_path, 'controller')
