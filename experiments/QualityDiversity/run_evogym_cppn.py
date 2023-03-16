@@ -19,7 +19,6 @@ sys.path.append(ENV_DIR)
 from evaluator import EvogymStructureEvaluatorME
 from simulator import EvogymStructureSimulator, SimulateProcess
 from cppn_decoder import EvogymStructureDecoder
-from substrate import Substrate
 from constraint import EvogymStructureConstraint
 import structural_bd as BD
 

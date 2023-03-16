@@ -5,7 +5,7 @@ from .feedforward import FeedForwardNetwork
 
 
 class BaseCPPNDecoder:
-    def feedforward(self, inputs, genome, config, ):
+    def feedforward(self, inputs, genome, config):
         cppn = FeedForwardNetwork.create(genome, config)
 
         states = []
