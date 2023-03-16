@@ -10,20 +10,20 @@ class EvogymStructureDecoder(BaseCPPNDecoder):
     def __init__(self, size):
         self.size = size
 
-        x, y = torch.meshgrid(torch.arange(size[0]), torch.arange(size[1]), indexing='ij')
+        x, y = np.meshgrid(np.arange(size[0]), np.arange(size[1]), indexing='ij')
         x = x.flatten()
         y = y.flatten()
 
         center = (np.array(size) - 1) / 2
         d = np.sqrt(np.square(x - center[0]) + np.square(y - center[1]))
 
-        self.inputs = {'x': x, 'y': y, 'd': d}
-        self.output_keys = ['empty', 'rigid', 'soft', 'hori', 'vert']
+        self.inputs = np.vstack([x, y, d]).T
 
     def decode(self, genome, config):
-        output = super().decode(genome, config)
-        output = np.vstack([output[key] for key in self.output_keys])
-        material = np.argmax(output, axis=0)
+        # [empty, rigid, soft, vertical, horizontal] * (robot size)
+        output = self.feedforward(self.inputs, genome, config)
+        # 各voxelの種類を選択
+        material = np.argmax(output, axis=1)
 
         body = np.reshape(material, self.size)
         connections = get_full_connectivity(body)

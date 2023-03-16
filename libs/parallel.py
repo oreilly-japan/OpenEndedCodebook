@@ -39,6 +39,8 @@ class EvaluatorParallel:
 
     def evaluate(self, genomes, config, generation):
 
+        size = len(genomes)
+
         if self.parallel:
             phenomes = {key: self.decode_function(genome, config.genome_config) for key,genome in genomes.items()}
 
@@ -52,8 +54,7 @@ class EvaluatorParallel:
                 jobs[key] = self.pool.apply_async(self.evaluate_function, args=args)
 
             # assign the result back to each genome
-            for key,genome in genomes.items():
-
+            for i,(key,genome) in enumerate(genomes.items()):
                 if key not in jobs:
                     continue
 
@@ -61,15 +62,19 @@ class EvaluatorParallel:
                 for attr, data in results.items():
                     setattr(genome, attr, data)
 
+                print(f'\revaluating genomes ... {i+1: =4}/{size: =4}', end='')
+            print('evaluating genomes ... done')
+
         else:
-            for key,genome in genomes.items():
+            for i,(key,genome) in enumerate(genomes.items()):
                 phenome = self.decode_function(genome, config.genome_config)
 
                 args = (key, phenome, generation)
                 results = self.evaluate_function(*args)
                 for attr, data in results.items():
                     setattr(genome, attr, data)
-
+                print(f'\revaluating genomes ... {i+1: =4}/{size: =4}', end='')
+            print('evaluating genomes ... done')
 
 class MCCEvaluatorParallel:
     def __init__(self, num_workers, evaluate_function, decode_function1, decode_function2, timeout=None):

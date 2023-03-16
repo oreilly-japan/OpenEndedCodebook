@@ -2,25 +2,18 @@
 import numpy as np
 
 from .feedforward import FeedForwardNetwork
-from .pytorch_neat.cppn import create_cppn
 
 
 class BaseCPPNDecoder:
-    def __init__(self):
-        self.inputs = None
-        self.output_keys = None
+    def feedforward(self, inputs, genome, config, ):
+        cppn = FeedForwardNetwork.create(genome, config)
 
-    def decode(self, genome, config):
-        nodes = create_cppn(
-            genome, config,
-            leaf_names=self.inputs.keys(),
-            node_names=self.output_keys)
+        states = []
+        for inp in inputs:
+            state = cppn.activate(inp)
+            states.append(state)
 
-        outputs = {}
-        for key, node in zip(self.output_keys, nodes):
-            outputs[key] = node(**self.inputs).numpy()
-
-        return outputs
+        return np.vstack(states)
 
 class BaseHyperDecoder:
     def __init__(self, substrate, activation='sin'):
@@ -32,9 +25,8 @@ class BaseHyperDecoder:
         self.set_attr(substrate, connections, downstream_nodes)
 
     def set_attr(self, substrate, connections, downstream_nodes):
-
-        self.edge_labels, self.edge_inputs = substrate.get_connection_inputs(connections)
-        self.node_labels, self.node_inputs = substrate.get_node_inputs(downstream_nodes)
+        self.egde_inputs = substrate.get_connection_inputs(connections)
+        self.node_inputs = substrate.get_node_inputs(downstream_nodes)
         self.input_nodes = substrate.get_nodes('input')
         self.output_nodes = substrate.get_nodes('output')
         self.input_dims = substrate.get_dim_size()
@@ -43,21 +35,19 @@ class BaseHyperDecoder:
     def decode(self, genome, config):
         output_activation = genome.nodes[config.output_keys[0]].activation
 
-        nodes = create_cppn(
-            genome, config,
-            leaf_names=self.edge_inputs.keys(),
-            node_names=['value'])
+        cppn = FeedForwardNetwork.create(genome, config)
 
+        biases = {}
+        for node,inp in self.node_inputs.items():
+            bias = cppn.activate(inp)[0]
+            bias = self.scale_outputs(bias, output_activation)
+            biases[node] = bias
 
-        biases = nodes[0](**self.node_inputs).numpy()
-        biases = self.scale_outputs(biases, output_activation)
-
-        biases = {node: bias for node,bias in zip(self.node_labels, biases)}
-
-        weights = nodes[0](**self.edge_inputs).numpy()
-        weights = self.scale_outputs(weights, output_activation)
-
-        connections = {edge: weight for edge,weight in zip(self.edge_labels, weights)}
+        connections = {}
+        for edge,inp in self.egde_inputs.items():
+            weight = cppn.activate(inp)[0]
+            weight = self.scale_outputs(weight, output_activation)
+            connections[edge] = weight
 
         return FeedForwardNetwork.create_from_weights(
             config=config,

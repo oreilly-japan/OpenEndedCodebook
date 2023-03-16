@@ -1,5 +1,4 @@
 import numpy as np
-import torch
 
 EnvObservations = {
     'Walker-v0'         : ['robot_velocity', 'robot_relative_position'],
@@ -289,10 +288,7 @@ class Substrate:
                 for node_out in self.nodes[layer_out]:
                     connections[(node_in['name'], node_out['name'])] = np.hstack((node_in['vector'], node_out['vector']))
 
-        edge_labels= list(connections.keys())
-        cppn_inputs = torch.from_numpy(np.vstack(list(connections.values())))
-        cppn_inputs = {dim: cppn_inputs[:,i] for i,dim in enumerate(self.cppn_dims)}
-        return edge_labels, cppn_inputs
+        return connections
 
     def get_node_inputs(self, layers):
         nodes = {}
@@ -301,10 +297,7 @@ class Substrate:
             for node in self.nodes[layer]:
                 nodes[node['name']] = np.hstack((node['vector'], blank))
 
-        node_labels = list(nodes.keys())
-        cppn_inputs = torch.from_numpy(np.vstack(list(nodes.values())))
-        cppn_inputs = {dim: cppn_inputs[:,i] for i,dim in enumerate(self.cppn_dims)}
-        return node_labels, cppn_inputs
+        return nodes
 
     def get_nodes(self, layer):
         return [node['name'] for node in self.nodes[layer]]
