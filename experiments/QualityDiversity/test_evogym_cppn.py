@@ -71,6 +71,7 @@ class RobotDrawer:
         self.ax.grid()
         self.ax.set_xlim([0, self.size[0]])
         self.ax.set_ylim([0, self.size[1]])
+        self.ax.invert_yaxis()
 
         plt.pause(0.01)
 
