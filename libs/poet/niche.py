@@ -66,7 +66,7 @@ class Niche:
         self.optimizer.save(save_path)
 
         self.history_file = os.path.join(save_path, 'history.csv')
-        self.history_header = ['step', 'reward', 'transferred_from']
+        self.history_header = ['step', 'reward', 'best', 'transferred_from']
 
         with open(self.history_file, 'w') as f:
             writer = csv.DictWriter(f, fieldnames=self.history_header)
@@ -85,6 +85,7 @@ class Niche:
             items = {
                     'step': self.steps,
                     'reward': self.reward,
+                    'best': self.best_reward,
                     'transferred_from': self.transferred_from
             }
             writer.writerow(items)
