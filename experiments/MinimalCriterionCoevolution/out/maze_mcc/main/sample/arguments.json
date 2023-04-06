@@ -1,0 +1,15 @@
+{
+    "name": "sample",
+    "bootstrap": "sample",
+    "generation": 1000,
+    "agent_criterion": 1,
+    "maze_criterion": 1,
+    "agent_pop": 160,
+    "maze_pop": 40,
+    "agent_limit": 0,
+    "maze_limit": 4,
+    "agent_batch": 40,
+    "maze_batch": 10,
+    "num_cores": 10,
+    "print_maze": false
+}

@@ -1,0 +1,15 @@
+{
+    "name": "sample",
+    "agent_num": 20,
+    "maze_num": 10,
+    "wall_gene_num": 2,
+    "path_gene_num": 2,
+    "exit_range": 5.0,
+    "radius": 5.0,
+    "range_finder": 100.0,
+    "max_speed": 5.0,
+    "max_angular_vel": 8.0,
+    "speed_scale": 2.0,
+    "angular_scale": 3.0,
+    "num_cores": 4
+}
