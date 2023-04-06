@@ -23,7 +23,7 @@ class NonDaemonPool(mp.pool.Pool):
         return proc
 
 class EvaluatorParallel:
-    def __init__(self, num_workers, decode_function, evaluate_function, revaluate=False, timeout=None, parallel=True):
+    def __init__(self, num_workers, decode_function, evaluate_function, revaluate=False, timeout=None, parallel=True, print_progress=True):
         self.num_workers = num_workers
         self.decode_function = decode_function
         self.evaluate_function = evaluate_function
@@ -31,6 +31,7 @@ class EvaluatorParallel:
         self.timeout = timeout
         self.parallel = parallel
         self.pool = NonDaemonPool(num_workers) if parallel and num_workers>0 else None
+        self.print_progress = print_progress
 
     def __del__(self):
         if self.pool is not None:
@@ -62,8 +63,10 @@ class EvaluatorParallel:
                 for attr, data in results.items():
                     setattr(genome, attr, data)
 
-                print(f'\revaluating genomes ... {i+1: =4}/{size: =4}', end='')
-            print('evaluating genomes ... done')
+                if self.print_progress:
+                    print(f'\revaluating genomes ... {i+1: =4}/{size: =4}', end='')
+            if self.print_progress:
+                print('evaluating genomes ... done')
 
         else:
             for i,(key,genome) in enumerate(genomes.items()):
@@ -73,8 +76,10 @@ class EvaluatorParallel:
                 results = self.evaluate_function(*args)
                 for attr, data in results.items():
                     setattr(genome, attr, data)
-                print(f'\revaluating genomes ... {i+1: =4}/{size: =4}', end='')
-            print('evaluating genomes ... done')
+                if self.print_progress:
+                    print(f'\revaluating genomes ... {i+1: =4}/{size: =4}', end='')
+            if self.print_progress:
+                print('evaluating genomes ... done')
 
 class MCCEvaluatorParallel:
     def __init__(self, num_workers, evaluate_function, decode_function1, decode_function2, timeout=None):

@@ -112,7 +112,8 @@ def main():
         parallel = EvaluatorParallel(
             num_workers=args.num_cores,
             evaluate_function=evaluator.evaluate_agent,
-            decode_function=ns_neat.FeedForwardNetwork.create
+            decode_function=ns_neat.FeedForwardNetwork.create,
+            print_progress=False
         )
 
         agent_genomes_tmp = {}

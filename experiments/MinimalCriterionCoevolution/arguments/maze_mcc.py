@@ -82,6 +82,12 @@ def get_args():
 
     if args.name==None:
         args.name = args.bootstrap
+    
+    assert args.agent_limit >= 0 and args.maze_limit >= 0, 'set agent limit and maze limit 0 and over.'
+    if args.agent_limit > 0:
+        assert args.agent_limit > args.agent_criterion, 'set agent limit greater than agent criteria.'
+    if args.maze_limit > 0:
+        assert args.maze_limit > args.maze_criterion, 'set maze limit greater than maze criteria.'
 
     return args
 
@@ -164,11 +170,6 @@ def get_bootstrap_args():
     args = parser.parse_args()
 
     assert args.agent_num % args.maze_num == 0, 'set agent num as an integral multiple of maze num.'
-    assert args.agent_limit >= 0 and args.maze_limit >= 0, 'set agent limit and maze limit 0 and over.'
-    if args.agent_limit > 0:
-        assert args.agent_limit > args.agent_criteria, 'set agent limit greater than agent criteria.'
-    if args.maze_limit > 0:
-        assert args.maze_limit > args.maze_criteria, 'set maze limit greater than maze criteria.'
 
     return args
 
