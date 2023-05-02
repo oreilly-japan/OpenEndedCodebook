@@ -115,7 +115,7 @@
 
 ### WingspanMaximizer-v0
 このタスクでは、仮想生物は可能な限り幅が広くなるように成長します。X方向に成長すると、ロボットに報酬が与えられます。1回の実行で600ステップ実行されます。
-このタスクを指定するときは、-t WingspanMa**z**imizer-v0 と指定してください。
+このタスクを指定するときは、 `-t WingspanMa**z**imizer-v0` と指定してください。
 ![WingspanMaximizer-v0 (Bhatia et al, Evolution Gym: A Large-Scale Benchmark for Evolving Soft Robots, In proc. of NeurIPS 2021, pp. 2201--2214, 2021 (Fig.34より引用) )][image-71]
 
 ### HeightMaximizer-v0
