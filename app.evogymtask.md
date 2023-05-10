@@ -77,11 +77,11 @@
 ![DownStepper-v0 (Bhatia et al, Evolution Gym: A Large-Scale Benchmark for Evolving Soft Robots, In proc. of NeurIPS 2021, pp. 2201--2214, 2021 (Fig.24より引用) )][image-61]
 
 ### ObstacleTraverser-v0
-仮想生物はだんだんでこぼこになっていく地形を横切って歩きます。また、地形の端に到達すると1回限りの報酬として2が与えられ、元の方向からどちらかの方向に90度以上回転すると-3のペナルティがあります（その後、環境はリセットされます）。1回の実行で1,000ステップ実行されます。
+仮想生物はだんだん凸凹になっていく地形を横切って歩きます。また、地形の端に到達すると1回限りの報酬として2が与えられ、元の方向からどちらかの方向に90度以上回転すると-3のペナルティがあります（その後、環境はリセットされます）。1回の実行で1,000ステップ実行されます。
 ![ObstacleTraverser-v0 (Bhatia et al, Evolution Gym: A Large-Scale Benchmark for Evolving Soft Robots, In proc. of NeurIPS 2021, pp. 2201--2214, 2021 (Fig.25より引用) )][image-62]
 
 ### ObstacleTraverser-v1
-仮想生物は非常にデコボコした地形の中を歩きます。 また、地形の端に到達すると1回限りの報酬として2が与えられます（その後、環境はリセットされます）。1回の実行で1,000ステップ実行されます。
+仮想生物は非常に凸凹した地形の中を歩きます。 また、地形の端に到達すると1回限りの報酬として2が与えられます（その後、環境はリセットされます）。1回の実行で1,000ステップ実行されます。
 ![ObstacleTraverser-v1 (Bhatia et al, Evolution Gym: A Large-Scale Benchmark for Evolving Soft Robots, In proc. of NeurIPS 2021, pp. 2201--2214, 2021 (Fig.26より引用) )][image-63]
 
 ### Hurdler-v0
