@@ -43,7 +43,7 @@
 ![Catcher-v0 (Bhatia et al, Evolution Gym: A Large-Scale Benchmark for Evolving Soft Robots, In proc. of NeurIPS 2021, pp. 2201--2214, 2021 (Fig.16より引用) )][image-53]
 
 ### BeamToppler-v0
-仮想生物は2本の棒の上に乗っているブロックを間から押しあげて下に落とします。x方向にブロックの位置までへの移動、ブロックの移動、そしてブロックを下に落とすことに対して報酬が与えられます。1回の実行で1,000ステップ実行され、タスクを完了すると1回限りの報酬として1が与えられます。
+仮想生物は2本の棒の上に乗っているブロックを間から押し上げて下に落とします。x方向にブロックの位置までへの移動、ブロックの移動、そしてブロックを下に落とすことに対して報酬が与えられます。1回の実行で1,000ステップ実行され、タスクを完了すると1回限りの報酬として1が与えられます。
 ![BeamToppler-v0 (Bhatia et al, Evolution Gym: A Large-Scale Benchmark for Evolving Soft Robots, In proc. of NeurIPS 2021, pp. 2201--2214, 2021 (Fig.17より引用) )][image-54]
 
 ### BeamSlider-v0
