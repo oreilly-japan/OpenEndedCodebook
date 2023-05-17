@@ -6,7 +6,7 @@
 
 ### experiments/PPO/run_evogym_ppo.py
 
-このコマンドはEvolution Gym上に仮想生物を表示し、PPOアルゴリズムを用いて動きを学習します。
+このコマンドはEvolution Gym上にロボットを表示し、PPOアルゴリズムを用いて動きを学習します。
 用意されているオプションは次の通りです。
 
 | オプション              | 短縮表記（abbrev）| デフォルト値 | 詳細                                                                                    |
@@ -124,7 +124,7 @@ python run_maze.py --pop-size 100 --generation 200 --timestep 500
 
 ### experiments/NEAT/run_evogym.py
 
-このコマンドはEvolution Gym上に仮想生物を表示し、NEATアルゴリズムを用いて動きを学習します。
+このコマンドはEvolution Gym上にロボットを表示し、NEATアルゴリズムを用いて動きを学習します。
 用意されているオプションは次の通りです。
 
 | オプション     | 短縮表記（abbrev）| デフォルト値| 詳細                                                                                                                                        |
@@ -175,7 +175,7 @@ python run_maze.py --task medium --pop-size 100 --timestep 500
 
 ### experiments/NoveltySearch/run_evogym.py
 
-このコマンドはEvolution Gym上に仮想生物を表示し、新規性探索アルゴリズムを用いて動きを学習します。
+このコマンドはEvolution Gym上にロボットを表示し、新規性探索アルゴリズムを用いて動きを学習します。
 用意されているオプションは次の通りです。
 
 | オプション       | 短縮表記（abbrev）| デフォルト値| 詳細                                                                                                                                         |
@@ -203,7 +203,7 @@ $ python run_evogym.py -r cat --pop-size 100 --ns-threshold 0.5 --num-knn 10 --m
 
 ### experiments/QualityDiversity/run_evogym_cppn.py
 
-このコマンドはEvolution Gym上に仮想生物を表示し、品質多様性アルゴリズムを用いて動きを学習します。
+このコマンドはEvolution Gym上にロボットを表示し、品質多様性アルゴリズムを用いて動きを学習します。
 用意されているオプションは次の通りです。
 
 | オプション              | 短縮表記（abbrev）| デフォルト値| 詳細                                                                                          |
@@ -289,7 +289,7 @@ python run_maze.py
 
 ### experiments/POET/run_evogym_poet.py
 
-このスクリプトはEvolution Gym上に仮想生物を表示し、POETを用いて学習します。
+このスクリプトはEvolution Gym上にロボットを表示し、POETを用いて学習します。
 用意されているオプションは次の通りです。
 
 | オプション              | 短縮表記（abbrev）| デフォルト値 | 詳細                                                                                                                                                                            |
