@@ -1,10 +1,18 @@
 import os
-import numpy as np
+import sys
 
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import colors
 
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(os.path.dirname(CURR_DIR))
+
+LIB_DIR = os.path.join(ROOT_DIR, 'libs')
+sys.path.append(LIB_DIR)
+
 from neat_cppn import BaseReporter
+
 
 class DrawReporter(BaseReporter):
     def __init__(self, env, timesteps, save_path, decode_function, generations, no_plot=False):
