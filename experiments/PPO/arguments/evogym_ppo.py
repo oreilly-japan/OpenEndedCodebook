@@ -192,6 +192,4 @@ def get_figure_args():
 
     args = parser.parse_args()
 
-    assert args.name is not None, 'argumented error: input "{experiment name}"'
-
     return args
