@@ -1,6 +1,5 @@
-import sys
 import os
-
+import sys
 
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(os.path.dirname(CURR_DIR))
@@ -8,17 +7,16 @@ ROOT_DIR = os.path.dirname(os.path.dirname(CURR_DIR))
 LIB_DIR = os.path.join(ROOT_DIR, 'libs')
 sys.path.append(LIB_DIR)
 import neat_cppn
-from parallel import EvaluatorParallel
 from experiment_utils import initialize_experiment
+from parallel import EvaluatorParallel
 
 ENV_DIR = os.path.join(ROOT_DIR, 'envs', 'maze')
 sys.path.append(ENV_DIR)
-from maze_environment_numpy import MazeEnvironment
 from evaluator import MazeControllerEvaluator
-
+from maze_drawer import MazeReporterNEAT
+from maze_environment_numpy import MazeEnvironment
 
 from arguments.maze_neat import get_args
-from maze_drawer import DrawReporter
 
 
 def main():
@@ -59,7 +57,7 @@ def main():
     reporters = [
         neat_cppn.SaveResultReporter(save_path),
         neat_cppn.StdOutReporter(True),
-        DrawReporter(maze_env, args.timesteps, figure_path, decode_function, args.generation, no_plot=args.no_plot)
+        MazeReporterNEAT(maze_env, args.timesteps, figure_path, decode_function, args.generation, no_plot=args.no_plot)
     ]
     for reporter in reporters:
         pop.add_reporter(reporter)
