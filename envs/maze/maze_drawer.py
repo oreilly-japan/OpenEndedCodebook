@@ -1,21 +1,14 @@
 import os
-import sys
-
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib import colors
-import os
-import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import colors
 
-from ns_neat import BaseReporter as BaseReporterNS
 from neat_cppn import BaseReporter as BaseReporterNEAT
+from ns_neat import BaseReporter as BaseReporterNS
 
 
-class DrawReporterNEAT(BaseReporterNEAT):
+class MazeReporterNEAT(BaseReporterNEAT):
     def __init__(self, env, timesteps, save_path, decode_function, generations, no_plot=False):
 
         self.env = env
@@ -115,8 +108,7 @@ class DrawReporterNEAT(BaseReporterNEAT):
         plt.close('all')
 
 
-
-class DrawReporterNS(BaseReporterNS):
+class MazeReporterNS(BaseReporterNS):
     def __init__(self, env, timesteps, save_path, decode_function, generations, no_plot=False):
 
         self.env = env
@@ -223,4 +215,3 @@ class DrawReporterNS(BaseReporterNS):
     def found_solution(self, config, generation, best):
         plt.clf()
         plt.close('all')
-        
