@@ -25,7 +25,7 @@ from arguments.maze_mcc import get_bootstrap_args
 
 import time
 
-class RewardReporter(ns_neat.BaseReporter):
+class ScoreReporter(ns_neat.BaseReporter):
 
     def __init__(self):
         self.generation = 0
@@ -36,7 +36,7 @@ class RewardReporter(ns_neat.BaseReporter):
         self.generation = generation
 
     def post_evaluate(self, config, population, species, best_genome):
-        self.best = max(self.best, best_genome.reward)
+        self.best = max(self.best, best_genome.score)
         elapsed = time.time()-self.start_time
         hours = int(elapsed//3600)
         minutes = int(elapsed%3600//60)
@@ -122,10 +122,10 @@ def main():
         while len(agent_genomes_tmp) < perMaze:
 
             pop = ns_neat.Population(ns_config)
-            pop.add_reporter(RewardReporter())
+            pop.add_reporter(ScoreReporter())
             agent_genome = pop.run(evaluate_function=parallel.evaluate, n=400)
 
-            if agent_genome.reward>=1.0:
+            if agent_genome.score>=1.0:
                 print('  found')
 
                 setattr(agent_genome, 'success_keys', [maze_genome.key])
