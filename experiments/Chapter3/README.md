@@ -4,7 +4,7 @@
 ## Maze
 ### execution
 ```
-$python run_maze.py
+$ python run_maze_ns_neat.py
 ```
 #### options:
 | option        | abbrev  | default   | detail  |
@@ -15,7 +15,7 @@ $python run_maze.py
 | --generation  | -g      | 500       | iterations of NEAT |
 | --ns-threshold|         | 6.0       | initial threshold to add to novelty archive |
 | --num-knn     |         | 15        | number of nearest neighbors to calculate novelty |
-| --mcns        |         | 0.01      | minimal reward criterion. if not satisfy, die. |
+| --mcns        |         | 0.01      | minimal score criterion. if not satisfy, die. |
 | --timestep    |         | 400       | limit of timestep for solving maze |
 | --num-cores   | -c      | 4         | number of parallel evaluation processes |
 | --no-plot     |         | *false*   | not open window of progress figure |
@@ -24,7 +24,7 @@ $python run_maze.py
 ## Maze Hyper-NEAT
 ### execution
 ```
-$python run_maze_hyper.py
+$ python run_maze_ns_hyper.py
 ```
 #### options:
 | option        | abbrev  | default   | detail  |
@@ -35,7 +35,7 @@ $python run_maze_hyper.py
 | --generation  | -g      | 500       | iterations of NEAT |
 | --ns-threshold|         | 6.0       | initial threshold to add to novelty archive |
 | --num-knn     |         | 15        | number of nearest neighbors to calculate novelty |
-| --mcns        |         | 0.01      | minimal reward criterion. if not satisfy, die. |
+| --mcns        |         | 0.01      | minimal score criterion. if not satisfy, die. |
 | --use-hideen  |         | *false*   | make hidden nodes on NN substrate |
 | --timestep    |         | 400       | limit of timestep for solving maze |
 | --num-cores   | -c      | 4         | number of parallel evaluation processes |
@@ -45,7 +45,7 @@ $python run_maze_hyper.py
 ## Evogym
 ### execution
 ```
-$python run_evogym.py
+$ python run_evogym_ns_neat.py
 ```
 #### options:
 | option        | abbrev  | default         | detail  |
@@ -57,16 +57,16 @@ $python run_evogym.py
 | --generation  | -g      | 500             | iterations of NEAT |
 | --ns-threshold|         | 0.1             | initial threshold to add to novelty archive |
 | --num-knn     |         | 5               | number of nearest neighbors to calculate novelty |
-| --mcns        |         | 0.0             | minimal reward criterion. if not satisfy, die. |
+| --mcns        |         | 0.0             | minimal score criterion. if not satisfy, die. |
 | --eval-num    |         | 1               | evaluation times. if probabilistic task, need more. |
 | --num-cores   | -c      | 4               | number of parallel evaluation processes |
 | --no-view     |         | *false*         | not open simulation window of best robot |
 
-### make figure
-after run_evogym, make {gif, jpg} file for each of all genomes written in history files.
+### draw figure
+after run_evogym_ns_neat.py, make {gif, jpg} file for each of all genomes written in history files.
 output to "./out/evogym_ns_neat/{expt name}/figure/{gif, jpg}/"
 ```
-$python make_figures.py {experiment name}
+$ python draw_evogym_ns_neat.py {experiment name}
 ```
 #### options:
 | option              | abbrev  | default | detail  |
@@ -92,7 +92,7 @@ $python make_figures.py {experiment name}
 ## Evogym Hyper-NEAT
 ### execution
 ```
-$python run_evogym_hyper.py
+$ python run_evogym_ns_hyper.py
 ```
 #### options:
 | option        | abbrev  | default         | detail  |
@@ -104,17 +104,17 @@ $python run_evogym_hyper.py
 | --generation  | -g      | 500             | iterations of NEAT |
 | --ns-threshold|         | 0.1             | initial threshold to add to novelty archive |
 | --num-knn     |         | 5               | number of nearest neighbors to calculate novelty |
-| --mcns        |         | 0.0             | minimal reward criterion. if not satisfy, die. |
+| --mcns        |         | 0.0             | minimal score criterion. if not satisfy, die. |
 | --use-hideen  |         | *false*         | make hidden nodes on NN substrate |
 | --eval-num    |         | 1               | evaluation times. if probabilistic task, need more. |
 | --num-cores   | -c      | 4               | number of parallel evaluation processes |
 | --no-view     |         | *false*         | not open simulation window of best robot |
 
 ### make figure
-after run_evogym_hyper, make {gif, jpg} file for each of all genomes written in history files.
+after run_evogym_ns_hyper.py, make {gif, jpg} file for each of all genomes written in history files.
 output to "./out/evogym_ns_hyper/{expt name}/figure/{gif, jpg}/"
 ```
-$python make_figures_hyper.py {experiment name}
+$ python draw_evogym_ns_hyper.py {experiment name}
 ```
 #### options:
 | option              | abbrev  | default | detail  |

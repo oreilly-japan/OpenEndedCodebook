@@ -4,7 +4,7 @@
 ## Evogym
 ### execution
 ```
-$python run_evogym_poet.py
+$ python run_evogym_poet.py
 ```
 #### options:
 | option                | abbrev  | default         | detail  |
@@ -37,10 +37,10 @@ $python run_evogym_poet.py
 
 
 ### make figure
-after run_evogym_poet, make {gif, jpg} file for each of all niches.
+after run_evogym_poet.py, make {gif, jpg} file for each of all niches.
 output to "./out/evogym_poet/{expt name}/figure/{gif, jpg}/"
 ```
-$python make_figures_poet.py {experiment name}
+$ python draw_evogym_poet.py {experiment name}
 ```
 #### options:
 | option              | abbrev  | default | detail  |

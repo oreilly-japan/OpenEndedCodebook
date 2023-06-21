@@ -1,9 +1,9 @@
 # Quality Diversity
 
-
+## Evogym
 ### execution
 ```
-$python run_evogym_cppn.py
+$ python run_evogym_me_cppn.py
 ```
 #### options:
 | option                | abbrev  | default         | detail  |
@@ -21,10 +21,10 @@ $python run_evogym_cppn.py
 | --no-view             |         | *false*         | not open simulation window of best robot |
 
 ### make figure
-after run_evogym_cppn, make {gif, jpg} file for each of all robots written in population history file.
+after run_evogym_me_cppn, make {gif, jpg} file for each of all robots written in population history file.
 output to "./out/evogym_me_cppn/{expt name}/figure/{gif, jpg}/"
 ```
-$python make_figures_cppn.py {experiment name}
+$ python draw_evogym_me_cppn.py {experiment name}
 ```
 #### options:
 | option              | abbrev  | default | detail  |

@@ -5,7 +5,7 @@
 ### bootstrap
 To execute before main mcc process. It prepare initial population.
 ```
-$python bootstrap_maze.py
+$ python bootstrap_maze_mcc.py
 ```
 #### options:
 | option            | abbrev  | default   | detail  |
@@ -26,7 +26,7 @@ $python bootstrap_maze.py
 
 ### mcc
 ```
-$python run_maze.py
+$ python run_maze_mcc.py
 ```
 #### options:
 | option            | abbrev  | default       | detail  |
@@ -47,7 +47,7 @@ $python run_maze.py
 
 ### make figure
 ```
-$python make_figures.py {experiment name}
+$ python draw_maze_mcc.py {experiment name}
 ```
 #### options:
 | option            | abbrev  | default | detail  |
