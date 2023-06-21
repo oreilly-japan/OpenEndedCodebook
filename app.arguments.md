@@ -4,7 +4,7 @@
 
 ## 1章で使われているコマンド
 
-### experiments/PPO/run_evogym_ppo.py
+### experiments/Chapter2/run_evogym_ppo.py
 
 このコマンドはEvolution Gym上にロボットを表示し、PPOアルゴリズムを用いて動きを学習します。
 用意されているオプションは次の通りです。
@@ -30,14 +30,14 @@
 ここではバッチサイズを32、エポック数を10、適応度の割引率を0.99、学習率を1e-3で指定し、コマンドを実行します。
 
 ```
-$ cd リポジトリのルートディレクトリ/experiments/PPO
+$ cd リポジトリのルートディレクトリ/experiments/Chapter2
 $ python run_evogym_ppo.py --robot cat --num-mini-batch 32 --epoch 10 --gamma 0.99 --learning-rate 1e-3
 
 ```
 
-### experiments/PPO/make_figures.py
+### experiments/Chapter2/draw_evogym_ppo.py
 
-このコマンドは`experiments/PPO/run_evogym_ppo.py` で行った実験の結果を可視化するため、画像ファイルを生成します。そのため事前に実験を実行しておく必要があります。
+このコマンドは`experiments/Chapter2/run_evogym_ppo.py` で行った実験の結果を可視化するため、画像ファイルを生成します。そのため事前に実験を実行しておく必要があります。
 用意されているオプションは次の通りです。
 
 | オプション             | 短縮表記（abbrev）| デフォルト値 | 詳細                                                                                                                                                               |
@@ -65,21 +65,21 @@ $ python run_evogym_ppo.py --robot cat --num-mini-batch 32 --epoch 10 --gamma 0.
 GIFで出力する場合、`--track-robot`を指定すると画面がロボットを追跡した結果を描画できます。
 
 ```
-$ cd リポジトリのルートディレクトリ/experiments/PPO
-$ python make_figures.py --save-type gif --track-robot Walker-v0_cat
+$ cd リポジトリのルートディレクトリ/experiments/Chapter2
+$ python draw_evogym_ppo.py --save-type gif --track-robot Walker-v0_cat
 
 ```
 
 JPEGで出力する場合、`--draw-trajectory`を指定することでロボットの重心を描画したり、`--blur`に数値を指定することで残像を描画できます。
 
 ```
-$ cd リポジトリのルートディレクトリ/experiments/PPO
-$ python make_figures.py --save-type jpg --draw-trajectory --blur 10  Walker-v0_cat
+$ cd リポジトリのルートディレクトリ/experiments/Chapter2
+$ python draw_evogym_ppo.py --save-type jpg --draw-trajectory --blur 10  Walker-v0_cat
 ```
 
 ## 2章で使われているコマンド
 
-### experiments/NEAT-tutorial/run_circuit.py
+### experiments/Chapter2/run_circuit_neat.py
 
 このコマンドはNEATアルゴリズムを用いてXOR演算子の挙動を学習する実験を行います。
 用意されているオプションは次の通りです。
@@ -96,11 +96,11 @@ $ python make_figures.py --save-type jpg --draw-trajectory --blur 10  Walker-v0_
 ここでは集団数を1000、世代数を2000で指定し、コマンドを実行します。
 
 ```
-cd リポジトリのルートディレクトリ/experiments/NEAT-tutorial
-python run_circuit.py --pop-size 1000 --generation 2000 --error mae
+cd リポジトリのルートディレクトリ/experiments/Chapter2
+python run_circuit_neat.py --pop-size 1000 --generation 2000 --error mae
 ```
 
-### experiments/NEAT/run_maze.py
+### experiments/Chapter2/run_maze_neat.py
 
 このコマンドはNEATアルゴリズムを用いて迷路を解く実験を行います。
 用意されているオプションは次の通りです。
@@ -118,11 +118,11 @@ python run_circuit.py --pop-size 1000 --generation 2000 --error mae
 ここでは集団数を100、世代数を200、ロボットが1回の実行で動くステップ数を500で指定し、コマンドを実行します。
 
 ```
-cd リポジトリのルートディレクトリ/experiments/NEAT/run_maze.py
-python run_maze.py --pop-size 100 --generation 200 --timestep 500
+cd リポジトリのルートディレクトリ/experiments/Chapter2
+python run_maze_neat.py --pop-size 100 --generation 200 --timestep 500
 ```
 
-### experiments/NEAT/run_evogym.py
+### experiments/Chapter2/run_evogym_neat.py
 
 このコマンドはEvolution Gym上にロボットを表示し、NEATアルゴリズムを用いて動きを学習します。
 用意されているオプションは次の通りです。
@@ -141,13 +141,13 @@ python run_maze.py --pop-size 100 --generation 200 --timestep 500
 ここでは集団数を100、世代数を40で指定し、コマンドを実行します。
 
 ```
-$ cd リポジトリのルートディレクトリ/experiments/NEAT
-$ python run_evogym.py --pop-size 100 --generation 40
+$ cd リポジトリのルートディレクトリ/experiments/Chapter2
+$ python run_evogym_neat.py --pop-size 100 --generation 40
 ```
 
 ## 3章で使われているコマンド
 
-### experiments/NoveltySearch/run_maze.py
+### experiments/Chapter3/run_maze_ns_neat.py
 
 このコマンドは新規性探索アルゴリズムを用いて迷路を解く実験を行います。
 
@@ -169,11 +169,11 @@ $ python run_evogym.py --pop-size 100 --generation 40
 ここでは難易度中のタスク、集団数を100、ロボットのステップ数を500で指定し、コマンドを実行します。
 
 ```
-cd リポジトリのルートディレクトリ/experiments/NoveltySearch/
-python run_maze.py --task medium --pop-size 100 --timestep 500
+cd リポジトリのルートディレクトリ/experiments/Chapter3
+python run_maze_ns_neat.py --task medium --pop-size 100 --timestep 500
 ```
 
-### experiments/NoveltySearch/run_evogym.py
+### experiments/Chapter3/run_evogym_ns_neat.py
 
 このコマンドはEvolution Gym上にロボットを表示し、新規性探索アルゴリズムを用いて動きを学習します。
 用意されているオプションは次の通りです。
@@ -195,13 +195,13 @@ python run_maze.py --task medium --pop-size 100 --timestep 500
 ここでは難易度中のタスク、集団数を100、ロボットのステップ数を500で指定し、コマンドを実行します。
 
 ```
-$ cd リポジトリのルートディレクトリ/experiments/NoveltySearch
-$ python run_evogym.py -r cat --pop-size 100 --ns-threshold 0.5 --num-knn 10 --mcns 0.3
+$ cd リポジトリのルートディレクトリ/experiments/Chapter3
+$ python run_evogym_ns_neat.py -r cat --pop-size 100 --ns-threshold 0.5 --num-knn 10 --mcns 0.3
 ```
 
 ## 4章で使われているコマンド
 
-### experiments/QualityDiversity/run_evogym_cppn.py
+### experiments/Chapter4/run_evogym_me_cppn.py
 
 このコマンドはEvolution Gym上にロボットを表示し、品質多様性アルゴリズムを用いて動きを学習します。
 用意されているオプションは次の通りです。
@@ -223,13 +223,13 @@ $ python run_evogym.py -r cat --pop-size 100 --ns-threshold 0.5 --num-knn 10 --m
 実験を開始するには次のコマンドを実行します。
 
 ```
-$ cd リポジトリのルートディレクトリ/experiments/QualityDiversity
-$ python run_evogym_cppn.py
+$ cd リポジトリのルートディレクトリ/experiments/Chapter4
+$ python run_evogym_me_cppn.py
 ```
 
 ## 5章で使われているコマンド
 
-### experiments/MinimalCriterioCoevolution/bootstrap_maze.py
+### experiments/Chapter5/bootstrap_maze_mcc.py
 
 MCCアルゴリズムで迷路を解く実験のための初期集団として、迷路とエージェントを作成します。
 用意されているオプションは次の通りです。
@@ -253,11 +253,11 @@ MCCアルゴリズムで迷路を解く実験のための初期集団として�
 作成を開始するには次のコマンドを実行します。
 
 ```
-cd リポジトリのルートディレクトリ/experiments/MinimalCriterioCoevolution/
-python bootstrap_maze.py
+cd リポジトリのルートディレクトリ/experiments/Chapter5
+python bootstrap_maze_mcc.py
 ```
 
-### experiments/MinimalCriterioCoevolution/run_maze.py
+### experiments/Chapter5/run_maze_mcc.py
 
 このコマンドはMCCアルゴリズムを用いて迷路を解く実験を行います。
 用意されているオプションは次の通りです。
@@ -281,13 +281,13 @@ python bootstrap_maze.py
 実験を開始するには次のコマンドを実行します。
 
 ```
-cd リポジトリのルートディレクトリ/experiments/MinimalCriterioCoevolution/
-python run_maze.py
+cd リポジトリのルートディレクトリ/experiments/Chapter5
+python run_maze_mcc.py
 ```
 
 ## 6章で使われているコマンド
 
-### experiments/POET/run_evogym_poet.py
+### experiments/Chapter6/run_evogym_poet.py
 
 このスクリプトはEvolution Gym上にロボットを表示し、POETを用いて学習します。
 用意されているオプションは次の通りです。
@@ -323,6 +323,6 @@ python run_maze.py
 実験を開始するには次のコマンドを実行します。
 
 ```
-cd リポジトリのルートディレクトリ/experiments/POET
+cd リポジトリのルートディレクトリ/experiments/Chapter6
 python run_evogym_poet.py
 ```
