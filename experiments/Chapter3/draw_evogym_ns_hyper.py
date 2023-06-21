@@ -53,7 +53,7 @@ def main():
         }
     else:
         files = {
-            'reward': 'history_reward.csv',
+            'score': 'history_score.csv',
             'novelty': 'history_novelty.csv'
         }
         for metric,file in files.items():

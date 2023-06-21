@@ -22,7 +22,7 @@ class MazeReporterNEAT(BaseReporterNEAT):
         self.ax = None
         self._init_figure()
 
-        self.best_reward = float('-inf')
+        self.best_fitness = float('-inf')
         self.best_path = None
         self.generation = -1
 
@@ -52,10 +52,10 @@ class MazeReporterNEAT(BaseReporterNEAT):
         self.generation = generation
 
     def _update_path(self, genomes, config):
-        genome_reward = max(genomes.values(), key=lambda z: z.fitness)
-        if genome_reward.fitness > self.best_reward:
-            self.best_reward = genome_reward.fitness
-            self.best_path = self._get_path(genome_reward, config)
+        genome_best = max(genomes.values(), key=lambda z: z.fitness)
+        if genome_best.fitness > self.best_fitness:
+            self.best_fitness = genome_best.fitness
+            self.best_path = self._get_path(genome_best, config)
 
     def _get_path(self, genome, config):
         controller = self.decode_function(genome, config.genome_config)
@@ -122,7 +122,7 @@ class MazeReporterNS(BaseReporterNS):
         self.ax = None
         self._init_figure()
 
-        self.best_reward = float('-inf')
+        self.best_score = float('-inf')
         self.best_path = None
         self.novelty_path = None
         self.generation = -1
@@ -153,10 +153,10 @@ class MazeReporterNS(BaseReporterNS):
         self.generation = generation
 
     def _update_path(self, genomes, config):
-        genome_reward = max(genomes.values(), key=lambda z: z.reward)
-        if genome_reward.reward > self.best_reward:
-            self.best_reward = genome_reward.reward
-            self.best_path = self._get_path(genome_reward, config)
+        genome_best = max(genomes.values(), key=lambda z: z.score)
+        if genome_best.score > self.best_score:
+            self.best_score = genome_best.score
+            self.best_path = self._get_path(genome_best, config)
 
         genome_novelty = max(genomes.values(), key=lambda z: z.fitness)
         self.novelty_path = self._get_path(genome_novelty, config)
@@ -187,7 +187,7 @@ class MazeReporterNS(BaseReporterNS):
         start_point = self.ax.scatter(self.start_point[0], self.start_point[1], color=[0.0,0.6,0.3], s=96, marker='s')
         goal_point = self.ax.scatter(self.exit_point[0], self.exit_point[1], color=[0.9,0.2,0.0], s=128, marker='*')
 
-        line_best = self.ax.plot(self.best_path[:,0], self.best_path[:,1], linewidth=3, c='b', alpha=0.7, label='reward')
+        line_best = self.ax.plot(self.best_path[:,0], self.best_path[:,1], linewidth=3, c='b', alpha=0.7, label='best')
         line_novelty = self.ax.plot(self.novelty_path[:,0], self.novelty_path[:,1], linewidth=3, c='orange', alpha=0.7, label='novelty')
 
         legend = plt.legend(bbox_to_anchor=(0.95, 0.97), loc='lower right', borderaxespad=0, fontsize=10)

@@ -52,8 +52,8 @@ class SaveResultReporter(BaseReporter):
         self.save_path = save_path
         self.history_pop_file = os.path.join(self.save_path, 'history_pop.csv')
         self.history_pop_header = ['generation', 'id'] + bd_names + ['fitness', 'parent']
-        self.history_reward_file = os.path.join(self.save_path, 'history_reward.csv')
-        self.history_reward_header = ['generation', 'id'] + bd_names + ['fitness', 'parent']
+        self.history_fitness_file = os.path.join(self.save_path, 'history_fitness.csv')
+        self.history_fitness_header = ['generation', 'id'] + bd_names + ['fitness', 'parent']
         self.generation = None
 
         self.genome_path = os.path.join(self.save_path, 'genome')
@@ -63,8 +63,8 @@ class SaveResultReporter(BaseReporter):
             writer = csv.DictWriter(f, fieldnames=self.history_pop_header)
             writer.writeheader()
 
-        with open(self.history_reward_file, 'w') as f:
-            writer = csv.DictWriter(f, fieldnames=self.history_reward_header)
+        with open(self.history_fitness_file, 'w') as f:
+            writer = csv.DictWriter(f, fieldnames=self.history_fitness_header)
             writer.writeheader()
 
     def start_generation(self, generation):
@@ -91,11 +91,11 @@ class SaveResultReporter(BaseReporter):
             'parent': best_genome.parent
         }
         items.update(**best_genome.bd)
-        with open(self.history_reward_file, 'a', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=self.history_reward_header)
+        with open(self.history_fitness_file, 'a', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=self.history_fitness_header)
             writer.writerow(items)
-        reward_file = os.path.join(self.genome_path, f'{best_genome.key}.pickle')
-        with open(reward_file, 'wb') as f:
+        best_file = os.path.join(self.genome_path, f'{best_genome.key}.pickle')
+        with open(best_file, 'wb') as f:
             pickle.dump(best_genome, f)
 
 

@@ -17,14 +17,14 @@ class MazeControllerEvaluator:
                 break
 
         if done:
-            reward = 1.0
+            score = 1.0
         else:
             distance = self.maze.get_distance_to_exit()
-            reward = (self.maze.initial_distance - distance) / self.maze.initial_distance
+            score = (self.maze.initial_distance - distance) / self.maze.initial_distance
 
         last_loc = self.maze.get_agent_location()
         results = {
-            'fitness': reward,
+            'fitness': score,
             'data': last_loc
         }
         return results
@@ -47,14 +47,14 @@ class MazeControllerEvaluatorNS:
                 break
 
         if done:
-            reward = 1.0
+            score = 1.0
         else:
             distance = self.maze.get_distance_to_exit()
-            reward = (self.maze.initial_distance - distance) / self.maze.initial_distance
+            score = (self.maze.initial_distance - distance) / self.maze.initial_distance
 
         last_loc = self.maze.get_agent_location()
         results = {
-            'reward': reward,
+            'score': score,
             'data': last_loc
         }
         return results

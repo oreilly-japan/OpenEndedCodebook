@@ -12,9 +12,9 @@ class SaveResultReporter(BaseReporter):
 
         self.save_path = save_path
         self.history_pop_file = os.path.join(self.save_path, 'history_pop.csv')
-        self.history_pop_header = ['generation', 'id', 'reward', 'species', 'parent1', 'parent2']
-        self.history_reward_file = os.path.join(self.save_path, 'history_reward.csv')
-        self.history_reward_header = ['generation', 'id', 'reward', 'species', 'parent1', 'parent2']
+        self.history_pop_header = ['generation', 'id', 'fitness', 'species', 'parent1', 'parent2']
+        self.history_fitness_file = os.path.join(self.save_path, 'history_fitness.csv')
+        self.history_fitness_header = ['generation', 'id', 'fitness', 'species', 'parent1', 'parent2']
 
         self.genome_path = os.path.join(self.save_path, 'genome')
         os.makedirs(self.genome_path, exist_ok=True)
@@ -23,8 +23,8 @@ class SaveResultReporter(BaseReporter):
             writer = csv.DictWriter(f, fieldnames=self.history_pop_header)
             writer.writeheader()
 
-        with open(self.history_reward_file, 'w') as f:
-            writer = csv.DictWriter(f, fieldnames=self.history_reward_header)
+        with open(self.history_fitness_file, 'w') as f:
+            writer = csv.DictWriter(f, fieldnames=self.history_fitness_header)
             writer.writeheader()
 
 
@@ -38,28 +38,28 @@ class SaveResultReporter(BaseReporter):
                 items = {
                     'generation': self.generation,
                     'id': genome.key,
-                    'reward': genome.fitness,
+                    'fitness': genome.fitness,
                     'species': species.get_species_id(genome.key),
                     'parent1': genome.parent1,
                     'parent2': genome.parent2
                 }
                 writer.writerow(items)
 
-        current_reward = max(population.values(), key=lambda z: z.fitness)
+        current_best = max(population.values(), key=lambda z: z.fitness)
         items = {
             'generation': self.generation,
-            'id': current_reward.key,
-            'reward': current_reward.fitness,
-            'species': species.get_species_id(current_reward.key),
-            'parent1': current_reward.parent1,
-            'parent2': current_reward.parent2
+            'id': current_best.key,
+            'fitness': current_best.fitness,
+            'species': species.get_species_id(current_best.key),
+            'parent1': current_best.parent1,
+            'parent2': current_best.parent2
         }
-        with open(self.history_reward_file, 'a', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=self.history_reward_header)
+        with open(self.history_fitness_file, 'a', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=self.history_fitness_header)
             writer.writerow(items)
-        reward_file = os.path.join(self.genome_path, f'{current_reward.key}.pickle')
-        with open(reward_file, 'wb') as f:
-            pickle.dump(current_reward, f)
+        best_file = os.path.join(self.genome_path, f'{current_best.key}.pickle')
+        with open(best_file, 'wb') as f:
+            pickle.dump(current_best, f)
 
     def found_solution(self, config, generation, best):
         pass

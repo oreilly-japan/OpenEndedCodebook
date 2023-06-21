@@ -14,21 +14,19 @@ class EvogymControllerEvaluator:
         env = make_vec_envs(self.env_id, self.robot, 0, 1)
 
         obs = env.reset()
-        episode_rewards = []
-        while len(episode_rewards) < self.num_eval:
-            # t = env.env_method('get_time')[0]
+        episode_scores = []
+        while len(episode_scores) < self.num_eval:
             action = np.array(controller.activate(obs[0]))*2 - 1
             obs, _, done, infos = env.step([np.array(action)])
 
             if 'episode' in infos[0]:
-                # print(t)
-                reward = infos[0]['episode']['r']
-                episode_rewards.append(reward)
+                score = infos[0]['episode']['r']
+                episode_scores.append(score)
 
         env.close()
 
         results = {
-            'fitness': np.mean(episode_rewards),
+            'fitness': np.mean(episode_scores),
         }
         return results
 
@@ -47,9 +45,9 @@ class EvogymControllerEvaluatorNS:
         obs_data = []
         act_data = []
 
-        episode_rewards = []
+        episode_scores = []
         episode_data = []
-        while len(episode_rewards) < self.num_eval:
+        while len(episode_scores) < self.num_eval:
             action = np.array(controller.activate(obs[0]))*2 - 1
             obs_data.append(obs)
             act_data.append(action)
@@ -68,13 +66,13 @@ class EvogymControllerEvaluatorNS:
                 obs_data = []
                 act_data = []
 
-                reward = infos[0]['episode']['r']
-                episode_rewards.append(reward)
+                score = infos[0]['episode']['r']
+                episode_scores.append(score)
 
         env.close()
 
         results = {
-            'reward': np.mean(episode_rewards),
+            'score': np.mean(episode_scores),
             'data': np.mean(np.vstack(episode_data),axis=0)
         }
         return results
@@ -112,7 +110,7 @@ class EvogymStructureEvaluator:
         file_controller = os.path.join(self.controller_save_path, f'{key}')
         np.savez(file_robot, **robot)
 
-        fitness = run_ppo(
+        reward = run_ppo(
             env_id=self.env_id,
             robot=robot,
             train_iters=self.ppo_iters,
@@ -122,7 +120,7 @@ class EvogymStructureEvaluator:
         )
 
         results = {
-            'fitness': fitness,
+            'fitness': reward,
         }
         return results
 
@@ -146,7 +144,7 @@ class EvogymStructureEvaluatorME:
         file_controller = os.path.join(self.controller_save_path, f'{key}')
         np.savez(file_robot, **robot)
 
-        fitness = run_ppo(
+        reward = run_ppo(
             env_id=self.env_id,
             robot=robot,
             train_iters=self.ppo_iters,
@@ -157,7 +155,7 @@ class EvogymStructureEvaluatorME:
         bd = {bd_name: bd_func.evaluate(robot) for bd_name,bd_func in self.bd_dictionary.items()}
 
         results = {
-            'fitness': fitness,
+            'fitness': reward,
             'bd': bd
         }
         return results

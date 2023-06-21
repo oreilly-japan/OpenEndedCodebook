@@ -45,7 +45,7 @@ def get_args():
     parser.add_argument(
         '--mcns',
         default=0.0, type=float,
-        help='minimal reward criterion. if not satisfy, die. (default: 0.0)'
+        help='minimal score criterion. if not satisfy, die. (default: 0.0)'
     )
 
     parser.add_argument(

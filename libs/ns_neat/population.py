@@ -35,21 +35,21 @@ class Population(Population):
             # Gather and report statistics.
             best = None
             for g in self.population.values():
-                reward = getattr(g, 'reward', None)
-                if reward is None:
-                    raise RuntimeError("Reward not assigned to genome {}".format(g.key))
+                score = getattr(g, 'score', None)
+                if score is None:
+                    raise RuntimeError("Score not assigned to genome {}".format(g.key))
 
-                if best is None or reward > best.reward:
+                if best is None or score > best.score:
                     best = g
             self.reporters.post_evaluate(self.config, self.population, self.species, best)
 
             # Track the best genome ever seen.
-            if self.best_genome is None or best.reward > self.best_genome.reward:
+            if self.best_genome is None or best.score > self.best_genome.score:
                 self.best_genome = best
 
             if not self.config.no_fitness_termination:
                 # End if the fitness threshold is reached.
-                fv = self.fitness_criterion(g.reward for g in self.population.values())
+                fv = self.fitness_criterion(g.score for g in self.population.values())
                 if fv >= self.config.fitness_threshold:
                     self.reporters.found_solution(self.config, self.generation, best)
                     break
@@ -88,11 +88,11 @@ class Population(Population):
         new_archive = {}
         for key,genome in self.population.items():
 
-            reward = getattr(genome, 'reward', None)
-            if reward is None:
-                raise RuntimeError("reward not assigned to genome {}".format(genome.key))
+            score = getattr(genome, 'score', None)
+            if score is None:
+                raise RuntimeError("score not assigned to genome {}".format(genome.key))
 
-            if reward < self.config.mcns:
+            if score < self.config.mcns:
                 genome.fitness = -1
                 continue
 
