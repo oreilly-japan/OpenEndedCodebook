@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+
+<html lang="{{ .Site.Language }}" dir="{{ .Language.LanguageDirection | default "auto" }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ if .IsHome }}{{ else }}{{ if .Title }}{{ .Title }}{{ end }}{{ end }}</title>
+  </head>
+
+  <body>
+    <main class="main">
+      {{- block "main" . }}{{ end }}
+    </main>
+  </body>
+</html>
