@@ -55,6 +55,8 @@ jobs:
           HUGO_ENV: production
         working-directory: hugo
         run: |
+          ls
+          pwd
           hugo \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
