@@ -1,5 +1,5 @@
 baseURL = 'http://example.org/'
-languageCode = 'en-us'
-title = 'My New Hugo Site'
+languageCode = 'ja'
+title = '進化計算サポートサイト'
 publishDir = '../public'
 contentDir = "../appendix/"
