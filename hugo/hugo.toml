@@ -1,5 +1,21 @@
-baseURL = 'http://example.org/'
+# baseURL = 'https://takesxisximada.github.io/OpenEndedCodebook/'
 languageCode = 'ja'
-title = '進化計算サポートサイト'
+title = ''
 publishDir = '../public'
 contentDir = "../appendix/"
+
+[markup]
+  [markup.highlight]
+    anchorLineNos = false
+    codeFences = true
+    guessSyntax = false
+    hl_Lines = ''
+    hl_inline = false
+    lineAnchors = ''
+    lineNoStart = 1
+    lineNos = false
+    lineNumbersInTable = true
+    noClasses = true
+    noHl = false
+    style = 'monokai'
+    tabWidth = 4
