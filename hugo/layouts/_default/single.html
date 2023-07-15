@@ -1,4 +1,8 @@
 {{ define "main" }}
+<div style="text-align: right;">
+  {{ partial "nav.html" . }}
+</div>
+
 <section id="main">
   <div>
     <article id="content">
@@ -6,35 +10,16 @@
     </article>
   </div>
 </section>
-<aside id="meta">
+
+<div style="text-align: right;">
+  {{ if .Lastmod }}
   <div>
-  <section>
-    <h4 id="date"> {{ .Date.Format "Mon Jan 2, 2006" }} </h4>
-    <h5 id="wordcount"> {{ .WordCount }} Words </h5>
-  </section>
-    {{ with .GetTerms "topics" }}
-      <ul id="topics">
-        {{ range . }}
-          <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
-        {{ end }}
-      </ul>
-    {{ end }}
-    {{ with .GetTerms "tags" }}
-      <ul id="tags">
-        {{ range . }}
-          <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
-        {{ end }}
-      </ul>
-    {{ end }}
+    <span>最終更新: </span><span>{{ .Lastmod.Format "2006-01-02" }}</span>
   </div>
-  <div>
-    {{ with .PrevInSection }}
-      <a class="previous" href="{{ .Permalink }}"> {{ .Title }}</a>
-    {{ end }}
-    {{ with .NextInSection }}
-      <a class="next" href="{{ .Permalink }}"> {{ .Title }}</a>
-    {{ end }}
-  </div>
-</aside>
+  {{ end }}
+  
+  {{ partial "nav.html" . }}
+</div>
+
 {{ end }}
 

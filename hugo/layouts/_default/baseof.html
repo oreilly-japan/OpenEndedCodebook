@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>進化計算(仮)</title>
     <style>
+* {
+  overflow-wrap: break-word;
+}
 
 table {
   border-collapse: collapse;
@@ -13,17 +16,17 @@ table {
 
 th {
   background: #eee;
-  border: 1px solid #ddd;
   font-size: .95em;
   line-height: 1.5;
-  padding: 0.5rem;
+  border: 1px solid #ddd;
+  overflow-wrap: anywhere;
 }
 
 td {
   border: 1px solid #ddd;
   font-size: .95em;
   line-height: 1.5;
-  padding: 0.5rem;
+  overflow-wrap: anywhere;
 }
 
 pre {
@@ -93,28 +96,25 @@ header {
   margin: 0 auto;
   max-width: 1240px;
   padding: 0 20px;
-  width: 100%;
   border-bottom: 1px solid #ddd;
 }
 
 article > * > img {
   width: 100%;
 }
-
 </style>
   </head>
 
   <body>
     <header>
-      <img src="/logo_oreilly_japan.svg">
+      <a href="{{ .Site.BaseURL }}"><img src="/logo_oreilly_japan.svg"></a>
+	
     </header>
 
     <main class="maincontent">
       {{- block "main" . }}{{ end }}
     </main>
 
-    <footer>
-      <img src="/logo_oreilly_japan.svg">
-    </footer>
+    <header style="text-align: center;">&copy 2023, O’Reilly Japan, Inc.</header>
   </body>
 </html>
