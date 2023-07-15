@@ -158,9 +158,9 @@ lastmod: 2023-07-15T18:14:38+0900
 [image-54]:	https://github.com/ryokoakaike/EC_image/blob/master/img/BeamToppler-v0.png?raw=true
 [image-55]:	https://github.com/ryokoakaike/EC_image/blob/master/img/BeamSlider-v0.png?raw=true
 [image-56]:	https://github.com/ryokoakaike/EC_image/blob/master/img/Lifter-v0.png?raw=true
-[image-57]:	https://github.com/ryokoakaike/EC_image/blob/master/img/Climber-v0.png?raw=true
-[image-58]:	https://github.com/ryokoakaike/EC_image/blob/master/img/Climber-v1.png?raw=true
-[image-59]:	https://github.com/ryokoakaike/EC_image/blob/master/img/Climber-v2.png?raw=true
+[image-57]:	https://github.com/ryokoakaike/EC_image/blob/master/img/Climber-v0.png?raw=true#vertical
+[image-58]:	https://github.com/ryokoakaike/EC_image/blob/master/img/Climber-v1.png?raw=true#vertical
+[image-59]:	https://github.com/ryokoakaike/EC_image/blob/master/img/Climber-v2.png?raw=true#vertical
 [image-60]:	https://github.com/ryokoakaike/EC_image/blob/master/img/UpStepper-v0.png?raw=true
 [image-61]:	https://github.com/ryokoakaike/EC_image/blob/master/img/DownStepper-v0.png?raw=true
 [image-62]:	https://github.com/ryokoakaike/EC_image/blob/master/img/ObstacleTraverser-v0.png?raw=true
