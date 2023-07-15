@@ -1,5 +1,4 @@
-# baseURL = 'https://takesxisximada.github.io/OpenEndedCodebook/'
-baseURL = 'http://http://192.168.207.167:1313'
+baseURL = 'https://takesxisximada.github.io/OpenEndedCodebook/'
 languageCode = 'ja'
 title = 'Openended Evolution - Pythonで実装する進化するAI'
 publishDir = '../public'
