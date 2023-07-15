@@ -1,6 +1,6 @@
 baseURL = 'https://takesxisximada.github.io/OpenEndedCodebook/'
 languageCode = 'ja'
-title = 'Openended Evolution - Pythonで実装する進化するAI'
+title = 'Pythonではじめるオープンエンドな進化計算'
 publishDir = '../public'
 contentDir = "../appendix/"
 
