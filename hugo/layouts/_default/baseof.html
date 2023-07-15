@@ -2,17 +2,97 @@
 
 <html lang="{{ .Site.Language }}" dir="{{ .Language.LanguageDirection | default "auto" }}">
   <head>
-    <meta charset="utf-8">
-    <meta name="HandheldFriendly" content="True">
-    <meta name="referrer" content="no-referrer-when-downgrade">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>進化計算(仮)</title>
+    <style>
+main {
+  padding: 1rem;
+}
 
-    <title>{{ if .IsHome }}{{ else }}{{ if .Title }}{{ .Title }}{{ end }}{{ end }}</title>
+table {
+  border-collapse: collapse;
+}
+
+th {
+  background: #eee;
+  border: 1px solid #ddd;
+  font-size: .95em;
+  line-height: 1.5;
+  padding: 0.5rem;
+}
+
+td {
+  border: 1px solid #ddd;
+  font-size: .95em;
+  line-height: 1.5;
+  padding: 0.5rem;
+}
+
+pre {
+  padding: 2em;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.5;
+  outline: 0;
+  padding-bottom: 0.2em;
+}
+
+article > h1 {
+  font-size: 2.0em;
+}
+
+article > h2 {
+  font-size: 1.8em;
+}
+
+article > h3 {
+  font-size: 1.6em;
+
+}
+
+article > h4 {
+  font-size: 1.4em;
+}
+
+article > h5 {
+  font-size: 1.2em;
+}
+
+article > h6 {
+  font-size: 1.1em;
+}
+
+@media (max-width: 767px) {
+  #eyecatch-image {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  #eyecatch-image {
+    width: 60%;
+  }
+}
+
+
+</style>
   </head>
 
   <body>
-    <main class="main">
+    <header>
+      <h1>Openended Evolution - Pythonで実装する進化するAI</h1>
+    </header>
+
+    <main class="maincontent">
       {{- block "main" . }}{{ end }}
     </main>
+
   </body>
 </html>
