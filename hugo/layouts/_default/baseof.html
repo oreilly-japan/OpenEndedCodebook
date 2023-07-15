@@ -6,9 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>進化計算(仮)</title>
     <style>
-main {
-  padding: 1rem;
-}
 
 table {
   border-collapse: collapse;
@@ -41,6 +38,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   line-height: 1.5;
   outline: 0;
+  padding-top: 2em;
   padding-bottom: 0.2em;
 }
 
@@ -70,29 +68,53 @@ article > h6 {
 }
 
 @media (max-width: 767px) {
+  main {
+    padding: 1rem;
+  }
+
   #eyecatch-image {
     width: 100%;
   }
 }
 
 @media (min-width: 768px) {
+  main {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 660px;
+  }
+
   #eyecatch-image {
     width: 60%;
   }
 }
 
+header {
+  margin: 0 auto;
+  max-width: 1240px;
+  padding: 0 20px;
+  width: 100%;
+  border-bottom: 1px solid #ddd;
+}
+
+article > * > img {
+  width: 100%;
+}
 
 </style>
   </head>
 
   <body>
     <header>
-      <h1>Openended Evolution - Pythonで実装する進化するAI</h1>
+      <img src="/logo_oreilly_japan.svg">
     </header>
 
     <main class="maincontent">
       {{- block "main" . }}{{ end }}
     </main>
 
+    <footer>
+      <img src="/logo_oreilly_japan.svg">
+    </footer>
   </body>
 </html>
