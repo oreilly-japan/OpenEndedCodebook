@@ -1,7 +1,7 @@
 baseURL = 'https://takesxisximada.github.io/OpenEndedCodebook/'
 languageCode = 'ja'
 title = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-publishDir = '../public'
+publishDir = '../../public'
 contentDir = "../appendix/"
 
 [markup]
