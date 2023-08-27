@@ -1,0 +1,18 @@
+<div style="display: inline-flex;">
+  <div style="margin: 0 10px; display: inline-block;">
+    <a
+      style="font-size: 1.2em; text-decoration: none;"
+      {{- if .Prev }} href="{{ .Prev.Permalink }}" {{ end }} >«</a>
+  </div>
+  <div style="margin: 0 10px; display: inline-block;">
+    <a
+      style="text-decoration: none;"
+      href="{{ .Site.BaseURL }}">△</a>
+  </div>
+  <div style="margin: 0 10px; display: inline-block;">
+    <a
+      style="font-size: 1.2em; text-decoration: none;"
+      {{- if .Next }} href="{{ .Next.Permalink }}" {{ end }} >»</a>
+  </div>
+</div>
+

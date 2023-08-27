@@ -1,0 +1,25 @@
+{{ define "main" }}
+<div style="text-align: right;">
+  {{ partial "nav.html" . }}
+</div>
+
+<section id="main">
+  <div>
+    <article id="content">
+      {{ .Content }}
+    </article>
+  </div>
+</section>
+
+<div style="text-align: right;">
+  {{ if .Lastmod }}
+  <div>
+    <span>最終更新: </span><span>{{ .Lastmod.Format "2006-01-02" }}</span>
+  </div>
+  {{ end }}
+  
+  {{ partial "nav.html" . }}
+</div>
+
+{{ end }}
+
