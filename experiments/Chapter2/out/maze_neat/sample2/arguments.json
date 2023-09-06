@@ -1,0 +1,9 @@
+{
+    "name": "sample2",
+    "task": "hard",
+    "pop_size": 500,
+    "generation": 500,
+    "timesteps": 400,
+    "num_cores": 20,
+    "no_plot": false
+}
