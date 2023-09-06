@@ -1,0 +1,16 @@
+{
+    "name": "sample1",
+    "task": "Walker-v0",
+    "shape": [
+        5,
+        5
+    ],
+    "batch_size": 4,
+    "generation": 100,
+    "ppo_iters": 500,
+    "evaluation_interval": 50,
+    "deterministic": true,
+    "num_cores": 4,
+    "no_plot": true,
+    "no_view": true
+}
