@@ -1,0 +1,8 @@
+{
+    "name": "sample",
+    "task": "xor",
+    "pop_size": 50,
+    "generation": 300,
+    "error": "mse",
+    "num_cores": 4
+}
