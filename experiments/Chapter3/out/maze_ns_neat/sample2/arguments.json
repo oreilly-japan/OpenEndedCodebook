@@ -1,0 +1,12 @@
+{
+    "name": "sample2",
+    "task": "hard",
+    "pop_size": 300,
+    "generation": 500,
+    "ns_threshold": 6.0,
+    "num_knn": 30,
+    "mcns": 0.01,
+    "timesteps": 600,
+    "num_cores": 100,
+    "no_plot": false
+}
