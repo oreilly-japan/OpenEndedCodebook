@@ -1,0 +1,10 @@
+{
+    "name": "sample",
+    "task": "Walker-v0",
+    "robot": "cat",
+    "pop_size": 200,
+    "generation": 500,
+    "eval_num": 1,
+    "num_cores": 12,
+    "no_view": true
+}
