@@ -130,7 +130,7 @@ class Population(Population):
         if len(distances)==0:
             return float('inf')
 
-        distances.sort()
+        distances = sorted(distances)
 
         knn = distances[:k]
         density = sum(knn) / len(knn)
