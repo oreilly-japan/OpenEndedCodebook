@@ -1,0 +1,15 @@
+{
+    "name": "sample1",
+    "task": "Walker-v0",
+    "shape": [
+        5,
+        5
+    ],
+    "pop_size": 4,
+    "generation": 50,
+    "ppo_iters": 100,
+    "evaluation_interval": 20,
+    "probabilistic": false,
+    "num_cores": 1,
+    "no_view": false
+}
