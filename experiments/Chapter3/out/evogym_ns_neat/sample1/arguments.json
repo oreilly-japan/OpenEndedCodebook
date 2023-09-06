@@ -1,0 +1,13 @@
+{
+    "name": "sample1",
+    "task": "Walker-v0",
+    "robot": "cat",
+    "pop_size": 200,
+    "generation": 500,
+    "ns_threshold": 0.1,
+    "num_knn": 5,
+    "mcns": 0.0,
+    "eval_num": 1,
+    "num_cores": 20,
+    "no_view": false
+}
