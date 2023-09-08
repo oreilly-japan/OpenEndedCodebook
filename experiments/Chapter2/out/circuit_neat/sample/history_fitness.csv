@@ -1,4 +1,4 @@
-generation,id,reward,species,parent1,parent2
+generation,id,fitness,species,parent1,parent2
 0,4,0.7123611965386485,1,-1,-1
 1,87,0.7168631503718256,1,1,2
 2,111,0.7361817104818694,1,83,74
