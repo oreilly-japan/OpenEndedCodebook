@@ -1,4 +1,4 @@
-generation,id,novelty,reward,species,parent1,parent2
+generation,id,novelty,score,species,parent1,parent2
 0,185,0.782017874088502,1.096384,10,-1,-1
 1,373,0.4335613871554135,1.640331,3,17,83
 2,516,0.4953682337632503,1.975357,6,333,289
