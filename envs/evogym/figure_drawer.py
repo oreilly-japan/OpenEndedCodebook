@@ -368,8 +368,6 @@ class EvogymDrawerPOET:
         env = make_vec_envs(self.env_id, env_kwargs, 0, 1, allow_early_resets=False, vecnormalize=True)
         viewer = env.get_attr("default_viewer", indices=None)[0]
 
-        params, obs_rms = torch.load(core_file)
-
         controller = Policy(env.observation_space, env.action_space, device='cpu')
         params, obs_rms = torch.load(core_file)
         controller.load_state_dict(params)
