@@ -1,6 +1,6 @@
-baseURL = 'https://takesxisximada.github.io/OpenEndedCodebook/'
+baseURL = 'https://oreilly-japan.github.io/OpenEndedCodebook/'
 languageCode = 'ja'
-title = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+title = 'Pythonではじめるオープンエンドな進化的アルゴリズム - 発散型の機械学習による多様な解の探索'
 publishDir = '../../public'
 contentDir = "../appendix/"
 
