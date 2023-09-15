@@ -1,10 +1,10 @@
 ---
-title: Evolution Gym用のタスク
+title: 付録5 Evolution Gymのタスク
 date: 2023-07-15T18:14:38+0900
 lastmod: 2023-07-15T18:14:38+0900
 ---
 
-# Evolution Gym用のタスク
+# 付録5 Evolution Gymのタスク
 
 本書のサンプルプログラムでは、32個のタスクを用意しています。これらはEvolution Gymのサイトで用意されているタスクと同じものです。多様なロボットがさまざまなタスクを解こうとします。
 

@@ -41,11 +41,11 @@
 
 本書では執筆段階で想定以上に文章の量が多くなってしまい、執筆した文章の全てを紙面に収める事ができませんでした。そこで、それらをオンライン付録として、サポートページに掲載する事にしました。本書を読み進め理解を深める時の補助的な資料としてご活用ください。
 
-- [[./app.arguments][サンプルコードのコマンドの使い方]]
-- [[./app.evogymtask][Evolution Gym用のタスク]]
-- [[./app.mazeencoding][迷路のエンコーディング]]
-- [[./app.neat][NEAT-Pythonの使い方の理解を深める]]
-- [[./app.noveltysearch-evogym-option][ロボットタスクで新規性探索アルゴリズムを使う]]
+- [[./app1.neat][付録1 NEAT-Pythonの使い方の理解を深める]]
+- [[./app2.arguments][付録2 サンプルコードのコマンドの使い方]]
+- [[./app3.noveltysearch-evogym-option][付録3 ロボットタスクを新規性探索アルゴリズムで解く]]
+- [[./app4.mazeencoding][付録4 迷路のエンコーディング方法]]
+- [[./app5.evogymtask][付録5 Evolution Gymのタスク]]
 
 ** 正誤表
 
