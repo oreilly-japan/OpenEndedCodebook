@@ -69,7 +69,8 @@ article > h6 {
   }
 
   #eyecatch-image {
-    width: 100%;
+    display: block;
+    margin: auto;
   }
 }
 
@@ -81,7 +82,8 @@ article > h6 {
   }
 
   #eyecatch-image {
-    width: 60%;
+    display: block;
+    margin: auto;
   }
 }
 
