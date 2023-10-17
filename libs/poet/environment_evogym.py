@@ -347,14 +347,14 @@ class EnvrionmentEvogymConfig:
         return next(self.env_indexer)
 
     def make_init(self):
-        cppn_key = self.get_new_env_key()
+        cppn_key = next(self.cppn_indexer)
         cppn_genome = self.neat_config.genome_type(cppn_key)
         cppn_genome.configure_new(self.neat_config.genome_config)
 
         params_key = next(self.params_indexer)
         terrain_params = TerrainParams(params_key)
 
-        env_key = next(self.env_indexer)
+        env_key = self.get_new_env_key()
         environment = EnvironmentEvogym(env_key, cppn_genome, terrain_params)
         environment.make_terrain(self.decode_cppn, self.neat_config.genome_config)
         return environment
