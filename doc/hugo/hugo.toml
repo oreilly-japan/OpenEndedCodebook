@@ -19,3 +19,6 @@ contentDir = "../appendix/"
     noHl = false
     style = 'monokai'
     tabWidth = 4
+    
+[markup.goldmark.renderer]
+unsafe = true
