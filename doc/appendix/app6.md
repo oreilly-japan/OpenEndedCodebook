@@ -4,17 +4,17 @@ date: 2023-10-20T07:41:03+0900
 lastmod: 2023-10-20T07:41:03+0900
 ---
 
-# 付録6 Evolution Gym のインストールに失敗したら?
+# 付録6 `Evolution Gym`のインストールに失敗したら?
 
-Evolution Gymのインストールは、環境によってはうまくいかないことがあります。実際に、筆者は本家()のレポジトリからインストールしようとして最初は失敗しています。ここでは、macOSにEvolution Gymをインストールする手順と、遭遇する可能性がありそうな問題とその対応策をまとめてみました。インストールがうまくいかない場合は参考にしてみてください。
+`Evolution Gym`のインストールは、環境によってはうまくいかないことがあります。実際に、筆者は本家()のレポジトリからインストールしようとして最初は失敗しています。ここでは、`macOS`に`Evolution Gym`をインストールする手順と、遭遇する可能性がありそうな問題とその対応策をまとめてみました。インストールがうまくいかない場合は参考にしてみてください。
 
-## macOS へのインストール手順
+## `macOS`へのインストール手順
 
-macOSへEvolution Gymをインストールする手順はいくつかありますが、ここでは、本家のリポジトリをフォークして、必要な修正を施したリポジトリの develop ブランチを使用する例を紹介します。
+`macOS`へ`Evolution Gym`をインストールする手順はいくつかありますが、ここでは、本家のリポジトリをフォークして、必要な修正を施したリポジトリの`develop`ブランチを使用する例を紹介します。
 
 1. 問題修正済みのリポジトリを取得する
 
-   https://github.com/oreilly-japan/evogym から取得します。シミュレータのビルド時にサブモジュールのソースコードも使うため、サブモジュールも合わせて取得します。このリポジトリのdevelopブランチにはmacOS用のビルドエラーに対応する修正が入っています。なお、本家にはプルリクエストを送付していますが、まだマージされていません。
+   https://github.com/oreilly-japan/evogym から取得します。シミュレータのビルド時にサブモジュールのソースコードも使うため、サブモジュールも合わせて取得します。このリポジトリの`develop`ブランチには`macOS`用のビルドエラーに対応する修正が入っています。なお、本家にはプルリクエストを送付していますが、まだマージされていません。
 
    ```
    git clone --recursive https://github.com/oreilly-japan/evogym.git
@@ -30,7 +30,7 @@ macOSへEvolution Gymをインストールする手順はいくつかありま�
 
 3. venvを用いて仮想環境をを作成する
 
-   venvを用いてPython 3.8の仮想環境を作成します。ここでは便宜上 `env-evogym` という名前で仮想環境を作成する事にします。
+   `venv`を用いてPython 3.8の仮想環境を作成します。ここでは便宜上 `env-evogym` という名前で仮想環境を作成する事にします。
 
    ```
    python3.8 -m venv env-evogym .
@@ -51,9 +51,9 @@ macOSへEvolution Gymをインストールする手順はいくつかありま�
    pip install -r requirements.txt
    ```
 
-6. Evolution Gymをインストールする
+6. `Evolution Gym`をインストールする
 
-   Evolution Gym 本体をインストールします。ここでは pip を用いることにします。インストール時にはシミュレータもビルドされるため、そこそこ時間がかかります。
+   `Evolution Gym`本体をインストールします。ここでは`pip`を用いることにします。インストール時にはシミュレータもビルドされるため、そこそこ時間がかかります。
 
    ```
    pip install .
@@ -72,13 +72,13 @@ macOSへEvolution Gymをインストールする手順はいくつかありま�
 
 ## 遭遇する可能性のあるエラー
 
-先ほども述べたように、本家の Evolution Gym の主ブランチでは、環境によってはインストールエラーに遭遇することがあります。ここでは筆者が実際に遭遇したエラーと、その対応方法を紹介します。
+先ほども述べたように、本家の`Evolution Gym`の主ブランチでは、環境によってはインストールエラーに遭遇することがあります。ここでは筆者が実際に遭遇したエラーと、その対応方法を紹介します。
 
 ### バージョンの不一致による失敗
 
-環境によっては依存パッケージのインストールに失敗することがあります。これは gym と stable-baselines3 のバージョンの食い違いや、gym の依存パッケージの宣言方法に問題があるため発生します。
+環境によっては依存パッケージのインストールに失敗することがあります。これは`gym`と`stable-baselines3`のバージョンの食い違いや、`gym`の依存パッケージの宣言方法に問題があるため発生します。
 
-対応としては、gym のバージョンを 0.20 以上にすることと、stable-baselines3 をインストールしないことです。stable-baselines3 は明示的に指定しなくても、他のパッケージの依存関係によりインストールされてしまいます。本家のリポジトリには、この問題に対応するプルリクエストがあるので、これを利用することで解決します。
+対応としては、`gym`のバージョンを 0.20 以上にすることと、`stable-baselines3`をインストールしないことです。`stable-baselines3`は明示的に指定しなくても、他のパッケージの依存関係によりインストールされてしまいます。本家のリポジトリには、この問題に対応するプルリクエストがあるので、これを利用することで解決します。
 
 https://github.com/EvolutionGym/evogym/pull/30
 
@@ -267,9 +267,9 @@ Notice:  A new release of pip is available: 23.0.1 -> 23.2.1
 Notice:  To update, run: pip install --upgrade pip
 ```
 
-### GLEW を見つけられないことによる失敗
+### `GLEW`を見つけられないことによる失敗
 
-Evolution Gym のリポジトリには GLEW のソースコードがサブモジュールとして evogym/simulator/externals/glew に登録されています。サブモジュールがそもそも取得できていない場合は、git コマンドを使ってサブモジュールを取得する必要があります。ただしサブモジュールが取得できていたとしても、インストールに失敗することがあります。その際は以下のようなエラーメッセージが出力されます。
+Evolution Gymのリポジトリには`GLEW`のソースコードがサブモジュールとして`evogym/simulator/externals/glew`に登録されています。サブモジュールがそもそも取得できていない場合は、`git`コマンドを使ってサブモジュールを取得する必要があります。ただしサブモジュールが取得できていたとしても、インストールに失敗することがあります。その際は以下のようなエラーメッセージが出力されます。
 
 *エラーメッセージ:*
 ```
@@ -426,9 +426,9 @@ Failed to build evogym
 ERROR: Could not build wheels for evogym, which is required to install pyproject.toml-based projects
 ```
 
-次のエラーから、GLEW を見つけられていないことがわかります。
+次のエラーから、`GLEW`を見つけられていないことがわかります。
 
-*GLEW を見つけられていない場合のエラーの例:*
+*`GLEW`を見つけられていない場合のエラーの例:*
 ```
       CMake Error at /usr/local/Cellar/cmake/3.27.1/share/cmake/Modules/FindPackageHandleStandardArgs.cmake:230 (message):
         Could NOT find GLEW (missing: GLEW_INCLUDE_DIRS GLEW_LIBRARIES)
@@ -438,11 +438,11 @@ ERROR: Could not build wheels for evogym, which is required to install pyproject
         CMakeLists.txt:22 (find_package)
 ```
 
-この GLEW は cmake が自動的に見つけてくれるものですが、cmake のバージョンによってはその機構(FindGLEW.cmake)が機能しません。その場合、FindGLEW.cmake を独自に用意する事で問題を回避できます。
+この`GLEW`は`cmake`が自動的に見つけてくれるものですが、`cmake`のバージョンによってはその機構(`FindGLEW.cmake`)が機能しません。その場合、`FindGLEW.cmake`を独自に用意する事で問題を回避できます。
 
-evogym/simulator/FindGLEW.cmake ファイルを作成し、以下のように記述します。
+`evogym/simulator/FindGLEW.cmake`ファイルを作成し、以下のように記述します。
 
-*evogym/simulator/FindGLEW.cmake:*
+*`evogym/simulator/FindGLEW.cmake`:*
 ```
 # FindGLEW.cmake
 # Search for GLEW library and include directories
@@ -469,9 +469,9 @@ endif()
 mark_as_advanced(GLEW_INCLUDE_DIR GLEW_LIBRARY)
 ```
 
-また、この独自の FindGLEW.cmake を cmake に使用させるため、 evogym/simulator/CMakeLists.txt 内に以下の 3 行を追加します。
+また、この独自の`FindGLEW.cmake`を`cmake`に使用させるため、`evogym/simulator/CMakeLists.txt`内に以下の 3 行を追加します。
 
-*evogym/simulator/CMakeLists.txtの差分*
+*`evogym/simulator/CMakeLists.txt`の差分*
 ```
  if(UNIX)
    find_package(OpenGL REQUIRED)
@@ -482,11 +482,11 @@ mark_as_advanced(GLEW_INCLUDE_DIR GLEW_LIBRARY)
  endif()
 ```
 
-この修正でサブモジュールにある GLEW を見つけられるようになります。この対応は、本家のリポジトリのプルリクエスト https://github.com/EvolutionGym/evogym/pull/31 と同じものです。
+この修正でサブモジュールにある`GLEW`を見つけられるようになります。この対応は、本家のリポジトリのプルリクエスト https://github.com/EvolutionGym/evogym/pull/31 と同じものです。
 
 ### 型エラーによる失敗
 
-Evolution Gym ではインストール時にシミュレータをビルドします。そのビルド時に問題があるとインストールに失敗します。型の宣言に間違いがあると、以下のようなエラーが発生します。
+`Evolution Gym`ではインストール時にシミュレータをビルドします。そのビルド時に問題があるとインストールに失敗します。型の宣言に間違いがあると、以下のようなエラーが発生します。
 
 *型エラーによるビルドの失敗:*
 ```
@@ -536,7 +536,7 @@ Evolution Gym ではインストール時にシミュレータをビルドしま
       make: *** [all] Error 2
 ```
 
-このエラーが出る場合は型宣言を変更するか、読み込んでいるライブラリとの辻褄を合わせる必要があります。今回は型宣言を変更する方法をとります。エラーメッセージをよく見ると、どんな型に変更すればよいか出力されているので、それに置換します。問題となるコードは全て evogym/simulator/SimulatorCPP 配下にあるため、この中にある該当のコードを grepし、コンパイラが出力した型に置き換えればよいのです。
+このエラーが出る場合は型宣言を変更するか、読み込んでいるライブラリとの辻褄を合わせる必要があります。今回は型宣言を変更する方法をとります。エラーメッセージをよく見ると、どんな型に変更すればよいか出力されているので、それに置換します。問題となるコードは全て`evogym/simulator/SimulatorCPP`配下にあるため、この中にある該当のコードを`grep`し、コンパイラが出力した型に置き換えればよいのです。
 
 なお、本家のリポジトリには、これに対応したプルリクエストがあります。 https://github.com/EvolutionGym/evogym/pull/32
 
@@ -891,9 +891,9 @@ Failed to build evogym
 ERROR: Could not build wheels for evogym, which is required to install pyproject.toml-based projects
 ```
 
-### 画面がないことによる失敗
+### 画面がないことによる失敗(例えばDockerコンテナなど)
 
-Docker を用いて Evolution Gym を実行する場合、インストールはうまくいくものの、シミュレータの起動に失敗することがあります。
+`Docker`を用いて`Evolution Gym`を実行する場合、インストールはうまくいくものの、シミュレータの起動に失敗することがあります。
 
 *動作確認用のスクリプトの実行でシミュレータの起動に失敗する場合の出力:*
 ```
@@ -902,19 +902,17 @@ Using Evolution Gym Simulator v2.2.5
 Error initializing GLFW.
 ```
 
-これは GLFW が使用できない環境でシミュレータを起動しようとするために発生します。例えばCUI しかない Docker のコンテナ内や GNU/Linux 環境では、当然シミュレータを起動することができません。その場合、仮想画面を使用する必要があります。
-
+これは`GLFW`が使用できない環境でシミュレータを起動しようとするために発生します。例えば`CUI`しかない`Docker`のコンテナ内や`GNU/Linux`環境では、当然シミュレータを起動することができません。その場合、仮想画面を使用する必要があります。
 
 *仮想画面を使用して動作確認用のスクリプトを実行する:*
 ```
 xvfb-run python example/gym_test.py
 ```
+しかし、この場合実際の画面は表示されず、画像としてファイルに出力されるため、通常とは挙動が異なることになります。可能なら`GUI`で実行する環境を整えて実施することをおすすめします。どうしてもコンテナ内で実行させたい場合はX転送を使う方法もあるとは思いますが、未検証です。
 
-しかし、この場合実際の画面は表示されず、画像としてファイルに出力されるため、通常とは挙動が異なることになります。可能なら GUI で実行する環境を整えて実施することをおすすめします。どうしてもコンテナ内で実行させたい場合は X 転送を使う方法もあるとは思いますが、未検証です。
+### シミュレータ起動時に`SEGFAULT`してしまう
 
-### シミュレータ起動時にSEGFAULTしてしまう
-
-この失敗の原因はいまのところわかりません。ビルドした共有オブジェクトを一度削除し、再度Evolution Gym をインストールしてみるとうまくいく可能性があります。
+この失敗の原因はいまのところわかりません。ビルドした共有オブジェクトを一度削除し、再度`Evolution Gym`をインストールしてみるとうまくいく可能性があります。
 
 ## 原因究明の方法
 
@@ -935,15 +933,15 @@ Failed to build evogym
 ERROR: Could not build wheels for evogym, which is required to install pyproject.toml-based projects
 ```
 
-Evolution Gym はインストール時にシミュレータをビルドするために、setup.py の中でサブプロセスとしてビルドコマンドを実行しています。この部分は正にそれを表しています。
+`Evolution Gym`はインストール時にシミュレータをビルドするために、`setup.py`の中でサブプロセスとしてビルドコマンドを実行しています。この部分は正にそれを表しています。
 
 ```
 subprocess.CalledProcessError: Command '['cmake', '--build', '.', '--config', 'Release', '--', '-j8']' returned non-zero exit status 2.
 ```
 
-このコマンドの後ろが実際に実行されているコマンドで、サブプロセスの起動時に文字列のリストで、コマンドと引数を指定しています。よく見るとわかりますが、これはただの cmake コマンドであって、当然ターミナルエミュレータで手入力することもできます。手動で実行する場合は次のようになります。
+このコマンドの後ろが実際に実行されているコマンドで、サブプロセスの起動時に文字列のリストで、コマンドと引数を指定しています。よく見るとわかりますが、これはただの`cmake`コマンドであって、当然ターミナルエミュレータで手入力することもできます。手動で実行する場合は次のようになります。
 
-*cmake を手動で実行する場合のコマンド:*
+*`cmake`を手動で実行する場合のコマンド:*
 ```
 cmake --build . --config Release -- -j8
 ```
