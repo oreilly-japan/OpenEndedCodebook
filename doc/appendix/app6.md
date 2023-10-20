@@ -68,7 +68,7 @@ lastmod: 2023-10-20T07:41:03+0900
    ```
 
    以下のような画面が表示されたら、インストールは成功です。
-   <img style="width: 100%;" src="https://res.cloudinary.com/symdon/image/upload/v1697685496/blog.symdon.info/1697684292/example_f99vlj.png">
+   <img style="width: 100%;" src="/OpenEndedCodebook/img/example_f99vlj.png">
 
 ## 遭遇する可能性のあるエラー
 
