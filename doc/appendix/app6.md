@@ -891,6 +891,576 @@ Failed to build evogym
 ERROR: Could not build wheels for evogym, which is required to install pyproject.toml-based projects
 ```
 
+### h5pyのインストールに失敗する
+
+環境によっては`h5py`のインストールに失敗する事があります。本書では読者からのご指摘を頂き、この問題について調査を行いました。
+
+`Evolution Gym`の`requirements.txt`には`h5py-3.6.0`が記述されています。`h5py-3.6.0`は、環境によって`whl`形式のパッケージが用事されていますが、用意されていない環境もあります。`whl`形式のパッケージにはビルド済みバイナリが梱包されています。もし、お使いの環境に対応する`whl`形式が用意されていない場合、ソースコードのtarballをダウンロードしビルドが行われます。しかしビルドの環境が整っていなけければ、ビルドに失敗するでしょう。以下に、ビルド失敗の出力の例を示します。
+
+```
+$ pip install 'h5py==3.6.0' --no-binary=h5py
+Collecting h5py==3.6.0
+  Using cached h5py-3.6.0.tar.gz (384 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: numpy>=1.14.5 in /Users/foo/.venv/testing-h5py/lib/python3.8/site-packages (from h5py==3.6.0) (1.21.5)
+Building wheels for collected packages: h5py
+  Building wheel for h5py (pyproject.toml): started
+  Building wheel for h5py (pyproject.toml): finished with status 'error'
+  error: subprocess-exited-with-error
+
+  × Building wheel for h5py (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [528 lines of output]
+      running bdist_wheel
+      running build
+      running build_py
+      creating build
+      creating build/lib.macosx-13-x86_64-cpython-38
+      creating build/lib.macosx-13-x86_64-cpython-38/h5py
+      copying h5py/h5py_warnings.py -> build/lib.macosx-13-x86_64-cpython-38/h5py
+      copying h5py/version.py -> build/lib.macosx-13-x86_64-cpython-38/h5py
+      copying h5py/__init__.py -> build/lib.macosx-13-x86_64-cpython-38/h5py
+      copying h5py/ipy_completer.py -> build/lib.macosx-13-x86_64-cpython-38/h5py
+      creating build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/files.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/compat.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/__init__.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/selections.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/dataset.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/vds.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/selections2.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/group.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/datatype.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/attrs.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/dims.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/base.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      copying h5py/_hl/filters.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/_hl
+      creating build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_dimension_scales.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_attribute_create.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_file_image.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/conftest.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_h5d_direct_chunk.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_h5f.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_dataset_getitem.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_group.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_errors.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_dataset_swmr.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_slicing.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_h5pl.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_attrs.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/__init__.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_attrs_data.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_h5t.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_big_endian_file.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_h5p.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_dims_dimensionproxy.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_h5o.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_datatype.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/common.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_dataset.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_file.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_selections.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_dtype.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_h5.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_file2.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_completions.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_filters.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_base.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      copying h5py/tests/test_objects.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests
+      creating build/lib.macosx-13-x86_64-cpython-38/h5py/tests/data_files
+      copying h5py/tests/data_files/__init__.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests/data_files
+      creating build/lib.macosx-13-x86_64-cpython-38/h5py/tests/test_vds
+      copying h5py/tests/test_vds/test_highlevel_vds.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests/test_vds
+      copying h5py/tests/test_vds/test_virtual_source.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests/test_vds
+      copying h5py/tests/test_vds/__init__.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests/test_vds
+      copying h5py/tests/test_vds/test_lowlevel_vds.py -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests/test_vds
+      copying h5py/tests/data_files/vlen_string_s390x.h5 -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests/data_files
+      copying h5py/tests/data_files/vlen_string_dset_utc.h5 -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests/data_files
+      copying h5py/tests/data_files/vlen_string_dset.h5 -> build/lib.macosx-13-x86_64-cpython-38/h5py/tests/data_files
+      running build_ext
+      warning: h5py/defs.pxd:15:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:62:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:64:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:66:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:68:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:70:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:72:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:74:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:76:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:78:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:102:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:104:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:106:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:107:4: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:109:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:110:4: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:112:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:114:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:116:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:180:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:197:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:199:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:201:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:203:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:213:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:215:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:229:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:231:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:233:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:235:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:237:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:239:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:241:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:269:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:271:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:273:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:275:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:277:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:279:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:285:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:287:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:289:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:291:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:293:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:295:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:297:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:299:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:333:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:335:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:337:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:339:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:341:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:343:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:345:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:347:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:349:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:383:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/defs.pxd:385:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_hdf5.pxd:48:2: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_hdf5.pxd:64:2: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_hdf5.pxd:143:2: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_hdf5.pxd:148:2: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_hdf5.pxd:156:2: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_hdf5.pxd:165:2: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_hdf5.pxd:198:2: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_hdf5.pxd:287:2: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_hdf5.pxd:334:2: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_ext.pxd:14:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_ext.pxd:25:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/api_types_ext.pxd:52:4: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/_conv.pyx:161:8: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/_conv.pyx:422:8: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+      warning: h5py/h5r.pxd:17:0: The 'IF' statement is deprecated and will be removed in a future Cython version. Consider using runtime conditions or C macros instead. See https://github.com/cython/cython/issues/4310
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+      # License:  Standard 3-clause BSD; see "license.txt" for full license terms
+      #           and contributor agreement.
+
+      from .defs cimport *
+
+      from ._objects cimport class ObjectID
+                             ^
+      ------------------------------------------------------------
+
+      h5py/h5t.pxd:13:23: Expected an identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+
+      from logging import getLogger
+
+      from .h5 import get_config
+      from .h5r cimport Reference, RegionReference, hobj_ref_t, hdset_reg_ref_t
+      from .h5t cimport H5PY_OBJ, typewrap, py_create, TypeID, H5PY_PYTHON_OPAQUE_TAG
+      ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:21:0: 'h5py/h5t/H5PY_OBJ.pxd' not found
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+
+      from logging import getLogger
+
+      from .h5 import get_config
+      from .h5r cimport Reference, RegionReference, hobj_ref_t, hdset_reg_ref_t
+      from .h5t cimport H5PY_OBJ, typewrap, py_create, TypeID, H5PY_PYTHON_OPAQUE_TAG
+      ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:21:0: 'h5py/h5t/typewrap.pxd' not found
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+
+      from logging import getLogger
+
+      from .h5 import get_config
+      from .h5r cimport Reference, RegionReference, hobj_ref_t, hdset_reg_ref_t
+      from .h5t cimport H5PY_OBJ, typewrap, py_create, TypeID, H5PY_PYTHON_OPAQUE_TAG
+      ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:21:0: 'h5py/h5t/py_create.pxd' not found
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+
+      from logging import getLogger
+
+      from .h5 import get_config
+      from .h5r cimport Reference, RegionReference, hobj_ref_t, hdset_reg_ref_t
+      from .h5t cimport H5PY_OBJ, typewrap, py_create, TypeID, H5PY_PYTHON_OPAQUE_TAG
+      ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:21:0: 'h5py/h5t/TypeID.pxd' not found
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+
+      from logging import getLogger
+
+      from .h5 import get_config
+      from .h5r cimport Reference, RegionReference, hobj_ref_t, hdset_reg_ref_t
+      from .h5t cimport H5PY_OBJ, typewrap, py_create, TypeID, H5PY_PYTHON_OPAQUE_TAG
+      ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:21:0: 'h5py/h5t/H5PY_PYTHON_OPAQUE_TAG.pxd' not found
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+          void* ptr
+
+      cdef int conv_vlen2ndarray(void* ipt,
+                                 void* opt,
+                                 cnp.dtype elem_dtype,
+                                 TypeID intype,
+                                 ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:687:27: 'TypeID' is not a type identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+
+      cdef int conv_vlen2ndarray(void* ipt,
+                                 void* opt,
+                                 cnp.dtype elem_dtype,
+                                 TypeID intype,
+                                 TypeID outtype) except -1:
+                                 ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:688:27: 'TypeID' is not a type identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+          return 0
+
+
+      cdef int conv_ndarray2vlen(void* ipt,
+                                 void* opt,
+                                 TypeID intype,
+                                 ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:820:27: 'TypeID' is not a type identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+
+
+      cdef int conv_ndarray2vlen(void* ipt,
+                                 void* opt,
+                                 TypeID intype,
+                                 TypeID outtype) except -1:
+                                 ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:821:27: 'TypeID' is not a type identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+          :return: error-code
+          """
+          cdef:
+              int command = cdata[0].command
+              size_t src_size, dst_size
+              TypeID supertype
+              ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:629:8: 'TypeID' is not a type identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+          """
+          cdef:
+              int command = cdata[0].command
+              size_t src_size, dst_size
+              TypeID supertype
+              TypeID outtype
+              ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:630:8: 'TypeID' is not a type identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+                               void *bkg_i,
+                               hid_t dxpl) except -1 with gil:
+          cdef:
+              int command = cdata[0].command
+              size_t src_size, dst_size
+              TypeID supertype
+              ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:752:8: 'TypeID' is not a type identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+                               hid_t dxpl) except -1 with gil:
+          cdef:
+              int command = cdata[0].command
+              size_t src_size, dst_size
+              TypeID supertype
+              TypeID outtype
+              ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:753:8: 'TypeID' is not a type identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+          cdef char* ctag = NULL
+          try:
+              if H5Tget_class(obj) == H5T_OPAQUE:
+                  ctag = H5Tget_tag(obj)
+                  if ctag != NULL:
+                      if strcmp(ctag, H5PY_PYTHON_OPAQUE_TAG) == 0:
+                                      ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:157:32: 'H5PY_PYTHON_OPAQUE_TAG' is not a constant, variable or function identifier
+      warning: h5py/_conv.pyx:157:32: Obtaining 'const char *' from externally modifiable global Python value
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+          elif command == H5T_CONV_FREE:
+              pass
+
+          elif command == H5T_CONV_CONV:
+              # need to pass element dtype to converter
+              supertype = typewrap(H5Tget_super(src_id))
+                          ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:645:20: 'typewrap' is not a constant, variable or function identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+
+          elif command == H5T_CONV_CONV:
+              # need to pass element dtype to converter
+              supertype = typewrap(H5Tget_super(src_id))
+              dt = supertype.dtype
+              outtype = py_create(dt)
+                        ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:647:18: 'py_create' is not a constant, variable or function identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+              PyObject *pdata_elem
+              char* buf = <char*>buf_i
+
+          if command == H5T_CONV_INIT:
+              cdata[0].need_bkg = H5T_BKG_NO
+              if not H5Tequal(src_id, H5PY_OBJ) or H5Tget_class(dst_id) != H5T_VLEN:
+                                      ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:761:32: 'H5PY_OBJ' is not a constant, variable or function identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+
+          if command == H5T_CONV_INIT:
+              cdata[0].need_bkg = H5T_BKG_NO
+              if not H5Tequal(src_id, H5PY_OBJ) or H5Tget_class(dst_id) != H5T_VLEN:
+                  return -2
+              supertype = typewrap(H5Tget_super(dst_id))
+                          ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:763:20: 'typewrap' is not a constant, variable or function identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+                  return -2
+              supertype = typewrap(H5Tget_super(dst_id))
+              for i in range(nl):
+                  # smells a lot
+                  memcpy(&pdata_elem, pdata+i, sizeof(pdata_elem))
+                  if supertype != py_create((<cnp.ndarray> pdata_elem).dtype, 1):
+                                  ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:767:28: 'py_create' is not a constant, variable or function identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+              if nl == 0:
+                  return 0
+
+              # need to pass element dtype to converter
+              pdata_elem = pdata[0]
+              supertype = py_create((<cnp.ndarray> pdata_elem).dtype)
+                          ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:784:20: 'py_create' is not a constant, variable or function identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+                  return 0
+
+              # need to pass element dtype to converter
+              pdata_elem = pdata[0]
+              supertype = py_create((<cnp.ndarray> pdata_elem).dtype)
+              outtype = typewrap(H5Tget_super(dst_id))
+                        ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:785:18: 'typewrap' is not a constant, variable or function identifier
+
+      Error compiling Cython file:
+      ------------------------------------------------------------
+      ...
+
+          enum = H5Tenum_create(H5T_STD_I32LE)
+
+          vlentype = H5Tvlen_create(H5T_STD_I32LE)
+
+          pyobj = H5PY_OBJ
+                  ^
+      ------------------------------------------------------------
+
+      h5py/_conv.pyx:894:12: 'H5PY_OBJ' is not a constant, variable or function identifier
+      Loading library to get build settings and version: libhdf5.dylib
+      ,********************************************************************************
+                             Summary of the h5py configuration
+
+      HDF5 include dirs: []
+      HDF5 library dirs: []
+           HDF5 Version: (1, 14, 2)
+            MPI Enabled: False
+       ROS3 VFD Enabled: False
+       Rebuild Required: True
+
+      ,********************************************************************************
+      Executing api_gen rebuild of defs
+      Executing cythonize()
+      [ 1/24] Cythonizing /private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-install-8b6c2mrb/h5py_3a9bffda4ab548d5ac5aea13ae9c6ee1/h5py/_conv.pyx
+      Traceback (most recent call last):
+        File "/Users/foo/.venv/testing-h5py/lib/python3.8/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 353, in <module>
+          main()
+        File "/Users/foo/.venv/testing-h5py/lib/python3.8/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 335, in main
+          json_out['return_val'] = hook(**hook_input['kwargs'])
+        File "/Users/foo/.venv/testing-h5py/lib/python3.8/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 251, in build_wheel
+          return _build_backend().build_wheel(wheel_directory, config_settings,
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/build_meta.py", line 434, in build_wheel
+          return self._build_with_temp_dir(
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/build_meta.py", line 419, in _build_with_temp_dir
+          self.run_setup()
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/build_meta.py", line 341, in run_setup
+          exec(code, locals())
+        File "<string>", line 104, in <module>
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/__init__.py", line 103, in setup
+          return distutils.core.setup(**attrs)
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/_distutils/core.py", line 185, in setup
+          return run_commands(dist)
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/_distutils/core.py", line 201, in run_commands
+          dist.run_commands()
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/_distutils/dist.py", line 969, in run_commands
+          self.run_command(cmd)
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/dist.py", line 989, in run_command
+          super().run_command(command)
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/_distutils/dist.py", line 988, in run_command
+          cmd_obj.run()
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/wheel/bdist_wheel.py", line 364, in run
+          self.run_command("build")
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/_distutils/cmd.py", line 318, in run_command
+          self.distribution.run_command(command)
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/dist.py", line 989, in run_command
+          super().run_command(command)
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/_distutils/dist.py", line 988, in run_command
+          cmd_obj.run()
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/_distutils/command/build.py", line 131, in run
+          self.run_command(cmd_name)
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/_distutils/cmd.py", line 318, in run_command
+          self.distribution.run_command(command)
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/dist.py", line 989, in run_command
+          super().run_command(command)
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/setuptools/_distutils/dist.py", line 988, in run_command
+          cmd_obj.run()
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-install-8b6c2mrb/h5py_3a9bffda4ab548d5ac5aea13ae9c6ee1/setup_build.py", line 170, in run
+          self.extensions = cythonize(self._make_extensions(config),
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/Cython/Build/Dependencies.py", line 1154, in cythonize
+          cythonize_one(*args)
+        File "/private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-build-env-uvpwfguv/overlay/lib/python3.8/site-packages/Cython/Build/Dependencies.py", line 1321, in cythonize_one
+          raise CompileError(None, pyx_file)
+      Cython.Compiler.Errors.CompileError: /private/var/folders/2f/1mkpnp3n1gjd0r7l9nm_dyhr0000gn/T/pip-install-8b6c2mrb/h5py_3a9bffda4ab548d5ac5aea13ae9c6ee1/h5py/_conv.pyx
+      [end of output]
+
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  ERROR: Failed building wheel for h5py
+Failed to build h5py
+ERROR: Could not build wheels for h5py, which is required to install pyproject.toml-based projects
+WARNING: There was an error checking the latest version of pip.
+```
+
+幾つかの`Cython`のバージョン(3.0.4, 0.29.14, 0.29.13, 0.29, 0.28)を用いて、`h5py-3.6.0`をソースコードのtarballからのビルドを試みましたが、ビルドできるバージョンを確認できませんでした。
+
+ただし回避策はいくつかあります。1つ目は最新の`h5py`をインストールする方法です。現時点(2023-10-21)での最新の`h5py`のバージョンは`3.10.0`です。そこで`Evolution Gym`の`requirements.txt`の`h5py==3.6.0`の部分を`h5py==3.10.0`にして、インストールを行います。筆者の環境では`Cython-3.0.4`をインストールした状態で`h5py==3.10.0`をソースコードからインストールできる事を確認できました。
+
+2つ目は`h5py`をインストールしないという方法です。`Evolution Gym`のコードをgrepした所、`h5py`は`examples`ディレクトリ配下のサブモジュールのソースコードで使われていました。`examples`ディレクトリは実装例を示すものであり、`Evolution Gym`本体ではありません。そこで`Evolution Gym`の`requirements.txt`の`h5py==3.6.0`の部分を削除して、インストールを行います。この状態のインストールで`Evolution Gym`の機能の全てが適切に使用できるとは言えませんが、`Evolution Gym`のシミュレータを起動できる事を確認しました。
+
+この問題については、これら2つの回避方法を使って`Evolution Gym`のインストール作業を進める事ができます。
+
 ### 画面がないことによる失敗(例えばDockerコンテナなど)
 
 `Docker`を用いて`Evolution Gym`を実行する場合、インストールはうまくいくものの、シミュレータの起動に失敗することがあります。
