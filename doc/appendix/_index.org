@@ -39,6 +39,116 @@ Evolution Gymのインストールの際、プラットフォームによって�
 | libs                 | サンプルプログラムで使うモジュール: 共通ライブラリ         |
 | requirements.txt     |                                                            |
 
+** サンプルプログラムの環境構築
+
+サンプルプログラムの実行環境は以下の手順で作成します。
+
+*** Evolution Gymのインストール
+
+まず =Evolution Gym= のインストールを行います。
+
+1. リポジトリのソースコードを取得する
+
+   Github上にホスティングされているソースコードを取得します。ここでは例としてGitを使います。
+
+   #+begin_src
+   git clone --recursive https://github.com/EvolutionGym/evogym.git
+   #+end_src
+
+2. 作業ディレクトリをリポジトリルートに移動する
+
+   ソースコードを取得できたら、作業ディレクトリをリポジトリルートに移動します。
+
+   #+begin_src
+   cd evogym
+   #+end_src
+
+3. venvを用いて仮想環境をを作成する
+
+   =venv=を用いてPython 3.8の仮想環境を作成します。ここでは便宜上 =env-evogym= という名前で仮想環境を作成する事にします。
+
+   #+begin_src
+   python3.8 -m venv env-evogym .
+   #+end_src
+
+4. 仮想環境をアクティベートする
+
+   先程作成した仮想環境をアクティベートします。
+
+   #+begin_src
+   source env-evogym/bin/activate
+   #+end_src
+
+5. 依存パッケージをインストールする
+
+   依存パッケージをインストールします。
+
+   #+begin_src
+   pip install -r requirements.txt
+   #+end_src
+
+6. =Evolution Gym= をインストールする
+
+   =Evolution Gym= 本体をインストールします。ここでは =pip= を用いることにします。インストール時にはシミュレータもビルドされるため、そこそこ時間がかかります。
+
+   #+begin_src
+   pip install .
+   #+end_src
+
+7. 動作確認する
+
+   インストールが完了したら、動作確認用のスクリプトを実行し、うまくいったかを確認します。
+
+   #+begin_src
+   python examples/gym_test.py
+   #+end_src
+
+   以下のような画面が表示されたら、インストールは成功です。
+
+   [[/OpenEndedCodebook/img/example_f99vlj.png]]
+
+インストールができたら、作業ディレクトリを移動しておきます。
+
+#+begin_src
+cd ../
+#+end_src
+
+=Evolution Gym= のインストールが上手くいかない場合は[[./app6][付録6 Evolution Gym のインストールに失敗したら?]]も参照ください。
+
+*** サンプルプログラムの環境構築
+
+次にサンプルプログラムの実行環境を構築します。
+
+1. サンプルプログラムのソースコードを取得する
+
+   Github上にあるサンプルプログラムのソースコードを取得します。
+
+   #+begin_src
+   git clone https://github.com/oreilly-japan/OpenEndedCodebook.git
+   #+end_src
+
+2. 作業ディレクトリをリポジトリルートに移動する
+
+   ソースコードを取得できたら、作業ディレクトリをリポジトリルートに移動します。
+
+   #+begin_src
+   cd OpenEndedCodebook
+   #+end_src
+
+3. 依存パッケージをインストールします。
+
+   #+begin_src
+   pip install -r requirement.txt
+   #+end_src
+
+   本書で使用する依存パッケージの中に、以前のバージョンのライブラリを期待しているものがあります。ただしパッケージの状態により、依存パッケージの依存パッケージがインストールできない状態になっています。そのため =--no-deps= を指定してインストールします。
+
+   #+begin_src
+   pip install --no-deps -r requirements-extra.txt
+   #+end_src
+
+これで環境構築は終わりです。
+
 * オンライン付録
 
 本書では執筆段階で想定以上に文章の量が多くなってしまい、執筆した文章の全てを紙面に収める事ができませんでした。そこで、それらをオンライン付録として、サポートページに掲載する事にしました。本書を読み進め理解を深める時の補助的な資料としてご活用ください。
