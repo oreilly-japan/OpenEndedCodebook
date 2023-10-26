@@ -1457,7 +1457,7 @@ WARNING: There was an error checking the latest version of pip.
 
 ただし回避策はいくつかあります。1つ目は最新の`h5py`をインストールする方法です。現時点(2023-10-21)での最新の`h5py`のバージョンは`3.10.0`です。そこで`Evolution Gym`の`requirements.txt`の`h5py==3.6.0`の部分を`h5py==3.10.0`にして、インストールを行います。筆者の環境では`Cython-3.0.4`をインストールした状態で`h5py==3.10.0`をソースコードからインストールできる事を確認できました。
 
-2つ目は`h5py`をインストールしないという方法です。`Evolution Gym`のコードをgrepした所、`h5py`は`examples`ディレクトリ配下のサブモジュールのソースコードで使われていました。`examples`ディレクトリは実装例を示すものであり、`Evolution Gym`本体ではありません。そこで`Evolution Gym`の`requirements.txt`の`h5py==3.6.0`の部分を削除して、インストールを行います。この状態のインストールで`Evolution Gym`の機能の全てが適切に使用できるとは言えませんが、`Evolution Gym`のシミュレータを起動できる事を確認しました。
+2つ目は`h5py`をインストールしないという方法です。`Evolution Gym`のコードをgrepした所、`h5py`は`examples`ディレクトリ配下のサブモジュールのソースコードで使われていました。`examples`ディレクトリは`Evolution Gym`を用いた実験の実装例を示すものであり、`Evolution Gym`本体ではありません。そこで`Evolution Gym`の`requirements.txt`の`h5py==3.6.0`の部分を削除して、インストールを行います。この状態のインストールで`Evolution Gym`の機能の全てが適切に使用できるとは言えませんが、`Evolution Gym`のシミュレータを起動できる事を確認しました。
 
 この問題については、これら2つの回避方法を使って`Evolution Gym`のインストール作業を進める事ができます。
 
