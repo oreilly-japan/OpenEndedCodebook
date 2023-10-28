@@ -1,6 +1,6 @@
 # 『Pythonではじめるオープンエンドな進化的アルゴリズム』サポートページ
 
-<!-- 
+<!--
 ```
 brew install graphviz
 conda create -n openevo python=3.8
@@ -84,6 +84,40 @@ $ git clone --recurse-submodules https://github.com/EvolutionGym/evogym.git
 $ cd evogym
 $ conda env create -f environment.yml
 ```
+
+### サンプルプログラム
+
+サンプルプログラムの実行環境を構築します。
+
+1. サンプルプログラムのソースコードを取得する
+
+   Github上にあるサンプルプログラムのソースコードを取得します。
+
+   ```
+   git clone https://github.com/oreilly-japan/OpenEndedCodebook.git
+   ```
+
+2. 作業ディレクトリをリポジトリルートに移動する
+
+   ソースコードを取得できたら、作業ディレクトリをリポジトリルートに移動します。
+
+   ```
+   cd OpenEndedCodebook
+   ```
+
+3. 依存パッケージをインストールします。
+
+   ```
+   pip install -r requirement.txt
+   ```
+
+   本書で使用する依存パッケージの中に、以前のバージョンのライブラリを期待しているものがあります。ただしパッケージの状態により、依存パッケージの依存パッケージがインストールできない状態になっています。そのため `--no-deps` を指定してインストールします。
+
+   ```
+   pip install --no-deps -r requirements-extra.txt
+   ```
+
+これで環境構築は終わりです。
 
 |*注意*：<br>Evolution Gymのインストールの際、プラットフォームによってはエラーが出ることがあります。その際は、こちらのURLをお使いください。<br>https://github.com/oreilly-japan/evogym|
 |:-|
