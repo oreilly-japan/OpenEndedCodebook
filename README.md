@@ -1,4 +1,4 @@
-# wPython‚Å‚Í‚¶‚ß‚éƒI[ƒvƒ“ƒGƒ“ƒh‚Èi‰»“IƒAƒ‹ƒSƒŠƒYƒ€xƒTƒ|[ƒgƒy[ƒW
+# ã€ŽPythonã§ã¯ã˜ã‚ã‚‹ã‚ªãƒ¼ãƒ—ãƒ³ã‚¨ãƒ³ãƒ‰ãªé€²åŒ–çš„ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã€ã‚µãƒãƒ¼ãƒˆãƒšãƒ¼ã‚¸
 
 <!--
 ```
@@ -13,39 +13,39 @@ and install evogym.
 https://evolutiongym.github.io/tutorials/getting-started.html
 -->
 
-## ŠÂ‹«‚ÆƒCƒ“ƒXƒg[ƒ‹•û–@
+## ç’°å¢ƒã¨ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ–¹æ³•
 
-ƒI[ƒvƒ“ƒGƒ“ƒh‚ÈƒAƒ‹ƒSƒŠƒYƒ€‚ðŽÀ‘•Ï‚Ý‚ÌƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€‚ð—pˆÓ‚µ‚Ü‚µ‚½B‚±‚Ì
-ƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€‚É‚ÍA‚¢‚­‚Â‚©‚ÌŽÀŒ±‚ð—pˆÓ‚µ‚Ä‚¢‚Ü‚·B‚»‚ê‚ç‚ð“®ì‚³‚¹‚È‚ª‚çA
-ƒAƒ‹ƒSƒŠƒYƒ€‚ðŠw‚ñ‚Å‚¢‚½‚¾‚¯‚Ü‚·B‚±‚±‚Å‚ÍƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€‚ÆA‚»‚ÌŽÀsŠÂ‹«‚ÌƒC
-ƒ“ƒXƒg[ƒ‹•û–@‚ðà–¾‚µ‚Ü‚·B
+ã‚ªãƒ¼ãƒ—ãƒ³ã‚¨ãƒ³ãƒ‰ãªã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’å®Ÿè£…æ¸ˆã¿ã®ã‚µãƒ³ãƒ—ãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’ç”¨æ„ã—ã¾ã—ãŸã€‚ã“ã®
+ã‚µãƒ³ãƒ—ãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«ã¯ã€ã„ãã¤ã‹ã®å®Ÿé¨“ã‚’ç”¨æ„ã—ã¦ã„ã¾ã™ã€‚ãã‚Œã‚‰ã‚’å‹•ä½œã•ã›ãªãŒã‚‰ã€
+ã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’å­¦ã‚“ã§ã„ãŸã ã‘ã¾ã™ã€‚ã“ã“ã§ã¯ã‚µãƒ³ãƒ—ãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¨ã€ãã®å®Ÿè¡Œç’°å¢ƒã®ã‚¤
+ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ–¹æ³•ã‚’èª¬æ˜Žã—ã¾ã™ã€‚
 
-### Python‚ÆAnaconda
+### Pythonã¨Anaconda
 
-ƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€‚ÍPython‚ÅŽÀ‘•‚³‚ê‚Ä‚¢‚Ü‚·B‚Ü‚½–{‘‚ÅŽg—p‚µ‚Ä‚¢‚éEvolution
-Gym 1.0‚ÍPython 3.8‚ðƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚·B‚»‚Ì‚½‚ß–{‘‚Å‚àAPython 3.8‚ðŽg—p‚µ‚Ü
-‚·BPython 3.8‚ÌƒCƒ“ƒXƒg[ƒ‹•û–@‚É‚Â‚¢‚Ä‚ÍŠ„ˆ¤‚µ‚Ü‚·B‚Ü‚½Anaconda‚ðŽg—p‚µ‚Ü‚·
-‚ªAAnaconda‚ÌƒCƒ“ƒXƒg[ƒ‹•û–@‚É‚Â‚¢‚Ä‚ÍŠ„ˆ¤‚µ‚Ü‚·B
+ã‚µãƒ³ãƒ—ãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯Pythonã§å®Ÿè£…ã•ã‚Œã¦ã„ã¾ã™ã€‚ã¾ãŸæœ¬æ›¸ã§ä½¿ç”¨ã—ã¦ã„ã‚‹Evolution
+Gym 1.0ã¯Python 3.8ã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã¾ã™ã€‚ãã®ãŸã‚æœ¬æ›¸ã§ã‚‚ã€Python 3.8ã‚’ä½¿ç”¨ã—ã¾
+ã™ã€‚Python 3.8ã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ–¹æ³•ã«ã¤ã„ã¦ã¯å‰²æ„›ã—ã¾ã™ã€‚ã¾ãŸAnacondaã‚’ä½¿ç”¨ã—ã¾ã™
+ãŒã€Anacondaã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ–¹æ³•ã«ã¤ã„ã¦ã¯å‰²æ„›ã—ã¾ã™ã€‚
 
- - PythonFhttps://www.python.org/downloads/
- - AnacondaFhttps://docs.anaconda.com/
+ - Pythonï¼šhttps://www.python.org/downloads/
+ - Anacondaï¼šhttps://docs.anaconda.com/
 
 ### Evolution Gym
 
-ƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€‚Å‚ÍEvolution Gym‚ðŽg‚¢‚Ü‚·BEvolution Gym‚ÍƒVƒ~ƒ…ƒŒ[ƒVƒ‡
-ƒ“‚ÌŒ‹‰Ê‚ð•\Ž¦‚·‚é‚½‚ß‚ÉOpenGL‚ðŽg—p‚µAƒCƒ“ƒXƒg[ƒ‹Žž‚ÉƒVƒ~ƒ…ƒŒ[ƒ^‚ðƒrƒ‹ƒh‚µ
-‚Ü‚·Bƒrƒ‹ƒh‚É‚Í’Ç‰Á‚Ìƒ‰ƒCƒuƒ‰ƒŠ‚ª•K—v‚É‚È‚è‚Ü‚·B
+ã‚µãƒ³ãƒ—ãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã§ã¯Evolution Gymã‚’ä½¿ã„ã¾ã™ã€‚Evolution Gymã¯ã‚·ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§
+ãƒ³ã®çµæžœã‚’è¡¨ç¤ºã™ã‚‹ãŸã‚ã«OpenGLã‚’ä½¿ç”¨ã—ã€ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ™‚ã«ã‚·ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿ã‚’ãƒ“ãƒ«ãƒ‰ã—
+ã¾ã™ã€‚ãƒ“ãƒ«ãƒ‰ã«ã¯è¿½åŠ ã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒªãŒå¿…è¦ã«ãªã‚Šã¾ã™ã€‚
 
 #### Windows
 
-Windows‚Å‚ÍŽ–‘O‚ÉGit‚ÆVisual Studio‚ðƒCƒ“ƒXƒg[ƒ‹‚·‚é•K—v‚ª‚ ‚è‚Ü‚·BˆË‘¶ƒ‰
-ƒCƒuƒ‰ƒŠ‚ðƒCƒ“ƒXƒg[ƒ‹‚·‚é‚É‚Í `winget` ƒRƒ}ƒ“ƒh‚ð—p‚¢‚Ü‚·B
+Windowsã§ã¯äº‹å‰ã«Gitã¨Visual Studioã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚ä¾å­˜ãƒ©
+ã‚¤ãƒ–ãƒ©ãƒªã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹ã«ã¯ `winget` ã‚³ãƒžãƒ³ãƒ‰ã‚’ç”¨ã„ã¾ã™ã€‚
 
 ```
 $ winget install cmake
 ```
 
-‚»‚ÌŒãA`conda` ƒRƒ}ƒ“ƒh‚ÅEvolution Gym‚ðƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·B
+ãã®å¾Œã€`conda` ã‚³ãƒžãƒ³ãƒ‰ã§Evolution Gymã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¾ã™ã€‚
 
 ```
 $ git clone --recurse-submodules https://github.com/EvolutionGym/evogym.git
@@ -53,16 +53,16 @@ $ cd evogym
 $ conda env create -f environment.yml
 ```
 
-#### GNU/Linuxi—á‚Æ‚µ‚ÄUbuntuj
+#### GNU/Linuxï¼ˆä¾‹ã¨ã—ã¦Ubuntuï¼‰
 
-GNU/Linux‚Ì—á‚Æ‚µ‚ÄUbuntu‚Å‚ÌŠÂ‹«‚Ì\’z•û–@‚ðà–¾‚µ‚Ü‚·BUbuntu‚Å‚ÍaptƒR
-ƒ}ƒ“ƒh‚ð—p‚¢‚ÄˆË‘¶ƒ‰ƒCƒuƒ‰ƒŠ‚ðƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·B
+GNU/Linuxã®ä¾‹ã¨ã—ã¦Ubuntuã§ã®ç’°å¢ƒã®æ§‹ç¯‰æ–¹æ³•ã‚’èª¬æ˜Žã—ã¾ã™ã€‚Ubuntuã§ã¯aptã‚³
+ãƒžãƒ³ãƒ‰ã‚’ç”¨ã„ã¦ä¾å­˜ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¾ã™ã€‚
 
 ```
 $ apt install cmake glfw
 ```
 
-‚»‚ÌŒãA`conda` ƒRƒ}ƒ“ƒh‚ÅEvolution Gym‚ðƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·B
+ãã®å¾Œã€`conda` ã‚³ãƒžãƒ³ãƒ‰ã§Evolution Gymã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¾ã™ã€‚
 
 ```
 $ git clone --recurse-submodules https://github.com/EvolutionGym/evogym.git
@@ -72,52 +72,52 @@ $ conda env create -f environment.yml
 
 #### macOS
 
-macOS‚Ì—á‚Æ‚µ‚ÄHomebrew‚ðŽg‚Á‚½ŠÂ‹«‚Ì\’z•û–@‚ðà–¾‚µ‚Ü‚·B
+macOSã®ä¾‹ã¨ã—ã¦Homebrewã‚’ä½¿ã£ãŸç’°å¢ƒã®æ§‹ç¯‰æ–¹æ³•ã‚’èª¬æ˜Žã—ã¾ã™ã€‚
 
 ```
 $ brew install cmake glfw
 ```
 
-‚»‚ÌŒãA `conda` ƒRƒ}ƒ“ƒh‚ÅEvolution Gym‚ðƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·B
+ãã®å¾Œã€ `conda` ã‚³ãƒžãƒ³ãƒ‰ã§Evolution Gymã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¾ã™ã€‚
 ```
 $ git clone --recurse-submodules https://github.com/EvolutionGym/evogym.git
 $ cd evogym
 $ conda env create -f environment.yml
 ```
 
-### ƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€
+### ã‚µãƒ³ãƒ—ãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ 
 
-ƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€‚ÌŽÀsŠÂ‹«‚ð\’z‚µ‚Ü‚·B
+ã‚µãƒ³ãƒ—ãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®å®Ÿè¡Œç’°å¢ƒã‚’æ§‹ç¯‰ã—ã¾ã™ã€‚
 
-1. ƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€‚Ìƒ\[ƒXƒR[ƒh‚ðŽæ“¾‚·‚é
+1. ã‚µãƒ³ãƒ—ãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰ã‚’å–å¾—ã™ã‚‹
 
-   Githubã‚É‚ ‚éƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€‚Ìƒ\[ƒXƒR[ƒh‚ðŽæ“¾‚µ‚Ü‚·B
+   Githubä¸Šã«ã‚ã‚‹ã‚µãƒ³ãƒ—ãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰ã‚’å–å¾—ã—ã¾ã™ã€‚
 
    ```
    git clone https://github.com/oreilly-japan/OpenEndedCodebook.git
    ```
 
-2. ì‹ÆƒfƒBƒŒƒNƒgƒŠ‚ðƒŠƒ|ƒWƒgƒŠƒ‹[ƒg‚ÉˆÚ“®‚·‚é
+2. ä½œæ¥­ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ãƒªãƒã‚¸ãƒˆãƒªãƒ«ãƒ¼ãƒˆã«ç§»å‹•ã™ã‚‹
 
-   ƒ\[ƒXƒR[ƒh‚ðŽæ“¾‚Å‚«‚½‚çAì‹ÆƒfƒBƒŒƒNƒgƒŠ‚ðƒŠƒ|ƒWƒgƒŠƒ‹[ƒg‚ÉˆÚ“®‚µ‚Ü‚·B
+   ã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰ã‚’å–å¾—ã§ããŸã‚‰ã€ä½œæ¥­ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ãƒªãƒã‚¸ãƒˆãƒªãƒ«ãƒ¼ãƒˆã«ç§»å‹•ã—ã¾ã™ã€‚
 
    ```
    cd OpenEndedCodebook
    ```
 
-3. ˆË‘¶ƒpƒbƒP[ƒW‚ðƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·B
+3. ä¾å­˜ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ã‚’ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¾ã™ã€‚
 
    ```
    pip install -r requirement.txt
    ```
 
-   –{‘‚ÅŽg—p‚·‚éˆË‘¶ƒpƒbƒP[ƒW‚Ì’†‚ÉAˆÈ‘O‚Ìƒo[ƒWƒ‡ƒ“‚Ìƒ‰ƒCƒuƒ‰ƒŠ‚ðŠú‘Ò‚µ‚Ä‚¢‚é‚à‚Ì‚ª‚ ‚è‚Ü‚·B‚½‚¾‚µƒpƒbƒP[ƒW‚Ìó‘Ô‚É‚æ‚èAˆË‘¶ƒpƒbƒP[ƒW‚ÌˆË‘¶ƒpƒbƒP[ƒW‚ªƒCƒ“ƒXƒg[ƒ‹‚Å‚«‚È‚¢ó‘Ô‚É‚È‚Á‚Ä‚¢‚Ü‚·B‚»‚Ì‚½‚ß `--no-deps` ‚ðŽw’è‚µ‚ÄƒCƒ“ƒXƒg[ƒ‹‚µ‚Ü‚·B
+   æœ¬æ›¸ã§ä½¿ç”¨ã™ã‚‹ä¾å­˜ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ã®ä¸­ã«ã€ä»¥å‰ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã‚’æœŸå¾…ã—ã¦ã„ã‚‹ã‚‚ã®ãŒã‚ã‚Šã¾ã™ã€‚ãŸã ã—ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ã®çŠ¶æ…‹ã«ã‚ˆã‚Šã€ä¾å­˜ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ã®ä¾å­˜ãƒ‘ãƒƒã‚±ãƒ¼ã‚¸ãŒã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã§ããªã„çŠ¶æ…‹ã«ãªã£ã¦ã„ã¾ã™ã€‚ãã®ãŸã‚ `--no-deps` ã‚’æŒ‡å®šã—ã¦ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã—ã¾ã™ã€‚
 
    ```
    pip install --no-deps -r requirements-extra.txt
    ```
 
-‚±‚ê‚ÅŠÂ‹«\’z‚ÍI‚í‚è‚Å‚·B
+ã“ã‚Œã§ç’°å¢ƒæ§‹ç¯‰ã¯çµ‚ã‚ã‚Šã§ã™ã€‚
 
-|*’ˆÓ*F<br>Evolution Gym‚ÌƒCƒ“ƒXƒg[ƒ‹‚ÌÛAƒvƒ‰ƒbƒgƒtƒH[ƒ€‚É‚æ‚Á‚Ä‚ÍƒGƒ‰[‚ªo‚é‚±‚Æ‚ª‚ ‚è‚Ü‚·B‚»‚ÌÛ‚ÍA‚±‚¿‚ç‚ÌURL‚ð‚¨Žg‚¢‚­‚¾‚³‚¢B<br>https://github.com/oreilly-japan/evogym|
+|*æ³¨æ„*ï¼š<br>Evolution Gymã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã®éš›ã€ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã«ã‚ˆã£ã¦ã¯ã‚¨ãƒ©ãƒ¼ãŒå‡ºã‚‹ã“ã¨ãŒã‚ã‚Šã¾ã™ã€‚ãã®éš›ã¯ã€ã“ã¡ã‚‰ã®URLã‚’ãŠä½¿ã„ãã ã•ã„ã€‚<br>https://github.com/oreilly-japan/evogym|
 |:-|
