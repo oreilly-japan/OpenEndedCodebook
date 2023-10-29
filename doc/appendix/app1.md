@@ -149,6 +149,11 @@ def eval_genomes(genomes, config, foo):
 「ドメインに依存する処理を実装する」というコメントの箇所に各個体の評価を実装し、その個体の成績を適応度としてgenome.fitnessに設定します。この「ドメインに依存する処理」が今回はクッキー探しゲームとなります。ゲームを組み込んだ、評価関数eval_genomesを改めて実装し直します。
 
 ```python
+import curses
+import itertools
+import math
+import time
+
 from neat.nn import FeedForwardNetwork
 
 def eval_genomes(genomes, config, foo):
