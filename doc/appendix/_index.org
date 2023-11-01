@@ -105,6 +105,8 @@ Evolution Gymのインストールの際、プラットフォームによって�
 
    以下のような画面が表示されたら、インストールは成功です。
 
+   #+CAPTION: シミュレータの起動画面
+   #+ATTR_HTML: :src /OpenEndedCodebook/img/example_f99vlj.png :width 100%
    [[/OpenEndedCodebook/img/example_f99vlj.png]]
 
 インストールができたら、作業ディレクトリを移動しておきます。
