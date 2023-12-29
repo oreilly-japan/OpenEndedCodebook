@@ -108,7 +108,7 @@ $ conda env create -f environment.yml
 3. 依存パッケージをインストールします。
 
    ```
-   pip install -r requirement.txt
+   pip install -r requirements.txt
    ```
 
    本書で使用する依存パッケージの中に、以前のバージョンのライブラリを期待しているものがあります。ただしパッケージの状態により、依存パッケージの依存パッケージがインストールできない状態になっています。そのため `--no-deps` を指定してインストールします。
